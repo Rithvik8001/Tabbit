@@ -1,0 +1,10 @@
+node_modules
+.env*
+.expo/
+dist/
+.DS_Store
+.vscode/
+.idea
+.cursor/
+AGENTS.md
+CLAUDE.md
