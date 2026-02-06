@@ -1,5 +1,5 @@
 import { Stack, useRouter } from "expo-router";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
 
 import { PrimaryButton } from "@/design/primitives/primary-button";
@@ -44,28 +44,43 @@ export default function HeroScreen() {
         style={{
           flex: 1,
           justifyContent: "center",
-          gap: spacingTokens.lg,
+          gap: spacingTokens.xl,
           paddingBottom: spacingTokens.xxl,
+          maxWidth: 360,
         }}
       >
-        <Animated.Text
+        <Animated.View
           entering={getEntering(0)}
+          style={{
+            alignSelf: "flex-start",
+            borderRadius: 999,
+            borderCurve: "continuous",
+            borderWidth: 1,
+            borderColor: colorTokens.brand.primaryBorder,
+            backgroundColor: colorTokens.brand.primarySoft,
+            paddingHorizontal: spacingTokens.md,
+            paddingVertical: spacingTokens.sm,
+          }}
+        >
+          <Text
+            style={[
+              typographyTokens.label,
+              {
+                color: colorTokens.brand.primary,
+              },
+            ]}
+          >
+            tabbit
+          </Text>
+        </Animated.View>
+        <Animated.Text
+          entering={getEntering(80)}
           style={[
             typographyTokens.display,
             {
-              color: colorTokens.brand.primary,
-              fontSize: 42,
-              lineHeight: 46,
-              letterSpacing: -1.2,
+              color: colorTokens.text.primary,
             },
           ]}
-        >
-          {onboardingContent.hero.brand}
-        </Animated.Text>
-        <Animated.Text
-          entering={getEntering(80)}
-          selectable
-          style={[typographyTokens.title, { color: colorTokens.text.primary }]}
         >
           {onboardingContent.hero.title}
         </Animated.Text>
@@ -76,7 +91,7 @@ export default function HeroScreen() {
             typographyTokens.body,
             {
               color: colorTokens.text.secondary,
-              maxWidth: 330,
+              maxWidth: 320,
             },
           ]}
         >

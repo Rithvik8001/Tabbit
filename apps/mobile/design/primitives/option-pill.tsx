@@ -62,28 +62,24 @@ export function OptionPill<T extends string>({
           borderRadius: radiusTokens.pill,
           borderCurve: "continuous",
           borderWidth: 1,
-          borderColor: selected
-            ? "rgba(93, 24, 235, 0.42)"
-            : colorTokens.border.subtle,
+          borderColor: selected ? colorTokens.brand.primaryBorder : colorTokens.border.subtle,
           backgroundColor: selected
-            ? colorTokens.brand.primarySoft
-            : "rgba(255, 255, 255, 0.7)",
+            ? "rgba(255, 255, 255, 0.96)"
+            : "rgba(255, 255, 255, 0.72)",
           paddingHorizontal: spacingTokens.lg,
           paddingVertical: spacingTokens.md,
           alignItems: "center",
           justifyContent: "center",
           boxShadow: selected
-            ? "0 12px 20px rgba(93, 24, 235, 0.18)"
-            : "0 6px 12px rgba(17, 19, 26, 0.05)",
+            ? "0 6px 12px rgba(20, 22, 29, 0.08)"
+            : "0 4px 8px rgba(20, 22, 29, 0.04)",
         }}
       >
         <Text
           style={[
             typographyTokens.label,
             {
-              color: selected
-                ? colorTokens.brand.primary
-                : colorTokens.text.secondary,
+              color: selected ? colorTokens.text.primary : colorTokens.text.secondary,
             },
           ]}
         >

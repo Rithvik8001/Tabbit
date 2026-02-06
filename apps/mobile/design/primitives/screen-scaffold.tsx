@@ -50,7 +50,9 @@ export function ScreenScaffold({
             paddingHorizontal: spacingTokens.screenHorizontal,
             paddingTop: spacingTokens.md,
             paddingBottom: Math.max(insets.bottom, spacingTokens.lg),
-            backgroundColor: "rgba(247, 248, 252, 0.82)",
+            borderTopWidth: 1,
+            borderTopColor: colorTokens.border.subtle,
+            backgroundColor: "rgba(245, 246, 248, 0.94)",
           }}
         >
           {footer}

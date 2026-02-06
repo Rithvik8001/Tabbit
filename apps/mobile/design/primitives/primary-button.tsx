@@ -72,19 +72,19 @@ export function PrimaryButton({
           borderWidth: 1,
           borderColor: isSecondary
             ? colorTokens.border.subtle
-            : "rgba(93, 24, 235, 0.16)",
+            : colorTokens.brand.primary,
           backgroundColor: disabled
-            ? "rgba(93, 24, 235, 0.38)"
+            ? "rgba(20, 22, 29, 0.20)"
             : isSecondary
-              ? "rgba(255, 255, 255, 0.60)"
+              ? colorTokens.surface.elevated
               : colorTokens.brand.primary,
           paddingVertical: spacingTokens.lg,
           paddingHorizontal: spacingTokens.xl,
           alignItems: "center",
           justifyContent: "center",
           boxShadow: isSecondary
-            ? "0 10px 24px rgba(17, 19, 26, 0.08)"
-            : "0 14px 28px rgba(93, 24, 235, 0.28)",
+            ? "0 6px 14px rgba(20, 22, 29, 0.06)"
+            : "0 10px 18px rgba(20, 22, 29, 0.14)",
         }}
       >
         <Text

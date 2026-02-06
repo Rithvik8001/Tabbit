@@ -20,7 +20,7 @@ export function GlassCard({
   children,
   style,
   contentStyle,
-  intensity = 36,
+  intensity = 24,
 }: GlassCardProps) {
   return (
     <View
@@ -31,7 +31,7 @@ export function GlassCard({
           borderCurve: "continuous",
           borderWidth: 1,
           borderColor: colorTokens.border.glass,
-          boxShadow: "0 18px 40px rgba(93, 24, 235, 0.10)",
+          boxShadow: "0 8px 22px rgba(20, 22, 29, 0.06)",
         },
         style,
       ]}
@@ -42,7 +42,7 @@ export function GlassCard({
             style={[
               {
                 padding: spacingTokens.xl,
-                backgroundColor: "rgba(255, 255, 255, 0.36)",
+                backgroundColor: "rgba(255, 255, 255, 0.52)",
               },
               contentStyle,
             ]}

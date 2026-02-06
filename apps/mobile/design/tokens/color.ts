@@ -1,28 +1,25 @@
 export const colorTokens = {
   brand: {
     primary: "#5D18EB",
-    primarySoft: "#EFE7FF",
+    primarySoft: "#F3EEFF",
+    primaryBorder: "rgba(93, 24, 235, 0.28)",
   },
   text: {
-    primary: "#11131A",
-    secondary: "#5A6072",
-    muted: "#7B8193",
+    primary: "#14161D",
+    secondary: "#5F6472",
+    muted: "#8A8F9E",
     inverse: "#FFFFFF",
   },
   surface: {
-    base: "#F7F8FC",
-    glass: "rgba(255, 255, 255, 0.66)",
+    base: "#F5F6F8",
+    glass: "rgba(255, 255, 255, 0.72)",
     card: "#FFFFFF",
-    elevated: "#FFFFFF",
+    elevated: "#FCFCFD",
   },
   border: {
-    glass: "rgba(255, 255, 255, 0.78)",
-    subtle: "rgba(17, 19, 26, 0.08)",
-  },
-  orb: {
-    primary: "rgba(93, 24, 235, 0.25)",
-    secondary: "rgba(123, 205, 255, 0.24)",
-    tertiary: "rgba(232, 196, 255, 0.24)",
+    glass: "rgba(255, 255, 255, 0.85)",
+    subtle: "rgba(20, 22, 29, 0.10)",
+    strong: "rgba(20, 22, 29, 0.16)",
   },
 } as const;
 

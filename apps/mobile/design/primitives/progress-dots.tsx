@@ -22,10 +22,10 @@ type ProgressDotProps = {
 
 function ProgressDot({ isActive }: ProgressDotProps) {
   const shouldReduceMotion = useReducedMotion();
-  const dotWidth = useSharedValue(isActive ? 24 : 8);
+  const dotWidth = useSharedValue(isActive ? 20 : 7);
 
   useEffect(() => {
-    dotWidth.value = withTiming(isActive ? 24 : 8, {
+    dotWidth.value = withTiming(isActive ? 20 : 7, {
       duration: shouldReduceMotion ? 0 : motionTokens.duration.transition,
     });
   }, [dotWidth, isActive, shouldReduceMotion]);
@@ -44,7 +44,7 @@ function ProgressDot({ isActive }: ProgressDotProps) {
           borderRadius: 999,
           backgroundColor: isActive
             ? colorTokens.brand.primary
-            : "rgba(93, 24, 235, 0.2)",
+            : "rgba(20, 22, 29, 0.16)",
         },
         animatedStyle,
       ]}
