@@ -48,6 +48,30 @@ export type SettingsPreview = {
   smartRemindersEnabled: boolean;
 };
 
+export type FriendBalanceDirection = "you_owe" | "you_are_owed";
+
+export type FriendBalanceSummary = {
+  id: string;
+  name: string;
+  amount: number;
+  direction: FriendBalanceDirection;
+};
+
+export type FriendActivityItem = {
+  id: string;
+  title: string;
+  amount: number;
+  direction: FriendBalanceDirection;
+};
+
+export type FriendProfile = {
+  id: string;
+  name: string;
+  balance: number;
+  direction: FriendBalanceDirection;
+  activity: FriendActivityItem[];
+};
+
 export const dashboardSnapshot: DashboardSnapshot = {
   totalBalance: 248.4,
   dueSoon: 64.75,
@@ -146,6 +170,90 @@ export const settingsPreview: SettingsPreview = {
   smartRemindersEnabled: false,
 };
 
+export const friendBalances: FriendBalanceSummary[] = [
+  { id: "friend_1", name: "Aanya", amount: 42.5, direction: "you_are_owed" },
+  { id: "friend_2", name: "Rahul", amount: 18.0, direction: "you_owe" },
+  { id: "friend_3", name: "Mira", amount: 9.75, direction: "you_are_owed" },
+  { id: "friend_4", name: "Vikram", amount: 31.1, direction: "you_owe" },
+];
+
+export const friendProfiles: FriendProfile[] = [
+  {
+    id: "friend_1",
+    name: "Aanya",
+    balance: 42.5,
+    direction: "you_are_owed",
+    activity: [
+      {
+        id: "friend_activity_1",
+        title: "Concert tickets",
+        amount: 30,
+        direction: "you_are_owed",
+      },
+      {
+        id: "friend_activity_2",
+        title: "Dinner split",
+        amount: 12.5,
+        direction: "you_are_owed",
+      },
+    ],
+  },
+  {
+    id: "friend_2",
+    name: "Rahul",
+    balance: 18,
+    direction: "you_owe",
+    activity: [
+      {
+        id: "friend_activity_3",
+        title: "Cab fare",
+        amount: 8,
+        direction: "you_owe",
+      },
+      {
+        id: "friend_activity_4",
+        title: "Coffee run",
+        amount: 10,
+        direction: "you_owe",
+      },
+    ],
+  },
+  {
+    id: "friend_3",
+    name: "Mira",
+    balance: 9.75,
+    direction: "you_are_owed",
+    activity: [
+      {
+        id: "friend_activity_5",
+        title: "Brunch split",
+        amount: 9.75,
+        direction: "you_are_owed",
+      },
+    ],
+  },
+  {
+    id: "friend_4",
+    name: "Vikram",
+    balance: 31.1,
+    direction: "you_owe",
+    activity: [
+      {
+        id: "friend_activity_6",
+        title: "Movie tickets",
+        amount: 20,
+        direction: "you_owe",
+      },
+      {
+        id: "friend_activity_7",
+        title: "Snacks",
+        amount: 11.1,
+        direction: "you_owe",
+      },
+    ],
+  },
+];
+
 export function formatCurrency(amount: number): string {
   const sign = amount < 0 ? "-" : "";
   return `${sign}$${Math.abs(amount).toFixed(2)}`;
@@ -165,4 +273,8 @@ export function formatShortDate(value: string): string {
   } catch {
     return parsed.toISOString().slice(0, 10);
   }
+}
+
+export function findFriendProfile(friendId: string): FriendProfile | undefined {
+  return friendProfiles.find((profile) => profile.id === friendId);
 }
