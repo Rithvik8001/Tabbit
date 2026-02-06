@@ -2,11 +2,17 @@ import { supabase } from "@/features/auth/lib/supabase-client";
 import type {
   CreateGroupInput,
   Group,
+  GroupListItem,
+  GroupListRow,
   GroupRow,
+  UpdateGroupInput,
 } from "@/features/groups/types/group.types";
 
 const groupColumns =
   "id, name, emoji, group_type, created_by, created_at, updated_at";
+
+const groupListColumns =
+  "id, name, emoji, group_type, created_by, created_at, updated_at, group_members(count)";
 
 type GroupsRepositoryResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
@@ -19,6 +25,13 @@ function mapGroupRow(row: GroupRow): Group {
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+function mapGroupListRow(row: GroupListRow): GroupListItem {
+  return {
+    ...mapGroupRow(row),
+    memberCount: row.group_members?.[0]?.count ?? 0,
   };
 }
 
@@ -49,13 +62,10 @@ function normalizeGroupsError(
   return error.message || fallbackMessage;
 }
 
-export async function listGroupsForUser(
-  userId: string,
-): Promise<GroupsRepositoryResult<Group[]>> {
+export async function listGroupsForUser(): Promise<GroupsRepositoryResult<GroupListItem[]>> {
   const { data, error } = await supabase
     .from("groups")
-    .select(groupColumns)
-    .eq("created_by", userId)
+    .select(groupListColumns)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -65,11 +75,33 @@ export async function listGroupsForUser(
     };
   }
 
-  const rows = (data ?? []) as GroupRow[];
+  const rows = (data ?? []) as GroupListRow[];
 
   return {
     ok: true,
-    data: rows.map(mapGroupRow),
+    data: rows.map(mapGroupListRow),
+  };
+}
+
+export async function getGroupById(
+  groupId: string,
+): Promise<GroupsRepositoryResult<Group>> {
+  const { data, error } = await supabase
+    .from("groups")
+    .select(groupColumns)
+    .eq("id", groupId)
+    .single();
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeGroupsError("Unable to load this group.", error),
+    };
+  }
+
+  return {
+    ok: true,
+    data: mapGroupRow(data as GroupRow),
   };
 }
 
@@ -99,4 +131,51 @@ export async function createGroup(
     ok: true,
     data: mapGroupRow(data as GroupRow),
   };
+}
+
+export async function updateGroup(
+  groupId: string,
+  input: UpdateGroupInput,
+): Promise<GroupsRepositoryResult<Group>> {
+  const updates: Record<string, unknown> = {};
+  if (input.name !== undefined) updates.name = input.name.trim();
+  if (input.emoji !== undefined) updates.emoji = input.emoji.trim();
+  if (input.groupType !== undefined) updates.group_type = input.groupType;
+
+  const { data, error } = await supabase
+    .from("groups")
+    .update(updates)
+    .eq("id", groupId)
+    .select(groupColumns)
+    .single();
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeGroupsError("Unable to update this group.", error),
+    };
+  }
+
+  return {
+    ok: true,
+    data: mapGroupRow(data as GroupRow),
+  };
+}
+
+export async function deleteGroup(
+  groupId: string,
+): Promise<GroupsRepositoryResult<void>> {
+  const { error } = await supabase
+    .from("groups")
+    .delete()
+    .eq("id", groupId);
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeGroupsError("Unable to delete this group.", error),
+    };
+  }
+
+  return { ok: true, data: undefined };
 }

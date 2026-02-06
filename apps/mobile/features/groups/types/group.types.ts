@@ -25,3 +25,17 @@ export type CreateGroupInput = {
   emoji: string;
   groupType: GroupType;
 };
+
+export type UpdateGroupInput = {
+  name?: string;
+  emoji?: string;
+  groupType?: GroupType;
+};
+
+export type GroupListItem = Group & {
+  memberCount: number;
+};
+
+export type GroupListRow = GroupRow & {
+  group_members: { count: number }[];
+};

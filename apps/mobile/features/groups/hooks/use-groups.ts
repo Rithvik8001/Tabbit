@@ -6,7 +6,7 @@ import {
   createGroup as createGroupRecord,
   listGroupsForUser,
 } from "@/features/groups/lib/groups-repository";
-import type { CreateGroupInput, Group } from "@/features/groups/types/group.types";
+import type { CreateGroupInput, GroupListItem } from "@/features/groups/types/group.types";
 
 type UseGroupsOptions = {
   autoRefreshOnFocus?: boolean;
@@ -15,7 +15,7 @@ type UseGroupsOptions = {
 type CreateGroupActionResult = { ok: true } | { ok: false; message: string };
 
 type UseGroupsValue = {
-  groups: Group[];
+  groups: GroupListItem[];
   isLoading: boolean;
   isCreating: boolean;
   error: string | null;
@@ -26,7 +26,7 @@ type UseGroupsValue = {
 export function useGroups(options: UseGroupsOptions = {}): UseGroupsValue {
   const { autoRefreshOnFocus = true } = options;
   const { user } = useAuth();
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [groups, setGroups] = useState<GroupListItem[]>([]);
   const [isLoading, setIsLoading] = useState(autoRefreshOnFocus);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export function useGroups(options: UseGroupsOptions = {}): UseGroupsValue {
 
     setIsLoading(true);
 
-    const result = await listGroupsForUser(user.id);
+    const result = await listGroupsForUser();
 
     if (!result.ok) {
       setError(result.message);
@@ -86,15 +86,12 @@ export function useGroups(options: UseGroupsOptions = {}): UseGroupsValue {
         };
       }
 
-      setGroups((previous) => [
-        result.data,
-        ...previous.filter((group) => group.id !== result.data.id),
-      ]);
-      setError(null);
+      // Refresh full list to get accurate member counts
+      void refresh();
 
       return { ok: true };
     },
-    [user?.id],
+    [user?.id, refresh],
   );
 
   return {

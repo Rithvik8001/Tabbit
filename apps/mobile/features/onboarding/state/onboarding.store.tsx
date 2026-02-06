@@ -11,12 +11,14 @@ type OnboardingStoreValue = {
   draft: OnboardingDraft;
   setSplitStyle: (value: SplitStyle) => void;
   setUseContextValue: (value: OnboardingUseContext) => void;
+  setDisplayName: (value: string) => void;
   resetDraft: () => void;
 };
 
 const initialDraft: OnboardingDraft = {
   splitStyle: null,
   useContext: null,
+  displayName: null,
 };
 
 const OnboardingStoreContext = createContext<OnboardingStoreValue | null>(null);
@@ -32,6 +34,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       },
       setUseContextValue: (nextUseContext) => {
         setDraft((prevDraft) => ({ ...prevDraft, useContext: nextUseContext }));
+      },
+      setDisplayName: (nextDisplayName) => {
+        setDraft((prevDraft) => ({ ...prevDraft, displayName: nextDisplayName }));
       },
       resetDraft: () => {
         setDraft(initialDraft);

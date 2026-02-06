@@ -24,5 +24,6 @@ export type AuthActionResult = {
 export type PendingOnboardingPayload = {
   splitStyle: SplitStyle;
   useContext: UseContext;
+  displayName: string | null;
   createdAt: string;
 };

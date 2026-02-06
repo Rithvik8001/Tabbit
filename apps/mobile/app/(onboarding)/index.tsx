@@ -20,6 +20,7 @@ import {
   isValidEmail,
   isValidPassword,
 } from "@/features/auth/utils/auth-validation";
+import { setPendingOnboarding } from "@/features/onboarding/storage/pending-onboarding";
 
 type AuthModalType = "signup" | "login" | null;
 
@@ -141,6 +142,7 @@ export default function OnboardingScreen() {
 
   const [activeModal, setActiveModal] = useState<AuthModalType>(null);
 
+  const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirm, setSignupConfirm] = useState("");
@@ -185,6 +187,16 @@ export default function OnboardingScreen() {
 
     setSignupError(null);
     setIsSignupSubmitting(true);
+
+    const trimmedName = signupName.trim();
+    if (trimmedName) {
+      void setPendingOnboarding({
+        splitStyle: "equal",
+        useContext: "friends",
+        displayName: trimmedName,
+        createdAt: new Date().toISOString(),
+      });
+    }
 
     void (async () => {
       const result = await signUpWithPassword(signupEmail.trim(), signupPassword);
@@ -533,6 +545,21 @@ export default function OnboardingScreen() {
 
               {activeModal === "signup" ? (
                 <>
+                  <View style={{ gap: 10 }}>
+                    <Text
+                      selectable
+                      style={{
+                        color: "#0E1116",
+                        fontSize: 16,
+                        lineHeight: 16,
+                        fontWeight: "700",
+                      }}
+                    >
+                      Your name
+                    </Text>
+                    {lunaInput(signupName, setSignupName, "What should we call you?")}
+                  </View>
+
                   <View style={{ gap: 10 }}>
                     <Text
                       selectable

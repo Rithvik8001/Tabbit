@@ -5,4 +5,5 @@ export type UseContext = "roommates" | "travel" | "couple" | "friends";
 export interface OnboardingDraft {
   splitStyle: SplitStyle | null;
   useContext: UseContext | null;
+  displayName: string | null;
 }

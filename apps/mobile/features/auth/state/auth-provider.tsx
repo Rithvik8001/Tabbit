@@ -168,6 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: session?.user.email ?? null,
           split_style: pendingOnboarding.splitStyle,
           use_context: pendingOnboarding.useContext,
+          display_name: pendingOnboarding.displayName ?? null,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" },

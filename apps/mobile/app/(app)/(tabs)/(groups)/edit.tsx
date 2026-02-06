@@ -1,13 +1,13 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import {
   GROUP_DEFAULT_EMOJI_BY_TYPE,
   GROUP_EMOJI_OPTIONS,
   GROUP_TYPE_PRESETS,
 } from "@/features/groups/constants/group-presets";
-import { useGroups } from "@/features/groups/hooks/use-groups";
+import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import type { GroupType } from "@/features/groups/types/group.types";
 
 const surface = "#FFFFFF";
@@ -17,14 +17,25 @@ const muted = "#5C6780";
 const accent = "#4A29FF";
 const maxGroupNameLength = 40;
 
-export default function CreateGroupScreen() {
+export default function EditGroupScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { createGroup, isCreating } = useGroups({ autoRefreshOnFocus: false });
-  const [name, setName] = useState("");
-  const [groupType, setGroupType] = useState<GroupType>("other");
-  const [emoji, setEmoji] = useState(GROUP_DEFAULT_EMOJI_BY_TYPE.other);
-  const [hasManuallySelectedEmoji, setHasManuallySelectedEmoji] = useState(false);
+  const { group, updateGroup, deleteGroup, isUpdating, isDeleting } = useGroupDetail(id);
+
+  const [name, setName] = useState(group?.name ?? "");
+  const [groupType, setGroupType] = useState<GroupType>(group?.groupType ?? "other");
+  const [emoji, setEmoji] = useState(group?.emoji ?? GROUP_DEFAULT_EMOJI_BY_TYPE.other);
+  const [hasManuallySelectedEmoji, setHasManuallySelectedEmoji] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
+
+  // Sync initial values once group loads
+  if (group && !initialized) {
+    setName(group.name);
+    setGroupType(group.groupType);
+    setEmoji(group.emoji);
+    setInitialized(true);
+  }
 
   const handleSelectType = (nextType: GroupType) => {
     setGroupType(nextType);
@@ -39,7 +50,7 @@ export default function CreateGroupScreen() {
     setHasManuallySelectedEmoji(true);
   };
 
-  const handleCreate = () => {
+  const handleSave = () => {
     const trimmedName = name.trim();
 
     if (trimmedName.length === 0) {
@@ -60,7 +71,7 @@ export default function CreateGroupScreen() {
     setFormError(null);
 
     void (async () => {
-      const result = await createGroup({
+      const result = await updateGroup({
         name: trimmedName,
         emoji,
         groupType,
@@ -75,6 +86,30 @@ export default function CreateGroupScreen() {
     })();
   };
 
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Group",
+      "Are you sure you want to delete this group? This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            void (async () => {
+              const result = await deleteGroup();
+              if (result.ok) {
+                router.dismiss(2);
+              } else {
+                Alert.alert("Error", result.message);
+              }
+            })();
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -87,6 +122,7 @@ export default function CreateGroupScreen() {
         gap: 12,
       }}
     >
+      {/* Group name */}
       <View
         style={{
           borderRadius: 20,
@@ -127,7 +163,6 @@ export default function CreateGroupScreen() {
           placeholder="e.g. Summer in Tokyo"
           placeholderTextColor="#A2ABBC"
           selectionColor={accent}
-          autoFocus
           style={{
             borderRadius: 14,
             borderCurve: "continuous",
@@ -144,6 +179,7 @@ export default function CreateGroupScreen() {
         />
       </View>
 
+      {/* Group type */}
       <View
         style={{
           borderRadius: 20,
@@ -209,6 +245,7 @@ export default function CreateGroupScreen() {
         </View>
       </View>
 
+      {/* Group emoji */}
       <View
         style={{
           borderRadius: 20,
@@ -280,6 +317,7 @@ export default function CreateGroupScreen() {
         </View>
       </View>
 
+      {/* Error display */}
       {formError ? (
         <View
           style={{
@@ -300,18 +338,19 @@ export default function CreateGroupScreen() {
         </View>
       ) : null}
 
+      {/* Save button */}
       <Pressable
         accessibilityRole="button"
-        disabled={isCreating}
-        onPress={handleCreate}
+        disabled={isUpdating}
+        onPress={handleSave}
         style={{
           borderRadius: 16,
           borderCurve: "continuous",
-          backgroundColor: isCreating ? "#9A8CFF" : accent,
+          backgroundColor: isUpdating ? "#9A8CFF" : accent,
           paddingVertical: 14,
           alignItems: "center",
           justifyContent: "center",
-          opacity: isCreating ? 0.8 : 1,
+          opacity: isUpdating ? 0.8 : 1,
         }}
       >
         <Text
@@ -323,7 +362,37 @@ export default function CreateGroupScreen() {
             fontWeight: "700",
           }}
         >
-          {isCreating ? "Creating..." : "Create Group"}
+          {isUpdating ? "Saving..." : "Save Changes"}
+        </Text>
+      </Pressable>
+
+      {/* Delete button */}
+      <Pressable
+        accessibilityRole="button"
+        disabled={isDeleting}
+        onPress={handleDelete}
+        style={{
+          borderRadius: 16,
+          borderCurve: "continuous",
+          borderWidth: 1,
+          borderColor: "#F5D1D1",
+          backgroundColor: "#FFF6F6",
+          paddingVertical: 14,
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: isDeleting ? 0.6 : 1,
+        }}
+      >
+        <Text
+          selectable
+          style={{
+            color: "#B03030",
+            fontSize: 16,
+            lineHeight: 20,
+            fontWeight: "700",
+          }}
+        >
+          {isDeleting ? "Deleting..." : "Delete Group"}
         </Text>
       </Pressable>
     </ScrollView>

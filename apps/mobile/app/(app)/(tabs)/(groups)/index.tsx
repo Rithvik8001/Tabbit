@@ -1,4 +1,5 @@
-import { Stack, useRouter } from "expo-router";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Link, Stack, useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { GroupEmptyState } from "@/features/groups/components/group-empty-state";
@@ -79,6 +80,7 @@ export default function GroupsTabScreen() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         paddingHorizontal: 20,
+        paddingTop: 10,
         paddingBottom: 24,
         gap: 12,
       }}
@@ -92,21 +94,18 @@ export default function GroupsTabScreen() {
               onPress={openCreateScreen}
               hitSlop={8}
               style={{
-                width: 28,
-                height: 28,
+                width: 36,
+                height: 36,
                 borderRadius: 999,
                 borderCurve: "continuous",
                 backgroundColor: "#ECE9FF",
+                borderWidth: 1,
+                borderColor: "#E2DDFF",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Text
-                selectable
-                style={{ color: accent, fontSize: 20, lineHeight: 20, fontWeight: "700" }}
-              >
-                +
-              </Text>
+              <FontAwesome name="plus" size={14} color={accent} />
             </Pressable>
           ),
         }}
@@ -171,62 +170,77 @@ export default function GroupsTabScreen() {
 
       {!isLoading && !error
         ? groups.map((group) => (
-            <View
+            <Link
               key={group.id}
-              style={{
-                borderRadius: 20,
-                borderCurve: "continuous",
-                borderWidth: 1,
-                borderColor: stroke,
-                backgroundColor: surface,
-                padding: 16,
-                gap: 10,
+              href={{
+                pathname: "/(app)/(tabs)/(groups)/[id]",
+                params: { id: group.id },
               }}
+              asChild
             >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                <View
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 999,
-                    borderCurve: "continuous",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#F4F2FF",
-                  }}
-                >
-                  <Text selectable style={{ fontSize: 22, lineHeight: 26 }}>
-                    {group.emoji}
-                  </Text>
-                </View>
-                <View style={{ flex: 1, gap: 4 }}>
-                  <Text
-                    selectable
-                    style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
-                  >
-                    {group.name}
-                  </Text>
-                  <Text
-                    selectable
-                    style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
-                  >
-                    {getGroupTypeLabel(group.groupType)} group
-                  </Text>
-                </View>
-              </View>
-
-              <Text
-                selectable
+              <Pressable
                 style={{
-                  color: muted,
-                  fontSize: 14,
-                  lineHeight: 18,
-                  fontWeight: "500",
+                  borderRadius: 20,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: stroke,
+                  backgroundColor: surface,
+                  padding: 16,
+                  gap: 10,
                 }}
               >
-                1 member • No expenses yet
-              </Text>
-            </View>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                  <View
+                    style={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: 999,
+                      borderCurve: "continuous",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "#F4F2FF",
+                    }}
+                  >
+                    <Text selectable style={{ fontSize: 22, lineHeight: 26 }}>
+                      {group.emoji}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <Text
+                      selectable
+                      style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
+                    >
+                      {group.name}
+                    </Text>
+                    <Text
+                      selectable
+                      style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+                    >
+                      {getGroupTypeLabel(group.groupType)} group
+                    </Text>
+                  </View>
+                  <Text
+                    selectable
+                    style={{ color: muted, fontSize: 20, lineHeight: 24, fontWeight: "600" }}
+                  >
+                    ›
+                  </Text>
+                </View>
+
+                <Text
+                  selectable
+                  style={{
+                    color: muted,
+                    fontSize: 14,
+                    lineHeight: 18,
+                    fontWeight: "500",
+                  }}
+                >
+                  {group.memberCount} {group.memberCount === 1 ? "member" : "members"} · No
+                  expenses yet
+                </Text>
+              </Pressable>
+            </Link>
           ))
         : null}
     </ScrollView>
