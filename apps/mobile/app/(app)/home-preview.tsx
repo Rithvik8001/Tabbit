@@ -10,6 +10,7 @@ import { colorTokens } from "@/design/tokens/color";
 import { motionTokens } from "@/design/tokens/motion";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyTokens } from "@/design/tokens/typography";
+import { useAuth } from "@/features/auth/state/auth-provider";
 import { useOnboardingStore } from "@/features/onboarding/state/onboarding.store";
 
 export default function HomePreviewScreen() {
@@ -17,6 +18,7 @@ export default function HomePreviewScreen() {
   const shouldReduceMotion = useReducedMotion();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
+  const { signOut } = useAuth();
   const { draft, resetDraft } = useOnboardingStore();
 
   const isCompact = height < 780;
@@ -44,7 +46,10 @@ export default function HomePreviewScreen() {
         >
           <Text
             selectable
-            style={[typographyTokens.label, { color: colorTokens.text.secondary }]}
+            style={[
+              typographyTokens.label,
+              { color: colorTokens.text.secondary },
+            ]}
           >
             Tabbit Preview
           </Text>
@@ -81,7 +86,10 @@ export default function HomePreviewScreen() {
             <View style={{ gap: spacingTokens.xs }}>
               <Text
                 selectable
-                style={[typographyTokens.label, { color: colorTokens.text.secondary }]}
+                style={[
+                  typographyTokens.label,
+                  { color: colorTokens.text.secondary },
+                ]}
               >
                 Total owed to you
               </Text>
@@ -91,8 +99,12 @@ export default function HomePreviewScreen() {
                   typographyTokens.display,
                   {
                     color: colorTokens.text.primary,
-                    fontSize: isCompact ? 42 : typographyTokens.display.fontSize,
-                    lineHeight: isCompact ? 46 : typographyTokens.display.lineHeight,
+                    fontSize: isCompact
+                      ? 42
+                      : typographyTokens.display.fontSize,
+                    lineHeight: isCompact
+                      ? 46
+                      : typographyTokens.display.lineHeight,
                     fontVariant: ["tabular-nums"],
                   },
                 ]}
@@ -121,7 +133,10 @@ export default function HomePreviewScreen() {
           >
             <Text
               selectable
-              style={[typographyTokens.label, { color: colorTokens.text.primary }]}
+              style={[
+                typographyTokens.label,
+                { color: colorTokens.text.primary },
+              ]}
             >
               At a glance
             </Text>
@@ -145,7 +160,10 @@ export default function HomePreviewScreen() {
               >
                 <Text
                   selectable
-                  style={[typographyTokens.caption, { color: colorTokens.text.muted }]}
+                  style={[
+                    typographyTokens.caption,
+                    { color: colorTokens.text.muted },
+                  ]}
                 >
                   People involved
                 </Text>
@@ -155,8 +173,12 @@ export default function HomePreviewScreen() {
                     typographyTokens.title,
                     {
                       color: colorTokens.text.primary,
-                      fontSize: isCompact ? 20 : typographyTokens.title.fontSize,
-                      lineHeight: isCompact ? 26 : typographyTokens.title.lineHeight,
+                      fontSize: isCompact
+                        ? 20
+                        : typographyTokens.title.fontSize,
+                      lineHeight: isCompact
+                        ? 26
+                        : typographyTokens.title.lineHeight,
                     },
                   ]}
                 >
@@ -190,8 +212,12 @@ export default function HomePreviewScreen() {
                     typographyTokens.title,
                     {
                       color: colorTokens.text.primary,
-                      fontSize: isCompact ? 20 : typographyTokens.title.fontSize,
-                      lineHeight: isCompact ? 26 : typographyTokens.title.lineHeight,
+                      fontSize: isCompact
+                        ? 20
+                        : typographyTokens.title.fontSize,
+                      lineHeight: isCompact
+                        ? 26
+                        : typographyTokens.title.lineHeight,
                     },
                   ]}
                 >
@@ -200,22 +226,23 @@ export default function HomePreviewScreen() {
               </View>
             </View>
             <View style={{ gap: spacingTokens.sm }}>
-              {["Coffee run split equally", "Groceries split by exact amounts"].map(
-                (row) => {
-                  return (
-                    <Text
-                      key={row}
-                      selectable
-                      style={[
-                        typographyTokens.body,
-                        { color: colorTokens.text.secondary },
-                      ]}
-                    >
-                      {row}
-                    </Text>
-                  );
-                },
-              )}
+              {[
+                "Coffee run split equally",
+                "Groceries split by exact amounts",
+              ].map((row) => {
+                return (
+                  <Text
+                    key={row}
+                    selectable
+                    style={[
+                      typographyTokens.body,
+                      { color: colorTokens.text.secondary },
+                    ]}
+                  >
+                    {row}
+                  </Text>
+                );
+              })}
             </View>
           </GlassCard>
         </Animated.View>
@@ -230,11 +257,17 @@ export default function HomePreviewScreen() {
           }}
         >
           <PrimaryButton
-            label="Restart Onboarding"
+            label="Sign Out & Restart Onboarding"
             variant="secondary"
             onPress={() => {
-              resetDraft();
-              router.replace("/(onboarding)");
+              void (async () => {
+                const result = await signOut();
+                if (!result.ok) {
+                  return;
+                }
+                resetDraft();
+                router.replace("/(onboarding)");
+              })();
             }}
           />
         </View>

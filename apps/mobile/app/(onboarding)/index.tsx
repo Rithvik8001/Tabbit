@@ -15,6 +15,7 @@ import {
   splitStyleOptions,
   useContextOptions,
 } from "@/features/onboarding/config/onboarding-content";
+import { setPendingOnboarding } from "@/features/onboarding/storage/pending-onboarding";
 import { useOnboardingStore } from "@/features/onboarding/state/onboarding.store";
 
 export default function OnboardingScreen() {
@@ -52,7 +53,19 @@ export default function OnboardingScreen() {
               if (!canContinue) {
                 return;
               }
-              router.replace("/(app)/home-preview");
+              void (async () => {
+                if (!draft.splitStyle || !draft.useContext) {
+                  return;
+                }
+
+                await setPendingOnboarding({
+                  splitStyle: draft.splitStyle,
+                  useContext: draft.useContext,
+                  createdAt: new Date().toISOString(),
+                });
+
+                router.replace("/(auth)/signup");
+              })();
             }}
           />
         </View>
