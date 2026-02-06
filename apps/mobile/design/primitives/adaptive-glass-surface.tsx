@@ -1,8 +1,5 @@
 import { BlurView } from "expo-blur";
-import {
-  GlassView,
-  isLiquidGlassAvailable,
-} from "expo-glass-effect";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import type { ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
 import { View } from "react-native";
@@ -47,7 +44,11 @@ export function AdaptiveGlassSurface({
 
   if (isIOS) {
     return (
-      <BlurView tint="systemMaterial" intensity={blurIntensity} style={baseStyle}>
+      <BlurView
+        tint="systemMaterial"
+        intensity={blurIntensity}
+        style={baseStyle}
+      >
         <View style={contentStyle}>{children}</View>
       </BlurView>
     );

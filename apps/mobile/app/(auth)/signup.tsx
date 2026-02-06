@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { PrimaryButton } from "@/design/primitives/primary-button";
-import { colorTokens } from "@/design/tokens/color";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyTokens } from "@/design/tokens/typography";
+import { premiumAuthUiTokens } from "@/design/tokens/auth-ui";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { AuthTextField } from "@/features/auth/components/auth-text-field";
 import { useAuth } from "@/features/auth/state/auth-provider";
@@ -99,14 +97,14 @@ export default function SignupScreen() {
   return (
     <AuthScreenShell
       title="Create your account"
-      subtitle="Secure sign in, thoughtful defaults, and no visual noise."
+      subtitle="A quieter way to manage shared expenses starts here."
       footer={
-        <View style={{ gap: spacingTokens.sm }}>
+        <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
           <Text
             selectable
             style={[
-              typographyTokens.caption,
-              { color: colorTokens.text.muted },
+              premiumAuthUiTokens.typography.caption,
+              { color: premiumAuthUiTokens.color.textMuted },
             ]}
           >
             {verificationMessage
@@ -114,6 +112,7 @@ export default function SignupScreen() {
               : "By continuing, you agree to Tabbit's terms and privacy policy."}
           </Text>
           <PrimaryButton
+            visualStyle="premiumAuth"
             label={verificationMessage ? "Go to Login" : "Create Account"}
             disabled={isSubmitting}
             onPress={handleSignUp}
@@ -122,12 +121,12 @@ export default function SignupScreen() {
       }
     >
       {verificationMessage ? (
-        <View style={{ gap: spacingTokens.sm }}>
+        <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
           <Text
             selectable
             style={[
-              typographyTokens.body,
-              { color: colorTokens.text.secondary },
+              premiumAuthUiTokens.typography.body,
+              { color: premiumAuthUiTokens.color.textSecondary },
             ]}
           >
             {verificationMessage}
@@ -172,32 +171,50 @@ export default function SignupScreen() {
           {formError ? (
             <Text
               selectable
-              style={[typographyTokens.caption, { color: "rgb(176, 48, 48)" }]}
+              style={[
+                premiumAuthUiTokens.typography.caption,
+                { color: premiumAuthUiTokens.color.error },
+              ]}
             >
               {formError}
             </Text>
           ) : null}
 
-          <PrimaryButton
-            label="Continue with Google"
-            variant="secondary"
-            disabled={isSubmitting}
-            onPress={handleGoogleSignUp}
-          />
+          <View
+            style={{
+              marginTop: premiumAuthUiTokens.spacing.xs,
+              gap: premiumAuthUiTokens.spacing.sm,
+            }}
+          >
+            <View
+              style={{
+                height: 1,
+                backgroundColor: premiumAuthUiTokens.color.divider,
+              }}
+            />
+            <PrimaryButton
+              visualStyle="premiumAuth"
+              label="Continue with Google"
+              variant="secondary"
+              disabled={isSubmitting}
+              onPress={handleGoogleSignUp}
+            />
+          </View>
 
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              gap: spacingTokens.xs,
+              gap: premiumAuthUiTokens.spacing.xs,
+              paddingTop: premiumAuthUiTokens.spacing.xs,
             }}
           >
             <Text
               selectable
               style={[
-                typographyTokens.caption,
-                { color: colorTokens.text.muted },
+                premiumAuthUiTokens.typography.caption,
+                { color: premiumAuthUiTokens.color.textMuted },
               ]}
             >
               Already have an account?
@@ -207,9 +224,9 @@ export default function SignupScreen() {
                 <Text
                   selectable
                   style={[
-                    typographyTokens.caption,
+                    premiumAuthUiTokens.typography.link,
                     {
-                      color: colorTokens.brand.primary,
+                      color: premiumAuthUiTokens.color.accent,
                       textDecorationLine: "underline",
                     },
                   ]}

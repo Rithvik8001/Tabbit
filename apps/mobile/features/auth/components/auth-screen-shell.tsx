@@ -4,11 +4,7 @@ import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
 
 import { AdaptiveGlassSurface } from "@/design/primitives/adaptive-glass-surface";
 import { ScreenScaffold } from "@/design/primitives/screen-scaffold";
-import { colorTokens } from "@/design/tokens/color";
-import { motionTokens } from "@/design/tokens/motion";
-import { radiusTokens } from "@/design/tokens/radius";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyTokens } from "@/design/tokens/typography";
+import { premiumAuthUiTokens } from "@/design/tokens/auth-ui";
 
 type AuthScreenShellProps = {
   title: string;
@@ -32,8 +28,16 @@ export function AuthScreenShell({
       footerMode="docked"
       preferViewportFit
       contentContainerStyle={{
-        paddingTop: isCompact ? spacingTokens.lg : spacingTokens.xl,
-        paddingBottom: isCompact ? spacingTokens.lg : spacingTokens.xl,
+        paddingTop: isCompact
+          ? premiumAuthUiTokens.spacing.sm
+          : premiumAuthUiTokens.spacing.md,
+        paddingBottom: isCompact
+          ? premiumAuthUiTokens.spacing.sm
+          : premiumAuthUiTokens.spacing.md,
+      }}
+      footerStyle={{
+        backgroundColor: premiumAuthUiTokens.color.floatingBar,
+        borderTopColor: premiumAuthUiTokens.color.divider,
       }}
       footer={footer}
     >
@@ -41,43 +45,57 @@ export function AuthScreenShell({
         entering={
           shouldReduceMotion
             ? undefined
-            : FadeIn.duration(motionTokens.duration.transition)
+            : FadeIn.duration(premiumAuthUiTokens.motion.screenEnterDuration)
         }
         style={{
           flex: 1,
           justifyContent: isCompact ? "flex-start" : "center",
-          gap: isCompact ? spacingTokens.lg : spacingTokens.xl,
+          gap: isCompact
+            ? premiumAuthUiTokens.spacing.md
+            : premiumAuthUiTokens.spacing.lg,
         }}
       >
-        <View style={{ gap: spacingTokens.lg, maxWidth: 440 }}>
-          <View
-            style={{
-              alignSelf: "flex-start",
-              borderRadius: 999,
-              borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: colorTokens.border.subtle,
-              backgroundColor: "rgba(255, 255, 255, 0.72)",
-              paddingHorizontal: spacingTokens.md,
-              paddingVertical: spacingTokens.sm,
-            }}
-          >
+        <View
+          style={{
+            gap: premiumAuthUiTokens.spacing.sm,
+            maxWidth: 430,
+          }}
+        >
+          <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
             <Text
               selectable
-              style={[typographyTokens.label, { color: colorTokens.text.secondary }]}
+              style={[
+                premiumAuthUiTokens.typography.eyebrow,
+                {
+                  color: premiumAuthUiTokens.color.textMuted,
+                  textTransform: "uppercase",
+                },
+              ]}
             >
-              tabbit
+              tabbit / access
             </Text>
+            <View
+              style={{
+                width: 30,
+                height: 1,
+                backgroundColor: premiumAuthUiTokens.color.divider,
+              }}
+            />
           </View>
 
           <Text
             selectable
             style={[
-              typographyTokens.display,
+              premiumAuthUiTokens.typography.title,
               {
-                color: colorTokens.text.primary,
-                fontSize: isCompact ? 30 : typographyTokens.display.fontSize,
-                lineHeight: isCompact ? 36 : typographyTokens.display.lineHeight,
+                color: premiumAuthUiTokens.color.textPrimary,
+                fontSize: isCompact
+                  ? 27
+                  : premiumAuthUiTokens.typography.title.fontSize,
+                lineHeight: isCompact
+                  ? 32
+                  : premiumAuthUiTokens.typography.title.lineHeight,
+                maxWidth: 360,
               },
             ]}
           >
@@ -86,10 +104,10 @@ export function AuthScreenShell({
           <Text
             selectable
             style={[
-              typographyTokens.body,
+              premiumAuthUiTokens.typography.subtitle,
               {
-                color: colorTokens.text.secondary,
-                maxWidth: 360,
+                color: premiumAuthUiTokens.color.textSecondary,
+                maxWidth: 338,
               },
             ]}
           >
@@ -98,12 +116,20 @@ export function AuthScreenShell({
         </View>
 
         <AdaptiveGlassSurface
-          style={{ borderRadius: radiusTokens.card }}
+          blurIntensity={42}
+          style={{
+            borderRadius: premiumAuthUiTokens.radius.panel,
+            borderColor: premiumAuthUiTokens.color.border,
+            boxShadow: premiumAuthUiTokens.shadow.panel,
+          }}
           contentStyle={{
-            gap: spacingTokens.lg,
-            padding: isCompact ? spacingTokens.lg : spacingTokens.xl,
-            borderRadius: radiusTokens.card,
+            gap: premiumAuthUiTokens.spacing.md,
+            padding: isCompact
+              ? premiumAuthUiTokens.spacing.md
+              : premiumAuthUiTokens.spacing.lg,
+            borderRadius: premiumAuthUiTokens.radius.panel,
             borderCurve: "continuous",
+            backgroundColor: premiumAuthUiTokens.color.panel,
           }}
         >
           {children}

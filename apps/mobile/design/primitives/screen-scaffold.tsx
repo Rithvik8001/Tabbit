@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { GradientOrbBackground } from "@/design/primitives/gradient-orb-background";
+import { premiumAuthUiTokens } from "@/design/tokens/auth-ui";
 import { colorTokens } from "@/design/tokens/color";
 import { spacingTokens } from "@/design/tokens/spacing";
 
@@ -13,7 +14,7 @@ type ScreenScaffoldProps = {
   withOrbBackground?: boolean;
   contentContainerStyle?: StyleProp<ViewStyle>;
   footerStyle?: StyleProp<ViewStyle>;
-  footerMode?: "overlay" | "docked";
+  footerMode?: "overlay" | "docked" | "floating";
   preferViewportFit?: boolean;
 };
 
@@ -60,6 +61,24 @@ export function ScreenScaffold({
     footerStyle,
   ];
 
+  const floatingFooterContainerStyle: StyleProp<ViewStyle> = [
+    {
+      position: "absolute",
+      right: premiumAuthUiTokens.spacing.screenHorizontal,
+      bottom: Math.max(insets.bottom, premiumAuthUiTokens.spacing.sm),
+      left: premiumAuthUiTokens.spacing.screenHorizontal,
+      borderRadius: premiumAuthUiTokens.radius.floatingFooter,
+      borderCurve: "continuous",
+      borderWidth: 1,
+      borderColor: premiumAuthUiTokens.color.border,
+      backgroundColor: premiumAuthUiTokens.color.floatingBar,
+      paddingHorizontal: premiumAuthUiTokens.spacing.md,
+      paddingVertical: premiumAuthUiTokens.spacing.sm,
+      boxShadow: premiumAuthUiTokens.shadow.floatingFooter,
+    },
+    footerStyle,
+  ];
+
   const body = (
     <View
       style={{ flex: 1 }}
@@ -84,9 +103,11 @@ export function ScreenScaffold({
             paddingBottom:
               footer && footerMode === "overlay"
                 ? 140
-                : footer && footerMode === "docked"
-                  ? spacingTokens.lg
-                  : Math.max(insets.bottom + 24, 32),
+                : footer && footerMode === "floating"
+                  ? 152
+                  : footer && footerMode === "docked"
+                    ? spacingTokens.lg
+                    : Math.max(insets.bottom + 24, 32),
             minHeight:
               preferViewportFit && availableHeightForContent > 0
                 ? availableHeightForContent
@@ -118,6 +139,16 @@ export function ScreenScaffold({
             setFooterHeight(event.nativeEvent.layout.height);
           }}
           style={footerContainerStyle}
+        >
+          {footer}
+        </View>
+      ) : null}
+      {footer && footerMode === "floating" ? (
+        <View
+          onLayout={(event) => {
+            setFooterHeight(event.nativeEvent.layout.height);
+          }}
+          style={floatingFooterContainerStyle}
         >
           {footer}
         </View>

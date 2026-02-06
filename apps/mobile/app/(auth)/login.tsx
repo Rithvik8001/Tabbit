@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { PrimaryButton } from "@/design/primitives/primary-button";
-import { colorTokens } from "@/design/tokens/color";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyTokens } from "@/design/tokens/typography";
+import { premiumAuthUiTokens } from "@/design/tokens/auth-ui";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { AuthTextField } from "@/features/auth/components/auth-text-field";
 import { useAuth } from "@/features/auth/state/auth-provider";
@@ -76,17 +74,18 @@ export default function LoginScreen() {
       title="Welcome back"
       subtitle="Pick up exactly where your shared balances left off."
       footer={
-        <View style={{ gap: spacingTokens.sm }}>
+        <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
           <Text
             selectable
             style={[
-              typographyTokens.caption,
-              { color: colorTokens.text.muted },
+              premiumAuthUiTokens.typography.caption,
+              { color: premiumAuthUiTokens.color.textMuted },
             ]}
           >
             Email/password and Google are both supported.
           </Text>
           <PrimaryButton
+            visualStyle="premiumAuth"
             label="Log In"
             disabled={isSubmitting}
             onPress={handleLogin}
@@ -120,27 +119,45 @@ export default function LoginScreen() {
       {formError ? (
         <Text
           selectable
-          style={[typographyTokens.caption, { color: "rgb(176, 48, 48)" }]}
+          style={[
+            premiumAuthUiTokens.typography.caption,
+            { color: premiumAuthUiTokens.color.error },
+          ]}
         >
           {formError}
         </Text>
       ) : null}
 
-      <PrimaryButton
-        label="Continue with Google"
-        variant="secondary"
-        disabled={isSubmitting}
-        onPress={handleGoogleLogin}
-      />
+      <View
+        style={{
+          marginTop: premiumAuthUiTokens.spacing.xs,
+          gap: premiumAuthUiTokens.spacing.sm,
+        }}
+      >
+        <View
+          style={{
+            height: 1,
+            backgroundColor: premiumAuthUiTokens.color.divider,
+          }}
+        />
+
+        <PrimaryButton
+          visualStyle="premiumAuth"
+          label="Continue with Google"
+          variant="secondary"
+          disabled={isSubmitting}
+          onPress={handleGoogleLogin}
+        />
+      </View>
 
       <Link href="/(auth)/forgot-password" asChild>
         <Pressable style={{ alignSelf: "center" }}>
           <Text
             selectable
             style={[
-              typographyTokens.caption,
+              premiumAuthUiTokens.typography.link,
               {
-                color: colorTokens.brand.primary,
+                color: premiumAuthUiTokens.color.accent,
                 textDecorationLine: "underline",
               },
             ]}
@@ -155,12 +172,16 @@ export default function LoginScreen() {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          gap: spacingTokens.xs,
+          gap: premiumAuthUiTokens.spacing.xs,
+          paddingTop: premiumAuthUiTokens.spacing.xs,
         }}
       >
         <Text
           selectable
-          style={[typographyTokens.caption, { color: colorTokens.text.muted }]}
+          style={[
+            premiumAuthUiTokens.typography.caption,
+            { color: premiumAuthUiTokens.color.textMuted },
+          ]}
         >
           New to Tabbit?
         </Text>
@@ -169,9 +190,9 @@ export default function LoginScreen() {
             <Text
               selectable
               style={[
-                typographyTokens.caption,
+                premiumAuthUiTokens.typography.link,
                 {
-                  color: colorTokens.brand.primary,
+                  color: premiumAuthUiTokens.color.accent,
                   textDecorationLine: "underline",
                 },
               ]}

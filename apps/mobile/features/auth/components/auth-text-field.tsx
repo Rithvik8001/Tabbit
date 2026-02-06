@@ -1,47 +1,77 @@
+import { useState } from "react";
 import type { TextInputProps } from "react-native";
 import { Text, TextInput, View } from "react-native";
 
-import { colorTokens } from "@/design/tokens/color";
-import { radiusTokens } from "@/design/tokens/radius";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyTokens } from "@/design/tokens/typography";
+import { premiumAuthUiTokens } from "@/design/tokens/auth-ui";
 
 type AuthTextFieldProps = TextInputProps & {
   label: string;
   error?: string | null;
 };
 
-export function AuthTextField({ label, error, ...props }: AuthTextFieldProps) {
+export function AuthTextField({
+  label,
+  error,
+  onBlur,
+  onFocus,
+  ...props
+}: AuthTextFieldProps) {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleFocus: NonNullable<TextInputProps["onFocus"]> = (event) => {
+    setIsFocused(true);
+    onFocus?.(event);
+  };
+
+  const handleBlur: NonNullable<TextInputProps["onBlur"]> = (event) => {
+    setIsFocused(false);
+    onBlur?.(event);
+  };
+
   return (
-    <View style={{ gap: spacingTokens.xs }}>
+    <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
       <Text
         selectable
-        style={[typographyTokens.label, { color: colorTokens.text.secondary }]}
+        style={[
+          premiumAuthUiTokens.typography.label,
+          {
+            color: premiumAuthUiTokens.color.textSecondary,
+            textTransform: "uppercase",
+            letterSpacing: 0.22,
+          },
+        ]}
       >
         {label}
       </Text>
       <TextInput
-        placeholderTextColor={colorTokens.text.muted}
-        selectionColor={colorTokens.brand.primary}
+        placeholderTextColor={premiumAuthUiTokens.color.textSubtle}
+        selectionColor={premiumAuthUiTokens.color.accent}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         style={{
-          borderRadius: radiusTokens.button,
+          borderRadius: premiumAuthUiTokens.radius.control,
           borderCurve: "continuous",
           borderWidth: 1,
           borderColor: error
             ? "rgba(197, 57, 57, 0.45)"
-            : colorTokens.border.subtle,
-          backgroundColor: "rgba(255, 255, 255, 0.86)",
-          paddingHorizontal: spacingTokens.lg,
-          paddingVertical: spacingTokens.md,
-          color: colorTokens.text.primary,
-          ...typographyTokens.body,
+            : isFocused
+              ? premiumAuthUiTokens.color.fieldBorderFocus
+              : premiumAuthUiTokens.color.border,
+          backgroundColor: premiumAuthUiTokens.color.field,
+          paddingHorizontal: premiumAuthUiTokens.spacing.md,
+          paddingVertical: 12,
+          color: premiumAuthUiTokens.color.textPrimary,
+          ...premiumAuthUiTokens.typography.body,
         }}
         {...props}
       />
       {error ? (
         <Text
           selectable
-          style={[typographyTokens.caption, { color: "rgb(176, 48, 48)" }]}
+          style={[
+            premiumAuthUiTokens.typography.caption,
+            { color: premiumAuthUiTokens.color.error },
+          ]}
         >
           {error}
         </Text>

@@ -1,21 +1,14 @@
 import { Stack, useRouter } from "expo-router";
-import { Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
 
-import { GlassCard } from "@/design/primitives/glass-card";
-import { GradientOrbBackground } from "@/design/primitives/gradient-orb-background";
-import { PrimaryButton } from "@/design/primitives/primary-button";
-import { colorTokens } from "@/design/tokens/color";
-import { motionTokens } from "@/design/tokens/motion";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyTokens } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { useOnboardingStore } from "@/features/onboarding/state/onboarding.store";
 
+const primaryPurple = "#4A29FF";
+
 export default function HomePreviewScreen() {
   const router = useRouter();
-  const shouldReduceMotion = useReducedMotion();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const { signOut } = useAuth();
@@ -24,241 +17,228 @@ export default function HomePreviewScreen() {
   const isCompact = height < 780;
 
   return (
-    <GradientOrbBackground>
+    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <Stack.Screen options={{ title: "Preview Home" }} />
 
       <View
         style={{
           flex: 1,
-          paddingTop: Math.max(insets.top, spacingTokens.xl),
-          paddingHorizontal: spacingTokens.screenHorizontal,
-          paddingBottom: Math.max(insets.bottom, spacingTokens.lg),
-          gap: isCompact ? spacingTokens.lg : spacingTokens.xl,
+          paddingTop: Math.max(insets.top, 12),
+          paddingHorizontal: 24,
+          paddingBottom: Math.max(insets.bottom, 16),
+          gap: isCompact ? 14 : 18,
         }}
       >
-        <Animated.View
-          entering={
-            shouldReduceMotion
-              ? undefined
-              : FadeIn.duration(motionTokens.duration.transition)
-          }
-          style={{ gap: spacingTokens.xs }}
-        >
+        <View style={{ marginTop: 10, gap: 12 }}>
           <Text
             selectable
-            style={[
-              typographyTokens.label,
-              { color: colorTokens.text.secondary },
-            ]}
+            style={{
+              color: "#77829A",
+              fontSize: 16,
+              lineHeight: 20,
+              letterSpacing: 1,
+              fontWeight: "700",
+            }}
           >
-            Tabbit Preview
+            TABBIT / PREVIEW
           </Text>
+          <View
+            style={{
+              width: 68,
+              height: 2,
+              borderRadius: 99,
+              backgroundColor: "#E7EAF0",
+            }}
+          />
           <Text
             selectable
-            style={[
-              typographyTokens.title,
-              {
-                color: colorTokens.text.primary,
-                fontSize: isCompact ? 22 : typographyTokens.title.fontSize,
-                lineHeight: isCompact ? 28 : typographyTokens.title.lineHeight,
-              },
-            ]}
+            style={{
+              color: "#0E1116",
+              fontSize: isCompact ? 44 : 52,
+              lineHeight: isCompact ? 48 : 56,
+              letterSpacing: -0.6,
+              fontWeight: "600",
+            }}
           >
             Shared balances, beautifully clear.
           </Text>
-        </Animated.View>
-
-        <Animated.View
-          entering={
-            shouldReduceMotion
-              ? undefined
-              : FadeIn.duration(motionTokens.duration.transition).delay(80)
-          }
-          style={{ gap: isCompact ? spacingTokens.sm : spacingTokens.md }}
-        >
-          <GlassCard
-            contentStyle={{
-              gap: spacingTokens.md,
-              backgroundColor: "rgba(255, 255, 255, 0.62)",
-              padding: isCompact ? spacingTokens.lg : spacingTokens.xl,
-            }}
-          >
-            <View style={{ gap: spacingTokens.xs }}>
-              <Text
-                selectable
-                style={[
-                  typographyTokens.label,
-                  { color: colorTokens.text.secondary },
-                ]}
-              >
-                Total owed to you
-              </Text>
-              <Text
-                selectable
-                style={[
-                  typographyTokens.display,
-                  {
-                    color: colorTokens.text.primary,
-                    fontSize: isCompact
-                      ? 42
-                      : typographyTokens.display.fontSize,
-                    lineHeight: isCompact
-                      ? 46
-                      : typographyTokens.display.lineHeight,
-                    fontVariant: ["tabular-nums"],
-                  },
-                ]}
-              >
-                $248.40
-              </Text>
-            </View>
-            <Text
-              selectable
-              style={[
-                typographyTokens.body,
-                { color: colorTokens.text.secondary },
-              ]}
-            >
-              Style: {draft.splitStyle ?? "not set"} • Context:{" "}
-              {draft.useContext ?? "not set"}
-            </Text>
-          </GlassCard>
-
-          <GlassCard
-            contentStyle={{
-              gap: spacingTokens.md,
-              backgroundColor: "rgba(255, 255, 255, 0.58)",
-              padding: isCompact ? spacingTokens.lg : spacingTokens.xl,
-            }}
-          >
-            <Text
-              selectable
-              style={[
-                typographyTokens.label,
-                { color: colorTokens.text.primary },
-              ]}
-            >
-              At a glance
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                gap: spacingTokens.sm,
-              }}
-            >
-              <View
-                style={{
-                  flex: 1,
-                  borderRadius: 12,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: colorTokens.border.subtle,
-                  backgroundColor: "rgba(255, 255, 255, 0.72)",
-                  padding: spacingTokens.md,
-                  gap: spacingTokens.xs,
-                }}
-              >
-                <Text
-                  selectable
-                  style={[
-                    typographyTokens.caption,
-                    { color: colorTokens.text.muted },
-                  ]}
-                >
-                  People involved
-                </Text>
-                <Text
-                  selectable
-                  style={[
-                    typographyTokens.title,
-                    {
-                      color: colorTokens.text.primary,
-                      fontSize: isCompact
-                        ? 20
-                        : typographyTokens.title.fontSize,
-                      lineHeight: isCompact
-                        ? 26
-                        : typographyTokens.title.lineHeight,
-                    },
-                  ]}
-                >
-                  4
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  borderRadius: 12,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: colorTokens.border.subtle,
-                  backgroundColor: "rgba(255, 255, 255, 0.72)",
-                  padding: spacingTokens.md,
-                  gap: spacingTokens.xs,
-                }}
-              >
-                <Text
-                  selectable
-                  style={[
-                    typographyTokens.caption,
-                    { color: colorTokens.text.muted },
-                  ]}
-                >
-                  Pending requests
-                </Text>
-                <Text
-                  selectable
-                  style={[
-                    typographyTokens.title,
-                    {
-                      color: colorTokens.text.primary,
-                      fontSize: isCompact
-                        ? 20
-                        : typographyTokens.title.fontSize,
-                      lineHeight: isCompact
-                        ? 26
-                        : typographyTokens.title.lineHeight,
-                    },
-                  ]}
-                >
-                  2
-                </Text>
-              </View>
-            </View>
-            <View style={{ gap: spacingTokens.sm }}>
-              {[
-                "Coffee run split equally",
-                "Groceries split by exact amounts",
-              ].map((row) => {
-                return (
-                  <Text
-                    key={row}
-                    selectable
-                    style={[
-                      typographyTokens.body,
-                      { color: colorTokens.text.secondary },
-                    ]}
-                  >
-                    {row}
-                  </Text>
-                );
-              })}
-            </View>
-          </GlassCard>
-        </Animated.View>
-
-        <View style={{ flex: 1 }} />
+        </View>
 
         <View
           style={{
-            borderTopWidth: 1,
-            borderTopColor: colorTokens.border.subtle,
-            paddingTop: spacingTokens.md,
+            borderRadius: 22,
+            borderCurve: "continuous",
+            borderWidth: 1,
+            borderColor: "#E8EBF1",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 8px 20px rgba(17, 20, 26, 0.05)",
+            padding: isCompact ? 16 : 18,
+            gap: 12,
           }}
         >
-          <PrimaryButton
-            label="Sign Out & Restart Onboarding"
-            variant="secondary"
+          <Text
+            selectable
+            style={{
+              color: "#68748E",
+              fontSize: 16,
+              lineHeight: 18,
+              letterSpacing: 1.1,
+              fontWeight: "700",
+            }}
+          >
+            TOTAL OWED TO YOU
+          </Text>
+          <Text
+            selectable
+            style={{
+              color: "#0E1116",
+              fontSize: isCompact ? 50 : 58,
+              lineHeight: isCompact ? 54 : 62,
+              letterSpacing: -0.8,
+              fontWeight: "700",
+              fontVariant: ["tabular-nums"],
+            }}
+          >
+            $248.40
+          </Text>
+          <Text
+            selectable
+            style={{
+              color: "#596170",
+              fontSize: 18,
+              lineHeight: 28,
+              letterSpacing: -0.08,
+              fontWeight: "500",
+            }}
+          >
+            Style: {draft.splitStyle ?? "not set"} • Context: {draft.useContext ?? "not set"}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            borderRadius: 22,
+            borderCurve: "continuous",
+            borderWidth: 1,
+            borderColor: "#E8EBF1",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 8px 20px rgba(17, 20, 26, 0.05)",
+            padding: isCompact ? 16 : 18,
+            gap: 14,
+          }}
+        >
+          <Text
+            selectable
+            style={{
+              color: "#0E1116",
+              fontSize: 28,
+              lineHeight: 30,
+              letterSpacing: -0.3,
+              fontWeight: "600",
+            }}
+          >
+            At a glance
+          </Text>
+
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            <View
+              style={{
+                flex: 1,
+                borderRadius: 16,
+                borderCurve: "continuous",
+                borderWidth: 1,
+                borderColor: "#DCE2EC",
+                padding: 14,
+                gap: 8,
+                backgroundColor: "#FFFFFF",
+              }}
+            >
+              <Text
+                selectable
+                style={{
+                  color: "#7A849A",
+                  fontSize: 15,
+                  lineHeight: 18,
+                  fontWeight: "500",
+                }}
+              >
+                People involved
+              </Text>
+              <Text
+                selectable
+                style={{
+                  color: "#0E1116",
+                  fontSize: 40 / 2,
+                  lineHeight: 40 / 2,
+                  fontWeight: "700",
+                }}
+              >
+                4
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                borderRadius: 16,
+                borderCurve: "continuous",
+                borderWidth: 1,
+                borderColor: "#DCE2EC",
+                padding: 14,
+                gap: 8,
+                backgroundColor: "#FFFFFF",
+              }}
+            >
+              <Text
+                selectable
+                style={{
+                  color: "#7A849A",
+                  fontSize: 15,
+                  lineHeight: 18,
+                  fontWeight: "500",
+                }}
+              >
+                Pending requests
+              </Text>
+              <Text
+                selectable
+                style={{
+                  color: "#0E1116",
+                  fontSize: 40 / 2,
+                  lineHeight: 40 / 2,
+                  fontWeight: "700",
+                }}
+              >
+                2
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ gap: 10 }}>
+            {["Coffee run split equally", "Groceries split by exact amounts"].map((row) => {
+              return (
+                <Text
+                  key={row}
+                  selectable
+                  style={{
+                    color: "#596170",
+                    fontSize: 18,
+                    lineHeight: 28,
+                    letterSpacing: -0.08,
+                    fontWeight: "500",
+                  }}
+                >
+                  {row}
+                </Text>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={{ flex: 1 }} />
+
+        <View style={{ borderTopWidth: 1, borderTopColor: "#E8EBF1", paddingTop: 12 }}>
+          <Pressable
             onPress={() => {
               void (async () => {
                 const result = await signOut();
@@ -269,9 +249,29 @@ export default function HomePreviewScreen() {
                 router.replace("/(onboarding)");
               })();
             }}
-          />
+            style={{
+              borderRadius: 26,
+              borderCurve: "continuous",
+              backgroundColor: primaryPurple,
+              height: 66,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              selectable
+              style={{
+                color: "#FFFFFF",
+                fontSize: 22,
+                lineHeight: 22,
+                fontWeight: "700",
+              }}
+            >
+              Sign Out & Restart Onboarding
+            </Text>
+          </Pressable>
         </View>
       </View>
-    </GradientOrbBackground>
+    </View>
   );
 }

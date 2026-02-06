@@ -16,8 +16,14 @@ import { AppState, type AppStateStatus } from "react-native";
 import { supabase } from "@/features/auth/lib/supabase-client";
 import type { AuthActionResult } from "@/features/auth/types/auth.types";
 import { mapAuthError } from "@/features/auth/utils/auth-errors";
-import { parseAuthSessionFromUrl, isSupportedAuthUrl } from "@/features/auth/utils/auth-callback";
-import { AUTH_CALLBACK_URL, RESET_PASSWORD_URL } from "@/features/auth/utils/auth-urls";
+import {
+  parseAuthSessionFromUrl,
+  isSupportedAuthUrl,
+} from "@/features/auth/utils/auth-callback";
+import {
+  AUTH_CALLBACK_URL,
+  RESET_PASSWORD_URL,
+} from "@/features/auth/utils/auth-urls";
 import {
   clearPendingOnboarding,
   getPendingOnboarding,
@@ -29,8 +35,14 @@ type AuthContextValue = {
   session: Session | null;
   user: User | null;
   isAuthLoading: boolean;
-  signInWithPassword: (email: string, password: string) => Promise<AuthActionResult>;
-  signUpWithPassword: (email: string, password: string) => Promise<AuthActionResult>;
+  signInWithPassword: (
+    email: string,
+    password: string,
+  ) => Promise<AuthActionResult>;
+  signUpWithPassword: (
+    email: string,
+    password: string,
+  ) => Promise<AuthActionResult>;
   signInWithGoogle: () => Promise<AuthActionResult>;
   requestPasswordReset: (email: string) => Promise<AuthActionResult>;
   updatePassword: (nextPassword: string) => Promise<AuthActionResult>;
@@ -102,7 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     handleAppStateChange(AppState.currentState);
 
-    const subscription = AppState.addEventListener("change", handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange,
+    );
 
     return () => {
       subscription.remove();
@@ -227,7 +242,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
     }
 
-    const result = await WebBrowser.openAuthSessionAsync(data.url, AUTH_CALLBACK_URL);
+    const result = await WebBrowser.openAuthSessionAsync(
+      data.url,
+      AUTH_CALLBACK_URL,
+    );
 
     if (result.type !== "success" || !("url" in result)) {
       const { data: currentSessionData } = await supabase.auth.getSession();
@@ -268,9 +286,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const requestPasswordReset = useCallback(
     async (email: string): Promise<AuthActionResult> => {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: RESET_PASSWORD_URL,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.trim(),
+        {
+          redirectTo: RESET_PASSWORD_URL,
+        },
+      );
 
       if (error) {
         return mapAuthError(error);
@@ -283,7 +304,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updatePassword = useCallback(
     async (nextPassword: string): Promise<AuthActionResult> => {
-      const { error } = await supabase.auth.updateUser({ password: nextPassword });
+      const { error } = await supabase.auth.updateUser({
+        password: nextPassword,
+      });
 
       if (error) {
         return mapAuthError(error);
