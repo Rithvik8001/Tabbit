@@ -10,6 +10,14 @@ export default function GroupsTabLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "Groups" }} />
+      <Stack.Screen
+        name="create"
+        options={{
+          title: "New Group",
+          headerLargeTitle: false,
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

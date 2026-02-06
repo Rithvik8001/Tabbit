@@ -32,7 +32,11 @@ function settingRow(
       >
         {label}
       </Text>
-      <Switch value={value} onValueChange={onValueChange} trackColor={{ true: accent }} />
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        trackColor={{ true: accent }}
+      />
     </View>
   );
 }
@@ -97,25 +101,45 @@ export default function SettingsTabScreen() {
       >
         <Text
           selectable
-          style={{ color: muted, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+          style={{
+            color: muted,
+            fontSize: 14,
+            lineHeight: 18,
+            fontWeight: "600",
+          }}
         >
           Account
         </Text>
         <Text
           selectable
-          style={{ color: ink, fontSize: 22, lineHeight: 26, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 22,
+            lineHeight: 26,
+            fontWeight: "700",
+          }}
         >
           {settingsPreview.displayName}
         </Text>
         <Text
           selectable
-          style={{ color: muted, fontSize: 15, lineHeight: 20, fontWeight: "500" }}
+          style={{
+            color: muted,
+            fontSize: 15,
+            lineHeight: 20,
+            fontWeight: "500",
+          }}
         >
           {profileEmail}
         </Text>
         <Text
           selectable
-          style={{ color: muted, fontSize: 15, lineHeight: 20, fontWeight: "500" }}
+          style={{
+            color: muted,
+            fontSize: 15,
+            lineHeight: 20,
+            fontWeight: "500",
+          }}
         >
           Sign-in method: {providerLabel}
         </Text>
@@ -134,7 +158,12 @@ export default function SettingsTabScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+          }}
         >
           Preferences
         </Text>
@@ -163,15 +192,25 @@ export default function SettingsTabScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+          }}
         >
-          Session
+          Sign Out
         </Text>
 
         {signOutError ? (
           <Text
             selectable
-            style={{ color: "#B03030", fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{
+              color: "#B03030",
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
           >
             {signOutError}
           </Text>
@@ -192,7 +231,12 @@ export default function SettingsTabScreen() {
         >
           <Text
             selectable
-            style={{ color: "#FFFFFF", fontSize: 17, lineHeight: 20, fontWeight: "700" }}
+            style={{
+              color: "#FFFFFF",
+              fontSize: 17,
+              lineHeight: 20,
+              fontWeight: "700",
+            }}
           >
             Sign Out & Restart Onboarding
           </Text>
