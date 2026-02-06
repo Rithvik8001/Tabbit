@@ -91,7 +91,7 @@ export default function ResetPasswordScreen() {
       }
 
       setIsSuccess(true);
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     })();
   };
 

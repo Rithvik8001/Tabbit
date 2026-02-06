@@ -20,5 +20,5 @@ export default function AuthCallbackRoute() {
     );
   }
 
-  return <Redirect href={session ? "/(app)/home-preview" : "/(auth)/login"} />;
+  return <Redirect href={session ? "/(app)/(tabs)/(home)" : "/(auth)/login"} />;
 }

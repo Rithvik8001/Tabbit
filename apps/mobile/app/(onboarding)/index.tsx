@@ -156,7 +156,7 @@ export default function OnboardingScreen() {
 
   useEffect(() => {
     if (!isAuthLoading && session) {
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     }
   }, [isAuthLoading, router, session]);
 
@@ -203,7 +203,7 @@ export default function OnboardingScreen() {
       }
 
       closeModal();
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     })();
   };
 
@@ -231,7 +231,7 @@ export default function OnboardingScreen() {
       }
 
       closeModal();
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     })();
   };
 
@@ -260,7 +260,7 @@ export default function OnboardingScreen() {
       }
 
       closeModal();
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     })();
   };
 

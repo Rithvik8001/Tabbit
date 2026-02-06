@@ -28,7 +28,7 @@ export default function SignupScreen() {
 
   useEffect(() => {
     if (!isAuthLoading && session) {
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     }
   }, [isAuthLoading, router, session]);
 
@@ -73,7 +73,7 @@ export default function SignupScreen() {
         return;
       }
 
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     })();
   };
 
@@ -90,7 +90,7 @@ export default function SignupScreen() {
         return;
       }
 
-      router.replace("/(app)/home-preview");
+      router.replace("/(app)/(tabs)/(home)");
     })();
   };
 

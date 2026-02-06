@@ -11,6 +11,7 @@ export default function AppShellLayout() {
         contentStyle: { backgroundColor: colorTokens.surface.base },
       }}
     >
+      <Stack.Screen name="(tabs)" />
       <Stack.Screen name="home-preview" />
     </Stack>
   );
