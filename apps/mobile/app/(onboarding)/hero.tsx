@@ -56,8 +56,8 @@ export default function HeroScreen() {
             borderRadius: 999,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorTokens.brand.primaryBorder,
-            backgroundColor: colorTokens.brand.primarySoft,
+            borderColor: colorTokens.border.subtle,
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
             paddingHorizontal: spacingTokens.md,
             paddingVertical: spacingTokens.sm,
           }}
@@ -66,11 +66,11 @@ export default function HeroScreen() {
             style={[
               typographyTokens.label,
               {
-                color: colorTokens.brand.primary,
+                color: colorTokens.text.secondary,
               },
             ]}
           >
-            tabbit
+            {onboardingContent.hero.brand}
           </Text>
         </Animated.View>
         <Animated.Text

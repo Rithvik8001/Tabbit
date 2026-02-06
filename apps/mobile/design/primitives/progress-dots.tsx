@@ -43,7 +43,7 @@ function ProgressDot({ isActive }: ProgressDotProps) {
           height: 8,
           borderRadius: 999,
           backgroundColor: isActive
-            ? colorTokens.brand.primary
+            ? colorTokens.text.primary
             : "rgba(20, 22, 29, 0.16)",
         },
         animatedStyle,
@@ -56,7 +56,13 @@ export function ProgressDots({ currentIndex, total }: ProgressDotsProps) {
   const dots = Array.from({ length: total }, (_, index) => index);
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm }}>
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacingTokens.sm,
+      }}
+    >
       {dots.map((index) => {
         return <ProgressDot key={index} isActive={currentIndex === index} />;
       })}

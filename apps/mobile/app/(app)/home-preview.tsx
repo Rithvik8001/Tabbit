@@ -1,6 +1,9 @@
 import { Stack, useRouter } from "expo-router";
 import { Text, View } from "react-native";
-import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  useReducedMotion,
+} from "react-native-reanimated";
 
 import { GlassCard } from "@/design/primitives/glass-card";
 import { PrimaryButton } from "@/design/primitives/primary-button";
@@ -42,11 +45,23 @@ export default function HomePreviewScreen() {
     >
       <Stack.Screen options={{ title: "Preview Home" }} />
 
-      <Animated.View entering={getEntering(0)} style={{ gap: spacingTokens.xs }}>
-        <Text selectable style={[typographyTokens.label, { color: colorTokens.brand.primary }]}>
+      <Animated.View
+        entering={getEntering(0)}
+        style={{ gap: spacingTokens.xs }}
+      >
+        <Text
+          selectable
+          style={[
+            typographyTokens.label,
+            { color: colorTokens.text.secondary },
+          ]}
+        >
           Tabbit Preview
         </Text>
-        <Text selectable style={[typographyTokens.title, { color: colorTokens.text.primary }]}>
+        <Text
+          selectable
+          style={[typographyTokens.title, { color: colorTokens.text.primary }]}
+        >
           Shared balances, beautifully clear.
         </Text>
       </Animated.View>
@@ -55,11 +70,17 @@ export default function HomePreviewScreen() {
         <GlassCard
           contentStyle={{
             gap: spacingTokens.lg,
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
+            backgroundColor: "rgba(255, 255, 255, 0.62)",
           }}
         >
           <View style={{ gap: spacingTokens.xs }}>
-            <Text selectable style={[typographyTokens.label, { color: colorTokens.text.secondary }]}>
+            <Text
+              selectable
+              style={[
+                typographyTokens.label,
+                { color: colorTokens.text.secondary },
+              ]}
+            >
               Total owed to you
             </Text>
             <Text
@@ -75,8 +96,15 @@ export default function HomePreviewScreen() {
               $248.40
             </Text>
           </View>
-          <Text selectable style={[typographyTokens.body, { color: colorTokens.text.secondary }]}>
-            Style: {draft.splitStyle ?? "not set"} • Context: {draft.useContext ?? "not set"}
+          <Text
+            selectable
+            style={[
+              typographyTokens.body,
+              { color: colorTokens.text.secondary },
+            ]}
+          >
+            Style: {draft.splitStyle ?? "not set"} • Context:{" "}
+            {draft.useContext ?? "not set"}
           </Text>
         </GlassCard>
       </Animated.View>
@@ -85,36 +113,47 @@ export default function HomePreviewScreen() {
         <GlassCard
           contentStyle={{
             gap: spacingTokens.md,
-            backgroundColor: "rgba(255, 255, 255, 0.44)",
+            backgroundColor: "rgba(255, 255, 255, 0.58)",
           }}
         >
-          <Text selectable style={[typographyTokens.label, { color: colorTokens.text.primary }]}>
+          <Text
+            selectable
+            style={[
+              typographyTokens.label,
+              { color: colorTokens.text.primary },
+            ]}
+          >
             People you split with
           </Text>
           <View style={{ gap: spacingTokens.sm }}>
-            {["Aria owes $22.50", "Noah owes $8.20", "Maya owes $17.10"].map((row) => {
-              return (
-                <View
-                  key={row}
-                  style={{
-                    borderRadius: 12,
-                    borderCurve: "continuous",
-                    backgroundColor: "rgba(255, 255, 255, 0.72)",
-                    borderWidth: 1,
-                    borderColor: colorTokens.border.subtle,
-                    paddingHorizontal: spacingTokens.md,
-                    paddingVertical: spacingTokens.sm,
-                  }}
-                >
-                  <Text
-                    selectable
-                    style={[typographyTokens.body, { color: colorTokens.text.secondary }]}
+            {["Aria owes $22.50", "Noah owes $8.20", "Maya owes $17.10"].map(
+              (row) => {
+                return (
+                  <View
+                    key={row}
+                    style={{
+                      borderRadius: 12,
+                      borderCurve: "continuous",
+                      backgroundColor: "rgba(255, 255, 255, 0.72)",
+                      borderWidth: 1,
+                      borderColor: colorTokens.border.subtle,
+                      paddingHorizontal: spacingTokens.md,
+                      paddingVertical: spacingTokens.sm,
+                    }}
                   >
-                    {row}
-                  </Text>
-                </View>
-              );
-            })}
+                    <Text
+                      selectable
+                      style={[
+                        typographyTokens.body,
+                        { color: colorTokens.text.secondary },
+                      ]}
+                    >
+                      {row}
+                    </Text>
+                  </View>
+                );
+              },
+            )}
           </View>
         </GlassCard>
       </Animated.View>
@@ -123,10 +162,16 @@ export default function HomePreviewScreen() {
         <GlassCard
           contentStyle={{
             gap: spacingTokens.md,
-            backgroundColor: "rgba(255, 255, 255, 0.44)",
+            backgroundColor: "rgba(255, 255, 255, 0.58)",
           }}
         >
-          <Text selectable style={[typographyTokens.label, { color: colorTokens.text.primary }]}>
+          <Text
+            selectable
+            style={[
+              typographyTokens.label,
+              { color: colorTokens.text.primary },
+            ]}
+          >
             Recent activity
           </Text>
           <View style={{ gap: spacingTokens.sm }}>
@@ -139,7 +184,10 @@ export default function HomePreviewScreen() {
                 <Text
                   key={row}
                   selectable
-                  style={[typographyTokens.body, { color: colorTokens.text.secondary }]}
+                  style={[
+                    typographyTokens.body,
+                    { color: colorTokens.text.secondary },
+                  ]}
                 >
                   {row}
                 </Text>

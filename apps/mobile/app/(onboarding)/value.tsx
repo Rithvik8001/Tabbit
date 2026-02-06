@@ -83,7 +83,7 @@ export default function ValueScreen() {
               <GlassCard
                 contentStyle={{
                   gap: spacingTokens.md,
-                  backgroundColor: "rgba(255, 255, 255, 0.44)",
+                  backgroundColor: "rgba(255, 255, 255, 0.60)",
                 }}
               >
                 <View
@@ -93,15 +93,15 @@ export default function ValueScreen() {
                     borderRadius: 999,
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: colorTokens.brand.primarySoft,
+                    backgroundColor: "rgba(20, 22, 29, 0.06)",
                   }}
                 >
                   <SymbolView
                     name={pillar.symbol}
-                    tintColor={colorTokens.brand.primary}
+                    tintColor={colorTokens.text.primary}
                     size={20}
                     fallback={
-                      <Text style={[typographyTokens.label, { color: colorTokens.brand.primary }]}>
+                      <Text style={[typographyTokens.label, { color: colorTokens.text.primary }]}>
                         {pillar.fallback}
                       </Text>
                     }

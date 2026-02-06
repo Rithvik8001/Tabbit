@@ -62,7 +62,7 @@ export function OptionPill<T extends string>({
           borderRadius: radiusTokens.pill,
           borderCurve: "continuous",
           borderWidth: 1,
-          borderColor: selected ? colorTokens.brand.primaryBorder : colorTokens.border.subtle,
+          borderColor: selected ? colorTokens.border.strong : colorTokens.border.subtle,
           backgroundColor: selected
             ? "rgba(255, 255, 255, 0.96)"
             : "rgba(255, 255, 255, 0.72)",

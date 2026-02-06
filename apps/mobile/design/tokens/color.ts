@@ -2,7 +2,6 @@ export const colorTokens = {
   brand: {
     primary: "#5D18EB",
     primarySoft: "#F3EEFF",
-    primaryBorder: "rgba(93, 24, 235, 0.28)",
   },
   text: {
     primary: "#14161D",
