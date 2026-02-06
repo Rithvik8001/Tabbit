@@ -1,16 +1,7 @@
-import type { SFSymbol } from "expo-symbols";
-
 import type {
   SplitStyle,
   UseContext,
 } from "@/features/onboarding/types/onboarding.types";
-
-type ValuePillar = {
-  symbol: SFSymbol;
-  fallback: string;
-  title: string;
-  description: string;
-};
 
 type SplitStyleOption = {
   value: SplitStyle;
@@ -25,44 +16,22 @@ type UseContextOption = {
 };
 
 export const onboardingContent = {
+  brand: "tabbit",
   hero: {
-    brand: "tabbit",
-    title: "Split spending with zero awkwardness.",
+    kicker: "tabbit",
+    title: "Shared expenses, without social friction.",
     subtitle:
-      "A calm, crystal-clear space for every shared expense and every balance.",
+      "Track every split with clarity and calm. Built for people, not spreadsheets.",
   },
-  value: {
-    title: "Built for clarity, speed, and fairness.",
-    subtitle:
-      "Track what matters and settle with confidence without the spreadsheet chaos.",
+  selectors: {
+    splitStyleLabel: "How do you usually split?",
+    contextLabel: "Who do you split with most?",
   },
-  preferences: {
-    title: "Shape your split style.",
-    subtitle:
-      "Pick your preferred setup now. You can change everything later in settings.",
+  cta: {
+    label: "Enter Preview",
+    supportingNote: "No sign-up yet. You can edit preferences any time.",
   },
 } as const;
-
-export const valuePillars: ValuePillar[] = [
-  {
-    symbol: "eye.fill",
-    fallback: "👁️",
-    title: "Clarity first",
-    description: "See who paid, who owes, and what changed at a glance.",
-  },
-  {
-    symbol: "bolt.fill",
-    fallback: "⚡",
-    title: "Fast updates",
-    description: "Add expenses in seconds with polished, low-friction interactions.",
-  },
-  {
-    symbol: "person.3.fill",
-    fallback: "🧑‍🤝‍🧑",
-    title: "Fair outcomes",
-    description: "Flexible split rules keep every group balanced and transparent.",
-  },
-];
 
 export const splitStyleOptions: SplitStyleOption[] = [
   {

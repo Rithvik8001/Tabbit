@@ -70,11 +70,14 @@ export function PrimaryButton({
           borderRadius: radiusTokens.button,
           borderCurve: "continuous",
           borderWidth: 1,
+          opacity: disabled ? 0.88 : 1,
           borderColor: isSecondary
             ? colorTokens.border.subtle
-            : colorTokens.brand.primary,
+            : disabled
+              ? "rgba(20, 22, 29, 0.14)"
+              : colorTokens.brand.primary,
           backgroundColor: disabled
-            ? "rgba(20, 22, 29, 0.20)"
+            ? "rgba(20, 22, 29, 0.10)"
             : isSecondary
               ? colorTokens.surface.elevated
               : colorTokens.brand.primary,
@@ -84,16 +87,20 @@ export function PrimaryButton({
           justifyContent: "center",
           boxShadow: isSecondary
             ? "0 6px 14px rgba(20, 22, 29, 0.06)"
-            : "0 10px 18px rgba(20, 22, 29, 0.14)",
+            : disabled
+              ? "0 0px 0px rgba(0, 0, 0, 0)"
+              : "0 10px 18px rgba(20, 22, 29, 0.14)",
         }}
       >
         <Text
           style={[
             typographyTokens.label,
             {
-              color: isSecondary
-                ? colorTokens.text.primary
-                : colorTokens.text.inverse,
+              color: disabled
+                ? colorTokens.text.muted
+                : isSecondary
+                  ? colorTokens.text.primary
+                  : colorTokens.text.inverse,
             },
           ]}
         >

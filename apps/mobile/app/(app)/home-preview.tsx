@@ -1,13 +1,11 @@
 import { Stack, useRouter } from "expo-router";
-import { Text, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  useReducedMotion,
-} from "react-native-reanimated";
+import { Text, View, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
 
 import { GlassCard } from "@/design/primitives/glass-card";
+import { GradientOrbBackground } from "@/design/primitives/gradient-orb-background";
 import { PrimaryButton } from "@/design/primitives/primary-button";
-import { ScreenScaffold } from "@/design/primitives/screen-scaffold";
 import { colorTokens } from "@/design/tokens/color";
 import { motionTokens } from "@/design/tokens/motion";
 import { spacingTokens } from "@/design/tokens/spacing";
@@ -17,131 +15,196 @@ import { useOnboardingStore } from "@/features/onboarding/state/onboarding.store
 export default function HomePreviewScreen() {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
+  const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const { draft, resetDraft } = useOnboardingStore();
 
-  const getEntering = (delay: number) => {
-    if (shouldReduceMotion) {
-      return undefined;
-    }
-
-    return FadeInDown.duration(motionTokens.duration.enter)
-      .delay(delay)
-      .springify()
-      .damping(18);
-  };
+  const isCompact = height < 780;
 
   return (
-    <ScreenScaffold
-      footer={
-        <PrimaryButton
-          label="Restart Onboarding"
-          variant="secondary"
-          onPress={() => {
-            resetDraft();
-            router.replace("/(onboarding)/hero");
-          }}
-        />
-      }
-    >
+    <GradientOrbBackground>
       <Stack.Screen options={{ title: "Preview Home" }} />
 
-      <Animated.View
-        entering={getEntering(0)}
-        style={{ gap: spacingTokens.xs }}
+      <View
+        style={{
+          flex: 1,
+          paddingTop: Math.max(insets.top, spacingTokens.xl),
+          paddingHorizontal: spacingTokens.screenHorizontal,
+          paddingBottom: Math.max(insets.bottom, spacingTokens.lg),
+          gap: isCompact ? spacingTokens.lg : spacingTokens.xl,
+        }}
       >
-        <Text
-          selectable
-          style={[
-            typographyTokens.label,
-            { color: colorTokens.text.secondary },
-          ]}
+        <Animated.View
+          entering={
+            shouldReduceMotion
+              ? undefined
+              : FadeIn.duration(motionTokens.duration.transition)
+          }
+          style={{ gap: spacingTokens.xs }}
         >
-          Tabbit Preview
-        </Text>
-        <Text
-          selectable
-          style={[typographyTokens.title, { color: colorTokens.text.primary }]}
-        >
-          Shared balances, beautifully clear.
-        </Text>
-      </Animated.View>
+          <Text
+            selectable
+            style={[typographyTokens.label, { color: colorTokens.text.secondary }]}
+          >
+            Tabbit Preview
+          </Text>
+          <Text
+            selectable
+            style={[
+              typographyTokens.title,
+              {
+                color: colorTokens.text.primary,
+                fontSize: isCompact ? 22 : typographyTokens.title.fontSize,
+                lineHeight: isCompact ? 28 : typographyTokens.title.lineHeight,
+              },
+            ]}
+          >
+            Shared balances, beautifully clear.
+          </Text>
+        </Animated.View>
 
-      <Animated.View entering={getEntering(90)}>
-        <GlassCard
-          contentStyle={{
-            gap: spacingTokens.lg,
-            backgroundColor: "rgba(255, 255, 255, 0.62)",
-          }}
+        <Animated.View
+          entering={
+            shouldReduceMotion
+              ? undefined
+              : FadeIn.duration(motionTokens.duration.transition).delay(80)
+          }
+          style={{ gap: isCompact ? spacingTokens.sm : spacingTokens.md }}
         >
-          <View style={{ gap: spacingTokens.xs }}>
+          <GlassCard
+            contentStyle={{
+              gap: spacingTokens.md,
+              backgroundColor: "rgba(255, 255, 255, 0.62)",
+              padding: isCompact ? spacingTokens.lg : spacingTokens.xl,
+            }}
+          >
+            <View style={{ gap: spacingTokens.xs }}>
+              <Text
+                selectable
+                style={[typographyTokens.label, { color: colorTokens.text.secondary }]}
+              >
+                Total owed to you
+              </Text>
+              <Text
+                selectable
+                style={[
+                  typographyTokens.display,
+                  {
+                    color: colorTokens.text.primary,
+                    fontSize: isCompact ? 42 : typographyTokens.display.fontSize,
+                    lineHeight: isCompact ? 46 : typographyTokens.display.lineHeight,
+                    fontVariant: ["tabular-nums"],
+                  },
+                ]}
+              >
+                $248.40
+              </Text>
+            </View>
             <Text
               selectable
               style={[
-                typographyTokens.label,
+                typographyTokens.body,
                 { color: colorTokens.text.secondary },
               ]}
             >
-              Total owed to you
+              Style: {draft.splitStyle ?? "not set"} • Context:{" "}
+              {draft.useContext ?? "not set"}
             </Text>
+          </GlassCard>
+
+          <GlassCard
+            contentStyle={{
+              gap: spacingTokens.md,
+              backgroundColor: "rgba(255, 255, 255, 0.58)",
+              padding: isCompact ? spacingTokens.lg : spacingTokens.xl,
+            }}
+          >
             <Text
               selectable
-              style={[
-                typographyTokens.display,
-                {
-                  color: colorTokens.text.primary,
-                  fontVariant: ["tabular-nums"],
-                },
-              ]}
+              style={[typographyTokens.label, { color: colorTokens.text.primary }]}
             >
-              $248.40
+              At a glance
             </Text>
-          </View>
-          <Text
-            selectable
-            style={[
-              typographyTokens.body,
-              { color: colorTokens.text.secondary },
-            ]}
-          >
-            Style: {draft.splitStyle ?? "not set"} • Context:{" "}
-            {draft.useContext ?? "not set"}
-          </Text>
-        </GlassCard>
-      </Animated.View>
-
-      <Animated.View entering={getEntering(150)}>
-        <GlassCard
-          contentStyle={{
-            gap: spacingTokens.md,
-            backgroundColor: "rgba(255, 255, 255, 0.58)",
-          }}
-        >
-          <Text
-            selectable
-            style={[
-              typographyTokens.label,
-              { color: colorTokens.text.primary },
-            ]}
-          >
-            People you split with
-          </Text>
-          <View style={{ gap: spacingTokens.sm }}>
-            {["Aria owes $22.50", "Noah owes $8.20", "Maya owes $17.10"].map(
-              (row) => {
-                return (
-                  <View
-                    key={row}
-                    style={{
-                      borderRadius: 12,
-                      borderCurve: "continuous",
-                      backgroundColor: "rgba(255, 255, 255, 0.72)",
-                      borderWidth: 1,
-                      borderColor: colorTokens.border.subtle,
-                      paddingHorizontal: spacingTokens.md,
-                      paddingVertical: spacingTokens.sm,
-                    }}
-                  >
+            <View
+              style={{
+                flexDirection: "row",
+                gap: spacingTokens.sm,
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  borderRadius: 12,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: colorTokens.border.subtle,
+                  backgroundColor: "rgba(255, 255, 255, 0.72)",
+                  padding: spacingTokens.md,
+                  gap: spacingTokens.xs,
+                }}
+              >
+                <Text
+                  selectable
+                  style={[typographyTokens.caption, { color: colorTokens.text.muted }]}
+                >
+                  People involved
+                </Text>
+                <Text
+                  selectable
+                  style={[
+                    typographyTokens.title,
+                    {
+                      color: colorTokens.text.primary,
+                      fontSize: isCompact ? 20 : typographyTokens.title.fontSize,
+                      lineHeight: isCompact ? 26 : typographyTokens.title.lineHeight,
+                    },
+                  ]}
+                >
+                  4
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  borderRadius: 12,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: colorTokens.border.subtle,
+                  backgroundColor: "rgba(255, 255, 255, 0.72)",
+                  padding: spacingTokens.md,
+                  gap: spacingTokens.xs,
+                }}
+              >
+                <Text
+                  selectable
+                  style={[
+                    typographyTokens.caption,
+                    { color: colorTokens.text.muted },
+                  ]}
+                >
+                  Pending requests
+                </Text>
+                <Text
+                  selectable
+                  style={[
+                    typographyTokens.title,
+                    {
+                      color: colorTokens.text.primary,
+                      fontSize: isCompact ? 20 : typographyTokens.title.fontSize,
+                      lineHeight: isCompact ? 26 : typographyTokens.title.lineHeight,
+                    },
+                  ]}
+                >
+                  2
+                </Text>
+              </View>
+            </View>
+            <View style={{ gap: spacingTokens.sm }}>
+              {["Coffee run split equally", "Groceries split by exact amounts"].map(
+                (row) => {
+                  return (
                     <Text
+                      key={row}
                       selectable
                       style={[
                         typographyTokens.body,
@@ -150,52 +213,32 @@ export default function HomePreviewScreen() {
                     >
                       {row}
                     </Text>
-                  </View>
-                );
-              },
-            )}
-          </View>
-        </GlassCard>
-      </Animated.View>
+                  );
+                },
+              )}
+            </View>
+          </GlassCard>
+        </Animated.View>
 
-      <Animated.View entering={getEntering(210)}>
-        <GlassCard
-          contentStyle={{
-            gap: spacingTokens.md,
-            backgroundColor: "rgba(255, 255, 255, 0.58)",
+        <View style={{ flex: 1 }} />
+
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: colorTokens.border.subtle,
+            paddingTop: spacingTokens.md,
           }}
         >
-          <Text
-            selectable
-            style={[
-              typographyTokens.label,
-              { color: colorTokens.text.primary },
-            ]}
-          >
-            Recent activity
-          </Text>
-          <View style={{ gap: spacingTokens.sm }}>
-            {[
-              "Coffee run split equally · 4 people",
-              "Groceries split by exact amounts",
-              "Weekend trip hotel split by percentage",
-            ].map((row) => {
-              return (
-                <Text
-                  key={row}
-                  selectable
-                  style={[
-                    typographyTokens.body,
-                    { color: colorTokens.text.secondary },
-                  ]}
-                >
-                  {row}
-                </Text>
-              );
-            })}
-          </View>
-        </GlassCard>
-      </Animated.View>
-    </ScreenScaffold>
+          <PrimaryButton
+            label="Restart Onboarding"
+            variant="secondary"
+            onPress={() => {
+              resetDraft();
+              router.replace("/(onboarding)");
+            }}
+          />
+        </View>
+      </View>
+    </GradientOrbBackground>
   );
 }
