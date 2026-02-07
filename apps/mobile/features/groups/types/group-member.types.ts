@@ -16,5 +16,8 @@ export type GroupMemberRow = {
   user_id: string;
   role: MemberRole;
   joined_at: string;
-  profiles: { display_name: string | null; email: string | null }[] | null;
+  profiles:
+    | { display_name: string | null; email: string | null }[]
+    | { display_name: string | null; email: string | null }
+    | null;
 };
