@@ -34,8 +34,10 @@ export type UpdateGroupInput = {
 
 export type GroupListItem = Group & {
   memberCount: number;
+  expenseCount: number;
 };
 
 export type GroupListRow = GroupRow & {
   group_members: { count: number }[];
+  expenses: { count: number }[];
 };

@@ -236,8 +236,10 @@ export default function GroupsTabScreen() {
                     fontWeight: "500",
                   }}
                 >
-                  {group.memberCount} {group.memberCount === 1 ? "member" : "members"} · No
-                  expenses yet
+                  {group.memberCount} {group.memberCount === 1 ? "member" : "members"} ·{" "}
+                  {group.expenseCount === 0
+                    ? "No expenses yet"
+                    : `${group.expenseCount} ${group.expenseCount === 1 ? "expense" : "expenses"}`}
                 </Text>
               </Pressable>
             </Link>

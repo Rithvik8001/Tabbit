@@ -12,7 +12,7 @@ const groupColumns =
   "id, name, emoji, group_type, created_by, created_at, updated_at";
 
 const groupListColumns =
-  "id, name, emoji, group_type, created_by, created_at, updated_at, group_members(count)";
+  "id, name, emoji, group_type, created_by, created_at, updated_at, group_members(count), expenses(count)";
 
 type GroupsRepositoryResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
@@ -32,6 +32,7 @@ function mapGroupListRow(row: GroupListRow): GroupListItem {
   return {
     ...mapGroupRow(row),
     memberCount: row.group_members?.[0]?.count ?? 0,
+    expenseCount: row.expenses?.[0]?.count ?? 0,
   };
 }
 

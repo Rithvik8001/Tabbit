@@ -38,6 +38,14 @@ export default function GroupsTabLayout() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen
+        name="add-expense"
+        options={{
+          title: "Add Expense",
+          headerLargeTitle: false,
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }
