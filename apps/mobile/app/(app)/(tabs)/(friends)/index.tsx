@@ -1,10 +1,8 @@
 import { Link } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
-import {
-  friendBalances,
-  formatCurrency,
-} from "@/features/app-shell/mock/tab-mock-data";
+import { useFriends } from "@/features/friends/hooks/use-friends";
+import { formatCents } from "@/features/groups/lib/format-currency";
 
 const surface = "#FFFFFF";
 const stroke = "#E8ECF2";
@@ -13,6 +11,54 @@ const muted = "#5C6780";
 const accent = "#4A29FF";
 
 export default function FriendsTabScreen() {
+  const { friends, isLoading, error, refresh } = useFriends();
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={accent} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 20,
+          gap: 12,
+        }}
+      >
+        <Text style={{ color: ink, fontSize: 16, fontWeight: "600", textAlign: "center" }}>
+          {error}
+        </Text>
+        <Pressable onPress={() => void refresh()}>
+          <Text style={{ color: accent, fontSize: 16, fontWeight: "600" }}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  if (friends.length === 0) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 20,
+        }}
+      >
+        <Text style={{ color: muted, fontSize: 16, fontWeight: "500", textAlign: "center" }}>
+          No friends yet — join or create a group to get started.
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -23,15 +69,16 @@ export default function FriendsTabScreen() {
         gap: 12,
       }}
     >
-      {friendBalances.map((friend) => {
+      {friends.map((friend) => {
+        const isSettled = friend.direction === "settled";
         const isPositive = friend.direction === "you_are_owed";
 
         return (
           <Link
-            key={friend.id}
+            key={friend.userId}
             href={{
               pathname: "/(app)/(tabs)/(friends)/[friendId]",
-              params: { friendId: friend.id },
+              params: { friendId: friend.userId },
             }}
             asChild
           >
@@ -58,7 +105,7 @@ export default function FriendsTabScreen() {
                   selectable
                   style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
                 >
-                  {friend.name}
+                  {friend.displayName ?? friend.email ?? "Unknown"}
                 </Text>
                 <Text
                   selectable
@@ -71,15 +118,18 @@ export default function FriendsTabScreen() {
               <Text
                 selectable
                 style={{
-                  color: isPositive ? accent : ink,
+                  color: isSettled ? muted : isPositive ? accent : ink,
                   fontSize: 16,
                   lineHeight: 20,
                   fontWeight: "600",
                   fontVariant: ["tabular-nums"],
                 }}
               >
-                {isPositive ? "You are owed " : "You owe "}
-                {formatCurrency(friend.amount)}
+                {isSettled
+                  ? "Settled up"
+                  : isPositive
+                    ? `You are owed ${formatCents(Math.abs(friend.netCents))}`
+                    : `You owe ${formatCents(Math.abs(friend.netCents))}`}
               </Text>
             </Pressable>
           </Link>
