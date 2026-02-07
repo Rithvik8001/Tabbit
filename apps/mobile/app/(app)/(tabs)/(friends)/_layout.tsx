@@ -11,6 +11,14 @@ export default function FriendsTabLayout() {
     >
       <Stack.Screen name="index" options={{ title: "Friends" }} />
       <Stack.Screen name="[friendId]" options={{ title: "Friend", headerLargeTitle: false }} />
+      <Stack.Screen
+        name="settle-up"
+        options={{
+          title: "Settle Up",
+          headerLargeTitle: false,
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

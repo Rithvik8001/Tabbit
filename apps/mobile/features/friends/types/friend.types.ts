@@ -1,3 +1,5 @@
+import type { ExpenseEntryType } from "@/features/groups/types/expense.types";
+
 export type BalanceDirection = "you_are_owed" | "you_owe" | "settled";
 
 /** Raw row from get_cross_group_balances() RPC */
@@ -23,8 +25,10 @@ export type FriendActivityRow = {
   description: string;
   amount_cents: number;
   expense_date: string;
+  group_id: string;
   group_name: string;
   group_emoji: string | null;
+  entry_type: ExpenseEntryType;
   paid_by_me: boolean;
   my_share: number;
   friend_share: number;
@@ -36,8 +40,10 @@ export type FriendActivityItem = {
   description: string;
   amountCents: number;
   expenseDate: string;
+  groupId: string;
   groupName: string;
   groupEmoji: string | null;
+  entryType: ExpenseEntryType;
   paidByMe: boolean;
   myShare: number;
   friendShare: number;

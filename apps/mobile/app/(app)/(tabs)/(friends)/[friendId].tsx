@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
@@ -13,6 +13,7 @@ const accent = "#4A29FF";
 
 export default function FriendDetailScreen() {
   const { friendId } = useLocalSearchParams<{ friendId: string }>();
+  const router = useRouter();
   const { friend, activity, isLoading, error, refresh } = useFriendDetail(friendId);
 
   const friendName = friend?.displayName ?? friend?.email ?? "Friend";
@@ -145,6 +146,39 @@ export default function FriendDetailScreen() {
                 </Text>
               )}
             </View>
+            {!isSettled ? (
+              <Pressable
+                onPress={() => {
+                  router.push({
+                    pathname: "/(app)/(tabs)/(friends)/settle-up" as never,
+                    params: { friendId: friend.userId } as never,
+                  });
+                }}
+                style={{
+                  marginTop: 4,
+                  alignSelf: "flex-start",
+                  borderRadius: 999,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: "#E2DDFF",
+                  backgroundColor: "#ECE9FF",
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                }}
+              >
+                <Text
+                  selectable
+                  style={{
+                    color: accent,
+                    fontSize: 13,
+                    lineHeight: 16,
+                    fontWeight: "700",
+                  }}
+                >
+                  Settle Up
+                </Text>
+              </Pressable>
+            ) : null}
           </View>
 
           {/* Activity list */}
@@ -176,6 +210,7 @@ export default function FriendDetailScreen() {
             ) : (
               activity.map((item) => {
                 const itemPositive = item.netCents > 0;
+                const isSettlement = item.entryType === "settlement";
                 return (
                   <View
                     key={item.expenseId}
@@ -191,23 +226,48 @@ export default function FriendDetailScreen() {
                     <View
                       style={{
                         flexDirection: "row",
-                        alignItems: "center",
+                        alignItems: "flex-start",
                         justifyContent: "space-between",
                         gap: 12,
                       }}
                     >
-                      <Text
-                        selectable
-                        style={{
-                          flex: 1,
-                          color: ink,
-                          fontSize: 16,
-                          lineHeight: 20,
-                          fontWeight: "600",
-                        }}
-                      >
-                        {item.description}
-                      </Text>
+                      <View style={{ flex: 1, gap: 4 }}>
+                        <Text
+                          selectable
+                          style={{
+                            color: ink,
+                            fontSize: 16,
+                            lineHeight: 20,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {item.description}
+                        </Text>
+                        {isSettlement ? (
+                          <View
+                            style={{
+                              alignSelf: "flex-start",
+                              borderRadius: 999,
+                              borderCurve: "continuous",
+                              backgroundColor: "#ECE9FF",
+                              paddingHorizontal: 8,
+                              paddingVertical: 3,
+                            }}
+                          >
+                            <Text
+                              selectable
+                              style={{
+                                color: accent,
+                                fontSize: 11,
+                                lineHeight: 14,
+                                fontWeight: "700",
+                              }}
+                            >
+                              Settlement
+                            </Text>
+                          </View>
+                        ) : null}
+                      </View>
                       <Text
                         selectable
                         style={{

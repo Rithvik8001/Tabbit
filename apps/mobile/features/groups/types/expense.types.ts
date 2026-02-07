@@ -1,4 +1,5 @@
 export type SplitType = "equal" | "exact" | "percent";
+export type ExpenseEntryType = "expense" | "settlement";
 
 export type Expense = {
   id: string;
@@ -8,6 +9,7 @@ export type Expense = {
   currency: string;
   expenseDate: string;
   splitType: SplitType;
+  entryType: ExpenseEntryType;
   paidBy: string;
   createdBy: string;
   createdAt: string;
@@ -22,6 +24,7 @@ export type ExpenseRow = {
   currency: string;
   expense_date: string;
   split_type: SplitType;
+  entry_type: ExpenseEntryType;
   paid_by: string;
   created_by: string;
   created_at: string;
@@ -60,6 +63,7 @@ export type CreateExpenseInput = {
   currency?: string;
   expenseDate: string;
   splitType: SplitType;
+  entryType?: ExpenseEntryType;
   paidBy: string;
   participants: ExpenseSplitInput[];
 };

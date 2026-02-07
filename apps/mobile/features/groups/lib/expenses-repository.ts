@@ -12,7 +12,16 @@ import type {
 type ExpensesResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
 const expenseWithSplitsColumns =
-  "id, group_id, description, amount_cents, currency, expense_date, split_type, paid_by, created_by, created_at, updated_at, expense_splits(id, expense_id, user_id, share_cents, percent_share), paid_by_profile:profiles!paid_by(display_name, email)";
+  "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at, expense_splits(id, expense_id, user_id, share_cents, percent_share), paid_by_profile:profiles!paid_by(display_name, email)";
+
+export type CreateSettlementInput = {
+  groupId: string;
+  amountCents: number;
+  expenseDate: string;
+  paidBy: string;
+  paidTo: string;
+  createdBy: string;
+};
 
 function mapExpenseRow(row: ExpenseRow): Expense {
   return {
@@ -23,6 +32,7 @@ function mapExpenseRow(row: ExpenseRow): Expense {
     currency: row.currency,
     expenseDate: row.expense_date,
     splitType: row.split_type,
+    entryType: row.entry_type,
     paidBy: row.paid_by,
     createdBy: row.created_by,
     createdAt: row.created_at,
@@ -115,10 +125,11 @@ export async function createExpense(
       currency: input.currency ?? "USD",
       expense_date: input.expenseDate,
       split_type: input.splitType,
+      entry_type: input.entryType ?? "expense",
       paid_by: input.paidBy,
       created_by: userId,
     })
-    .select("id, group_id, description, amount_cents, currency, expense_date, split_type, paid_by, created_by, created_at, updated_at")
+    .select("id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at")
     .single();
 
   if (expenseError) {
@@ -156,6 +167,43 @@ export async function createExpense(
     ok: true,
     data: expense,
   };
+}
+
+export async function createSettlement(
+  input: CreateSettlementInput,
+): Promise<ExpensesResult<Expense>> {
+  if (input.paidBy === input.paidTo) {
+    return {
+      ok: false,
+      message: "Payer and payee must be different users.",
+    };
+  }
+
+  if (input.amountCents <= 0) {
+    return {
+      ok: false,
+      message: "Settlement amount must be greater than $0.00.",
+    };
+  }
+
+  return createExpense(
+    input.groupId,
+    {
+      description: "Settle Up",
+      amountCents: input.amountCents,
+      expenseDate: input.expenseDate,
+      splitType: "exact",
+      entryType: "settlement",
+      paidBy: input.paidBy,
+      participants: [
+        {
+          userId: input.paidTo,
+          shareCents: input.amountCents,
+        },
+      ],
+    },
+    input.createdBy,
+  );
 }
 
 export async function deleteExpense(

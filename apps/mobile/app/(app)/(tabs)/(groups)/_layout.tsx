@@ -46,6 +46,14 @@ export default function GroupsTabLayout() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen
+        name="settle-up"
+        options={{
+          title: "Settle Up",
+          headerLargeTitle: false,
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

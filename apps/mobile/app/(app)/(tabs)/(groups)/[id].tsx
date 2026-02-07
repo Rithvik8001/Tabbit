@@ -482,6 +482,12 @@ export default function GroupDetailScreen() {
                   {simplifiedDebts.map((debt, i) => {
                     const fromLabel = debt.fromUserId === user?.id ? "You" : (debt.fromName ?? "Someone");
                     const toLabel = debt.toUserId === user?.id ? "you" : (debt.toName ?? "someone");
+                    const settleActionLabel =
+                      debt.fromUserId === user?.id
+                        ? "I Paid"
+                        : debt.toUserId === user?.id
+                          ? "They Paid Me"
+                          : null;
 
                     return (
                       <View
@@ -494,18 +500,64 @@ export default function GroupDetailScreen() {
                           paddingVertical: 8,
                         }}
                       >
-                        <Text
-                          selectable
+                        <View
                           style={{
-                            color: ink,
-                            fontSize: 14,
-                            lineHeight: 18,
-                            fontWeight: "500",
-                            fontVariant: ["tabular-nums"],
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: 10,
                           }}
                         >
-                          {fromLabel} {debt.fromUserId === user?.id ? "owe" : "owes"} {toLabel} {formatCents(debt.amountCents)}
-                        </Text>
+                          <Text
+                            selectable
+                            style={{
+                              flex: 1,
+                              color: ink,
+                              fontSize: 14,
+                              lineHeight: 18,
+                              fontWeight: "500",
+                              fontVariant: ["tabular-nums"],
+                            }}
+                          >
+                            {fromLabel} {debt.fromUserId === user?.id ? "owe" : "owes"} {toLabel} {formatCents(debt.amountCents)}
+                          </Text>
+                          {settleActionLabel ? (
+                            <Pressable
+                              onPress={() => {
+                                router.push({
+                                  pathname: "/(app)/(tabs)/(groups)/settle-up" as never,
+                                  params: {
+                                    id: group.id,
+                                    fromUserId: debt.fromUserId,
+                                    toUserId: debt.toUserId,
+                                    maxAmountCents: String(debt.amountCents),
+                                  } as never,
+                                });
+                              }}
+                              style={{
+                                borderRadius: 999,
+                                borderCurve: "continuous",
+                                borderWidth: 1,
+                                borderColor: "#E2DDFF",
+                                backgroundColor: "#ECE9FF",
+                                paddingHorizontal: 10,
+                                paddingVertical: 4,
+                              }}
+                            >
+                              <Text
+                                selectable
+                                style={{
+                                  color: accent,
+                                  fontSize: 12,
+                                  lineHeight: 16,
+                                  fontWeight: "700",
+                                }}
+                              >
+                                {settleActionLabel}
+                              </Text>
+                            </Pressable>
+                          ) : null}
+                        </View>
                       </View>
                     );
                   })}
@@ -587,6 +639,7 @@ export default function GroupDetailScreen() {
                     : expense.splitType === "exact"
                       ? "exact"
                       : "percent";
+                const isSettlement = expense.entryType === "settlement";
 
                 return (
                   <View
@@ -603,23 +656,48 @@ export default function GroupDetailScreen() {
                     <View
                       style={{
                         flexDirection: "row",
-                        alignItems: "center",
+                        alignItems: "flex-start",
                         justifyContent: "space-between",
                         gap: 8,
                       }}
                     >
-                      <Text
-                        selectable
-                        style={{
-                          flex: 1,
-                          color: ink,
-                          fontSize: 16,
-                          lineHeight: 20,
-                          fontWeight: "600",
-                        }}
-                      >
-                        {expense.description}
-                      </Text>
+                      <View style={{ flex: 1, gap: 4 }}>
+                        <Text
+                          selectable
+                          style={{
+                            color: ink,
+                            fontSize: 16,
+                            lineHeight: 20,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {expense.description}
+                        </Text>
+                        {isSettlement ? (
+                          <View
+                            style={{
+                              alignSelf: "flex-start",
+                              borderRadius: 999,
+                              borderCurve: "continuous",
+                              backgroundColor: "#ECE9FF",
+                              paddingHorizontal: 8,
+                              paddingVertical: 3,
+                            }}
+                          >
+                            <Text
+                              selectable
+                              style={{
+                                color: accent,
+                                fontSize: 11,
+                                lineHeight: 14,
+                                fontWeight: "700",
+                              }}
+                            >
+                              Settlement
+                            </Text>
+                          </View>
+                        ) : null}
+                      </View>
                       <Text
                         selectable
                         style={{
@@ -643,7 +721,7 @@ export default function GroupDetailScreen() {
                         fontWeight: "500",
                       }}
                     >
-                      Paid by {expense.paidByName ?? "unknown"} · {expense.expenseDate} · {splitLabel}
+                      Paid by {expense.paidByName ?? "unknown"} · {expense.expenseDate} · {isSettlement ? "settlement" : splitLabel}
                     </Text>
 
                     {canDelete ? (
