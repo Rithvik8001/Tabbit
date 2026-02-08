@@ -1,11 +1,11 @@
 import { Link, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { useAuth } from "@/features/auth/state/auth-provider";
-import { isValidEmail } from "@/features/auth/utils/auth-validation";
+import { loginSchema, parseFormErrors } from "@/features/auth/utils/auth-schemas";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -14,7 +14,8 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthLoading && session) {
@@ -22,26 +23,33 @@ export default function LoginScreen() {
     }
   }, [isAuthLoading, router, session]);
 
+  const clearFieldError = useCallback((field: string) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setServerError(null);
+  }, []);
+
   const handleLogin = () => {
-    if (!isValidEmail(email)) {
-      setFormError("Enter a valid email address.");
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      setFieldErrors(parseFormErrors(result));
       return;
     }
 
-    if (password.length === 0) {
-      setFormError("Enter your password.");
-      return;
-    }
-
-    setFormError(null);
+    setFieldErrors({});
+    setServerError(null);
     setIsSubmitting(true);
 
     void (async () => {
-      const result = await signInWithPassword(email.trim(), password);
+      const authResult = await signInWithPassword(email.trim(), password);
       setIsSubmitting(false);
 
-      if (!result.ok) {
-        setFormError(result.message ?? "Unable to log in.");
+      if (!authResult.ok) {
+        setServerError(authResult.message ?? "Unable to log in.");
         return;
       }
 
@@ -56,27 +64,35 @@ export default function LoginScreen() {
           {
             placeholder: "Email",
             value: email,
-            onChangeText: setEmail,
+            onChangeText: (text: string) => {
+              setEmail(text);
+              clearFieldError("email");
+            },
             autoCapitalize: "none",
             autoCorrect: false,
             keyboardType: "email-address",
             textContentType: "emailAddress",
             autoComplete: "email",
+            error: fieldErrors.email,
           },
           {
             placeholder: "Password",
             value: password,
-            onChangeText: setPassword,
+            onChangeText: (text: string) => {
+              setPassword(text);
+              clearFieldError("password");
+            },
             secureTextEntry: true,
             autoCapitalize: "none",
             autoCorrect: false,
             textContentType: "password",
             autoComplete: "password",
+            error: fieldErrors.password,
           },
         ]}
       />
 
-      {formError ? (
+      {serverError ? (
         <Text
           style={{
             fontSize: 13,
@@ -85,7 +101,7 @@ export default function LoginScreen() {
             textAlign: "center",
           }}
         >
-          {formError}
+          {serverError}
         </Text>
       ) : null}
 
@@ -94,7 +110,7 @@ export default function LoginScreen() {
         disabled={isSubmitting}
         onPress={handleLogin}
         style={{
-          backgroundColor: "#E5E5E5",
+          backgroundColor: "#1CB0F6",
           borderRadius: 16,
           borderCurve: "continuous",
           minHeight: 50,
@@ -108,7 +124,7 @@ export default function LoginScreen() {
           style={{
             fontSize: 15,
             fontWeight: "700",
-            color: "#AFAFAF",
+            color: "#FFFFFF",
             textTransform: "uppercase",
             letterSpacing: 0.8,
           }}

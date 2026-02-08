@@ -98,7 +98,7 @@ export default function OnboardingScreen() {
               router.push("/(auth)/login");
             }}
             style={{
-              backgroundColor: "#E5E5E5",
+              backgroundColor: "#1CB0F6",
               borderRadius: 16,
               borderCurve: "continuous",
               minHeight: 50,
@@ -112,7 +112,7 @@ export default function OnboardingScreen() {
               style={{
                 fontSize: 15,
                 fontWeight: "700",
-                color: "#AFAFAF",
+                color: "#FFFFFF",
                 textTransform: "uppercase",
                 letterSpacing: 0.8,
               }}

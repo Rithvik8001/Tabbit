@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
 import { View } from "react-native";
 
-import { elevationTokens } from "@/design/tokens/elevation";
 import { radiusTokens } from "@/design/tokens/radius";
 
 type LiquidSurfaceProps = {
@@ -30,7 +29,8 @@ export function LiquidSurface({
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
           backgroundColor: "#FFFFFF",
-          boxShadow: elevationTokens.sm,
+          borderWidth: 2,
+          borderColor: "#E5E5E5",
         },
         style,
       ]}

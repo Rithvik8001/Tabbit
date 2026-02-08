@@ -156,24 +156,20 @@ export default function SettingsTabScreen() {
         {settingRow("Smart split suggestions", smartRemindersEnabled, setSmartRemindersEnabled)}
       </LiquidSurface>
 
-      <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
-        <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>
-          Sign Out
+      {signOutError ? (
+        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger, textAlign: "center" }]}>
+          {signOutError}
         </Text>
+      ) : null}
 
-        {signOutError ? (
-          <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
-            {signOutError}
-          </Text>
-        ) : null}
-
-        <Button
-          label="Sign Out & Restart Onboarding"
-          loading={isSigningOut}
-          onPress={handleSignOut}
-          tone="danger"
-        />
-      </LiquidSurface>
+      <Button
+        label="Sign Out"
+        loading={isSigningOut}
+        onPress={handleSignOut}
+        tone="danger"
+        variant="solid"
+        size="lg"
+      />
     </ScreenContainer>
   );
 }

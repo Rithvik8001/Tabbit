@@ -1,11 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import type { TextInputProps } from "react-native";
 
-type FieldConfig = TextInputProps & {
+export type FieldConfig = TextInputProps & {
   placeholder: string;
   secureTextEntry?: boolean;
+  error?: string;
 };
 
 type AuthInputGroupProps = {
@@ -21,6 +22,7 @@ function AuthInputField({
 }) {
   const [isSecure, setIsSecure] = useState(field.secureTextEntry ?? false);
   const hasEyeToggle = field.secureTextEntry;
+  const hasError = !!field.error;
 
   return (
     <View>
@@ -28,6 +30,7 @@ function AuthInputField({
         style={{
           flexDirection: "row",
           alignItems: "center",
+          backgroundColor: hasError ? "#FFF5F5" : undefined,
         }}
       >
         <TextInput
@@ -57,6 +60,20 @@ function AuthInputField({
           </Pressable>
         ) : null}
       </View>
+      {hasError ? (
+        <Text
+          style={{
+            fontSize: 12,
+            fontWeight: "400",
+            color: "#FF4B4B",
+            paddingHorizontal: 16,
+            paddingBottom: 8,
+            backgroundColor: "#FFF5F5",
+          }}
+        >
+          {field.error}
+        </Text>
+      ) : null}
       {!isLast ? (
         <View
           style={{
@@ -71,6 +88,8 @@ function AuthInputField({
 }
 
 export function AuthInputGroup({ fields }: AuthInputGroupProps) {
+  const hasAnyError = fields.some((f) => !!f.error);
+
   return (
     <View
       style={{
@@ -78,7 +97,7 @@ export function AuthInputGroup({ fields }: AuthInputGroupProps) {
         borderCurve: "continuous",
         backgroundColor: "#F7F7F7",
         borderWidth: 2,
-        borderColor: "#E5E5E5",
+        borderColor: hasAnyError ? "#FF4B4B" : "#E5E5E5",
         overflow: "hidden",
       }}
     >

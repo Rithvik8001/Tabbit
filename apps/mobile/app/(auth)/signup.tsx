@@ -1,16 +1,11 @@
 import { Link, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { useAuth } from "@/features/auth/state/auth-provider";
-import {
-  getDisplayNameValidationMessage,
-  normalizeDisplayName,
-  isValidEmail,
-  isValidPassword,
-} from "@/features/auth/utils/auth-validation";
+import { signupSchema, parseFormErrors } from "@/features/auth/utils/auth-schemas";
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -21,7 +16,8 @@ export default function SignupScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [verificationMessage, setVerificationMessage] = useState<string | null>(
     null,
   );
@@ -32,52 +28,54 @@ export default function SignupScreen() {
     }
   }, [isAuthLoading, router, session]);
 
+  const clearFieldError = useCallback((field: string) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setServerError(null);
+  }, []);
+
   const handleSignUp = () => {
     if (verificationMessage) {
       router.replace("/(auth)/login");
       return;
     }
 
-    const displayNameMessage = getDisplayNameValidationMessage(displayName);
-    if (displayNameMessage) {
-      setFormError(displayNameMessage);
+    const result = signupSchema.safeParse({
+      displayName,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (!result.success) {
+      setFieldErrors(parseFormErrors(result));
       return;
     }
 
-    if (!isValidEmail(email)) {
-      setFormError("Enter a valid email address.");
-      return;
-    }
-
-    if (!isValidPassword(password)) {
-      setFormError("Password must be at least 8 characters.");
-      return;
-    }
-
-    if (confirmPassword !== password) {
-      setFormError("Passwords do not match.");
-      return;
-    }
-
-    setFormError(null);
+    setFieldErrors({});
+    setServerError(null);
     setIsSubmitting(true);
 
     void (async () => {
-      const result = await signUpWithPassword(
-        normalizeDisplayName(displayName),
-        email.trim(),
+      const authResult = await signUpWithPassword(
+        result.data.displayName,
+        result.data.email,
         password,
       );
       setIsSubmitting(false);
 
-      if (!result.ok) {
-        setFormError(result.message ?? "Unable to create account.");
+      if (!authResult.ok) {
+        setServerError(authResult.message ?? "Unable to create account.");
         return;
       }
 
-      if (result.requiresEmailVerification) {
+      if (authResult.requiresEmailVerification) {
         setVerificationMessage(
-          result.message ??
+          authResult.message ??
             "Check your inbox and confirm your email to continue.",
         );
         return;
@@ -105,7 +103,7 @@ export default function SignupScreen() {
         <Pressable
           onPress={() => router.replace("/(auth)/login")}
           style={{
-            backgroundColor: "#E5E5E5",
+            backgroundColor: "#1CB0F6",
             borderRadius: 16,
             borderCurve: "continuous",
             minHeight: 50,
@@ -118,7 +116,7 @@ export default function SignupScreen() {
             style={{
               fontSize: 15,
               fontWeight: "700",
-              color: "#AFAFAF",
+              color: "#FFFFFF",
               textTransform: "uppercase",
               letterSpacing: 0.8,
             }}
@@ -137,46 +135,62 @@ export default function SignupScreen() {
           {
             placeholder: "Username",
             value: displayName,
-            onChangeText: setDisplayName,
+            onChangeText: (text: string) => {
+              setDisplayName(text);
+              clearFieldError("displayName");
+            },
             autoCapitalize: "words",
             autoCorrect: false,
             textContentType: "username",
             autoComplete: "name",
+            error: fieldErrors.displayName,
           },
           {
             placeholder: "Email",
             value: email,
-            onChangeText: setEmail,
+            onChangeText: (text: string) => {
+              setEmail(text);
+              clearFieldError("email");
+            },
             autoCapitalize: "none",
             autoCorrect: false,
             keyboardType: "email-address",
             textContentType: "emailAddress",
             autoComplete: "email",
+            error: fieldErrors.email,
           },
           {
             placeholder: "Password",
             value: password,
-            onChangeText: setPassword,
+            onChangeText: (text: string) => {
+              setPassword(text);
+              clearFieldError("password");
+            },
             secureTextEntry: true,
             autoCapitalize: "none",
             autoCorrect: false,
             textContentType: "newPassword",
             autoComplete: "password-new",
+            error: fieldErrors.password,
           },
           {
             placeholder: "Confirm password",
             value: confirmPassword,
-            onChangeText: setConfirmPassword,
+            onChangeText: (text: string) => {
+              setConfirmPassword(text);
+              clearFieldError("confirmPassword");
+            },
             secureTextEntry: true,
             autoCapitalize: "none",
             autoCorrect: false,
             textContentType: "newPassword",
             autoComplete: "password-new",
+            error: fieldErrors.confirmPassword,
           },
         ]}
       />
 
-      {formError ? (
+      {serverError ? (
         <Text
           style={{
             fontSize: 13,
@@ -185,7 +199,7 @@ export default function SignupScreen() {
             textAlign: "center",
           }}
         >
-          {formError}
+          {serverError}
         </Text>
       ) : null}
 
@@ -194,7 +208,7 @@ export default function SignupScreen() {
         disabled={isSubmitting}
         onPress={handleSignUp}
         style={{
-          backgroundColor: "#E5E5E5",
+          backgroundColor: "#1CB0F6",
           borderRadius: 16,
           borderCurve: "continuous",
           minHeight: 50,
@@ -208,7 +222,7 @@ export default function SignupScreen() {
           style={{
             fontSize: 15,
             fontWeight: "700",
-            color: "#AFAFAF",
+            color: "#FFFFFF",
             textTransform: "uppercase",
             letterSpacing: 0.8,
           }}

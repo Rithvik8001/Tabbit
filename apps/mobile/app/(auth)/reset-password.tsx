@@ -67,7 +67,7 @@ export default function ResetPasswordScreen() {
         <Link href="/(auth)/forgot-password" asChild>
           <Pressable
             style={{
-              backgroundColor: "#E5E5E5",
+              backgroundColor: "#1CB0F6",
               borderRadius: 16,
               borderCurve: "continuous",
               minHeight: 50,
@@ -80,7 +80,7 @@ export default function ResetPasswordScreen() {
               style={{
                 fontSize: 15,
                 fontWeight: "700",
-                color: "#AFAFAF",
+                color: "#FFFFFF",
                 textTransform: "uppercase",
                 letterSpacing: 0.8,
               }}
@@ -138,7 +138,7 @@ export default function ResetPasswordScreen() {
         disabled={disableSubmit}
         onPress={handleUpdatePassword}
         style={{
-          backgroundColor: "#E5E5E5",
+          backgroundColor: "#1CB0F6",
           borderRadius: 16,
           borderCurve: "continuous",
           minHeight: 50,
@@ -152,7 +152,7 @@ export default function ResetPasswordScreen() {
           style={{
             fontSize: 15,
             fontWeight: "700",
-            color: "#AFAFAF",
+            color: "#FFFFFF",
             textTransform: "uppercase",
             letterSpacing: 0.8,
           }}
