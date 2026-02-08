@@ -1,24 +1,26 @@
+import { colorSemanticTokens } from "@/design/tokens/colors";
+
 export const colorTokens = {
   brand: {
-    primary: "#5D18EB",
-    primarySoft: "#F3EEFF",
+    primary: colorSemanticTokens.accent.primary,
+    primarySoft: colorSemanticTokens.accent.soft,
   },
   text: {
-    primary: "#14161D",
-    secondary: "#5F6472",
-    muted: "#8A8F9E",
-    inverse: "#FFFFFF",
+    primary: colorSemanticTokens.text.primary,
+    secondary: colorSemanticTokens.text.secondary,
+    muted: colorSemanticTokens.text.tertiary,
+    inverse: colorSemanticTokens.text.inverse,
   },
   surface: {
-    base: "#F5F6F8",
-    glass: "rgba(255, 255, 255, 0.72)",
-    card: "#FFFFFF",
-    elevated: "#FCFCFD",
+    base: colorSemanticTokens.background.canvas,
+    glass: colorSemanticTokens.surface.glass,
+    card: colorSemanticTokens.surface.cardStrong,
+    elevated: colorSemanticTokens.surface.card,
   },
   border: {
-    glass: "rgba(255, 255, 255, 0.85)",
-    subtle: "rgba(20, 22, 29, 0.10)",
-    strong: "rgba(20, 22, 29, 0.16)",
+    glass: colorSemanticTokens.border.glass,
+    subtle: colorSemanticTokens.border.subtle,
+    strong: colorSemanticTokens.border.strong,
   },
 } as const;
 

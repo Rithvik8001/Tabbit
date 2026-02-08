@@ -1,14 +1,21 @@
 export const motionTokens = {
   duration: {
-    enter: 420,
-    transition: 260,
-    press: 140,
+    instant: 80,
+    fast: 140,
+    normal: 200,
+    relaxed: 280,
+    enter: 180,
+    transition: 200,
+    press: 110,
   },
   easing: {
+    standard: [0.2, 0, 0, 1] as const,
+    emphasized: [0.28, 0.95, 0.34, 1] as const,
     smoothOut: [0.22, 1, 0.36, 1] as const,
   },
   offset: {
-    screen: 12,
+    screen: 10,
+    listStagger: 26,
   },
 } as const;
 

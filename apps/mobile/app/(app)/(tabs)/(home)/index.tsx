@@ -1,16 +1,17 @@
 import { Link } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
+import { Badge } from "@/design/primitives/badge";
+import { Button } from "@/design/primitives/button";
+import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import { ScreenContainer } from "@/design/primitives/screen-container";
+import { SectionHeader } from "@/design/primitives/section-header";
+import { StatTile } from "@/design/primitives/stat-tile";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { spacingTokens } from "@/design/tokens/spacing";
+import { typographyScale } from "@/design/tokens/typography";
 import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
 import { formatCents } from "@/features/groups/lib/format-currency";
-
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
-const success = "#15803D";
-const danger = "#B03030";
 
 function formatShortDate(value: string): string {
   const parsed = new Date(value);
@@ -28,36 +29,52 @@ function formatShortDate(value: string): string {
   }
 }
 
-function LoadingCard() {
+function LoadingShell() {
   return (
-    <View
-      style={{
-        borderRadius: 20,
-        borderCurve: "continuous",
-        borderWidth: 1,
-        borderColor: stroke,
-        backgroundColor: surface,
-        padding: 16,
-        gap: 10,
-      }}
-    >
-      <View
-        style={{
-          width: "45%",
-          height: 12,
-          borderRadius: 999,
-          backgroundColor: "#F1F4F8",
-        }}
-      />
-      <View
-        style={{
-          width: "68%",
-          height: 24,
-          borderRadius: 999,
-          backgroundColor: "#F1F4F8",
-        }}
-      />
-    </View>
+    <>
+      <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.md }}>
+        <View
+          style={{
+            width: "38%",
+            height: 12,
+            borderRadius: 999,
+            backgroundColor: "rgba(11, 17, 32, 0.08)",
+          }}
+        />
+        <View
+          style={{
+            width: "62%",
+            height: 34,
+            borderRadius: 999,
+            backgroundColor: "rgba(11, 17, 32, 0.08)",
+          }}
+        />
+      </LiquidSurface>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacingTokens.sm }}>
+        {[0, 1, 2, 3].map((item) => (
+          <View key={`metric-loading-${item}`} style={{ width: "48%" }}>
+            <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+              <View
+                style={{
+                  width: "60%",
+                  height: 11,
+                  borderRadius: 999,
+                  backgroundColor: "rgba(11, 17, 32, 0.08)",
+                }}
+              />
+              <View
+                style={{
+                  width: "70%",
+                  height: 23,
+                  borderRadius: 999,
+                  backgroundColor: "rgba(11, 17, 32, 0.08)",
+                }}
+              />
+            </LiquidSurface>
+          </View>
+        ))}
+      </View>
+    </>
   );
 }
 
@@ -68,214 +85,99 @@ export default function HomeTabScreen() {
 
   const netBalanceColor =
     snapshot.netBalanceCents > 0
-      ? success
+      ? colorSemanticTokens.financial.positive
       : snapshot.netBalanceCents < 0
-        ? danger
-        : ink;
-
-  const metrics = [
-    {
-      label: "You Owe",
-      value: formatCents(snapshot.youOweCents),
-      valueColor: snapshot.youOweCents > 0 ? danger : ink,
-    },
-    {
-      label: "You're Owed",
-      value: formatCents(snapshot.youAreOwedCents),
-      valueColor: snapshot.youAreOwedCents > 0 ? success : ink,
-    },
-    {
-      label: "Unsettled Groups",
-      value: String(snapshot.unsettledGroupsCount),
-      valueColor: ink,
-    },
-    {
-      label: "Active Groups",
-      value: String(snapshot.activeGroupsCount),
-      valueColor: ink,
-    },
-  ];
+        ? colorSemanticTokens.financial.negative
+        : colorSemanticTokens.financial.neutral;
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingBottom: 24,
-        gap: 16,
-      }}
-    >
-      {isLoading ? (
-        <>
-          <LoadingCard />
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-            {[0, 1, 2, 3].map((index) => (
-              <View key={`home-metric-loading-${index}`} style={{ width: "48%" }}>
-                <LoadingCard />
-              </View>
-            ))}
-          </View>
-          <LoadingCard />
-        </>
-      ) : null}
+    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
+      {isLoading ? <LoadingShell /> : null}
 
       {!isLoading ? (
         <>
-          <View
-            style={{
-              borderRadius: 20,
-              borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
-              padding: 18,
-              gap: 8,
+          <LiquidSurface
+            kind="strong"
+            contentStyle={{
+              padding: spacingTokens.cardPadding,
+              gap: spacingTokens.xs,
             }}
           >
             <Text
               selectable
-              style={{ color: muted, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+              style={[typographyScale.labelMd, { color: colorSemanticTokens.text.tertiary }]}
             >
               Net Balance
             </Text>
             <Text
               selectable
-              style={{
-                color: netBalanceColor,
-                fontSize: 36,
-                lineHeight: 40,
-                letterSpacing: -0.6,
-                fontWeight: "700",
-                fontVariant: ["tabular-nums"],
-              }}
+              style={[
+                typographyScale.displayLg,
+                { color: netBalanceColor, fontVariant: ["tabular-nums"] },
+              ]}
             >
               {snapshot.netBalanceCents > 0
                 ? `+${formatCents(snapshot.netBalanceCents)}`
                 : formatCents(snapshot.netBalanceCents)}
             </Text>
-          </View>
+          </LiquidSurface>
 
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-            {metrics.map((metric) => (
-              <View
-                key={metric.label}
-                style={{
-                  width: "48%",
-                  borderRadius: 16,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: stroke,
-                  backgroundColor: surface,
-                  padding: 14,
-                  gap: 6,
-                }}
-              >
-                <Text
-                  selectable
-                  style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
-                >
-                  {metric.label}
-                </Text>
-                <Text
-                  selectable
-                  style={{
-                    color: metric.valueColor,
-                    fontSize: 20,
-                    lineHeight: 24,
-                    fontWeight: "700",
-                    fontVariant: ["tabular-nums"],
-                  }}
-                >
-                  {metric.value}
-                </Text>
-              </View>
-            ))}
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacingTokens.sm }}>
+            <View style={{ width: "48%" }}>
+              <StatTile
+                label="You Owe"
+                value={formatCents(snapshot.youOweCents)}
+                tone={snapshot.youOweCents > 0 ? "negative" : "neutral"}
+              />
+            </View>
+            <View style={{ width: "48%" }}>
+              <StatTile
+                label="You're Owed"
+                value={formatCents(snapshot.youAreOwedCents)}
+                tone={snapshot.youAreOwedCents > 0 ? "positive" : "neutral"}
+              />
+            </View>
+            <View style={{ width: "48%" }}>
+              <StatTile
+                label="Unsettled Groups"
+                value={String(snapshot.unsettledGroupsCount)}
+                tone="neutral"
+              />
+            </View>
+            <View style={{ width: "48%" }}>
+              <StatTile
+                label="Active Groups"
+                value={String(snapshot.activeGroupsCount)}
+                tone="neutral"
+              />
+            </View>
           </View>
 
           {error ? (
-            <View
-              style={{
-                borderRadius: 20,
-                borderCurve: "continuous",
-                borderWidth: 1,
-                borderColor: stroke,
-                backgroundColor: surface,
-                padding: 16,
-                gap: 10,
-              }}
-            >
-              <Text
-                selectable
-                style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
-              >
+            <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+              <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>
                 Could not refresh home dashboard
               </Text>
-              <Text
-                selectable
-                style={{ color: muted, fontSize: 14, lineHeight: 18, fontWeight: "500" }}
-              >
+              <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}>
                 {error}
               </Text>
-              <Pressable
-                onPress={() => {
-                  void refresh();
-                }}
-                style={{
-                  alignSelf: "flex-start",
-                  borderRadius: 999,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: "#D7DDE8",
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  backgroundColor: "#F8FAFC",
-                }}
-              >
-                <Text
-                  selectable
-                  style={{ color: ink, fontSize: 13, lineHeight: 16, fontWeight: "700" }}
-                >
-                  Try again
-                </Text>
-              </Pressable>
-            </View>
+              <Button label="Try Again" variant="soft" onPress={() => void refresh()} />
+            </LiquidSurface>
           ) : null}
 
-          <View
-            style={{
-              borderRadius: 20,
-              borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
-              padding: 18,
-              gap: 12,
-            }}
-          >
-            <Text
-              selectable
-              style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
-            >
-              Recent activity
-            </Text>
+          <LiquidSurface kind="strong" contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+            <SectionHeader title="Recent Activity" />
 
             {activity.length === 0 ? (
-              <Text
-                selectable
-                style={{
-                  color: muted,
-                  fontSize: 15,
-                  lineHeight: 20,
-                  fontWeight: "500",
-                }}
-              >
+              <Text selectable style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}>
                 No activity yet. Add an expense to see your balance changes.
               </Text>
             ) : (
               activity.map((item) => {
                 const isPositive = item.direction === "you_are_owed";
-                const isSettlement = item.entryType === "settlement";
+                const amountColor = isPositive
+                  ? colorSemanticTokens.financial.positive
+                  : colorSemanticTokens.financial.negative;
 
                 return (
                   <Link
@@ -288,12 +190,13 @@ export default function HomeTabScreen() {
                   >
                     <Pressable
                       style={{
-                        borderRadius: 14,
+                        borderRadius: 16,
                         borderCurve: "continuous",
                         borderWidth: 1,
-                        borderColor: stroke,
-                        padding: 12,
-                        gap: 6,
+                        borderColor: colorSemanticTokens.border.subtle,
+                        backgroundColor: "rgba(255, 255, 255, 0.52)",
+                        padding: spacingTokens.md,
+                        gap: spacingTokens.xs,
                       }}
                     >
                       <View
@@ -301,80 +204,40 @@ export default function HomeTabScreen() {
                           flexDirection: "row",
                           justifyContent: "space-between",
                           alignItems: "flex-start",
-                          gap: 12,
+                          gap: spacingTokens.sm,
                         }}
                       >
-                        <View style={{ flex: 1, gap: 4 }}>
+                        <View style={{ flex: 1, gap: spacingTokens.xxs }}>
                           <Text
                             selectable
-                            style={{
-                              color: ink,
-                              fontSize: 16,
-                              lineHeight: 20,
-                              fontWeight: "600",
-                            }}
+                            style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}
                           >
                             {item.description}
                           </Text>
-                          {isSettlement ? (
-                            <View
-                              style={{
-                                alignSelf: "flex-start",
-                                borderRadius: 999,
-                                borderCurve: "continuous",
-                                backgroundColor: "#ECE9FF",
-                                paddingHorizontal: 8,
-                                paddingVertical: 3,
-                              }}
-                            >
-                              <Text
-                                selectable
-                                style={{
-                                  color: accent,
-                                  fontSize: 11,
-                                  lineHeight: 14,
-                                  fontWeight: "700",
-                                }}
-                              >
-                                Settlement
-                              </Text>
-                            </View>
-                          ) : null}
+                          {item.entryType === "settlement" ? <Badge label="Settlement" tone="accent" /> : null}
                         </View>
                         <Text
                           selectable
-                          style={{
-                            color: isPositive ? success : danger,
-                            fontSize: 16,
-                            lineHeight: 20,
-                            fontWeight: "700",
-                            fontVariant: ["tabular-nums"],
-                          }}
+                          style={[
+                            typographyScale.headingSm,
+                            { color: amountColor, fontVariant: ["tabular-nums"] },
+                          ]}
                         >
                           {isPositive ? "+" : "-"}
                           {formatCents(Math.abs(item.netCents))}
                         </Text>
                       </View>
-                      <Text
-                        selectable
-                        style={{
-                          color: muted,
-                          fontSize: 14,
-                          lineHeight: 18,
-                          fontWeight: "500",
-                        }}
-                      >
-                        {item.groupEmoji ? `${item.groupEmoji} ` : ""}
-                        {item.groupName} • {formatShortDate(item.expenseDate)}
+                      <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.tertiary }]}>
+                        {item.groupEmoji} {item.groupName} · {formatShortDate(item.expenseDate)}
                       </Text>
                     </Pressable>
                   </Link>
                 );
               })
             )}
-          </View>
+          </LiquidSurface>
         </>
       ) : null}
-    </ScrollView>
+    </ScreenContainer>
   );
 }

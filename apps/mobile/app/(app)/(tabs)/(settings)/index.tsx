@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { Switch, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
+import { Button } from "@/design/primitives/button";
+import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import { ScreenContainer } from "@/design/primitives/screen-container";
+import { TextField } from "@/design/primitives/text-field";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { spacingTokens } from "@/design/tokens/spacing";
+import { typographyScale } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { getDisplayNameValidationMessage } from "@/features/auth/utils/auth-validation";
 import { useProfile } from "@/features/profile/hooks/use-profile";
-
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
 
 function settingRow(
   label: string,
@@ -23,19 +24,16 @@ function settingRow(
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 12,
+        gap: spacingTokens.sm,
       }}
     >
-      <Text
-        selectable
-        style={{ color: ink, fontSize: 16, lineHeight: 20, fontWeight: "600" }}
-      >
+      <Text selectable style={[typographyScale.bodyLg, { color: colorSemanticTokens.text.primary }]}>
         {label}
       </Text>
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ true: accent }}
+        trackColor={{ true: colorSemanticTokens.accent.primary }}
       />
     </View>
   );
@@ -82,10 +80,8 @@ export default function SettingsTabScreen() {
 
     void (async () => {
       const result = await saveDisplayName(draftDisplayName);
-
       if (!result.ok) {
         setProfileError(result.message);
-        return;
       }
     })();
   };
@@ -108,137 +104,40 @@ export default function SettingsTabScreen() {
   };
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingBottom: 24,
-        gap: 14,
-      }}
-    >
-      <View
-        style={{
-          borderRadius: 20,
-          borderCurve: "continuous",
-          borderWidth: 1,
-          borderColor: stroke,
-          backgroundColor: surface,
-          padding: 16,
-          gap: 10,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: muted,
-            fontSize: 14,
-            lineHeight: 18,
-            fontWeight: "600",
-          }}
-        >
+    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
+      <LiquidSurface kind="strong" contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+        <Text selectable style={[typographyScale.labelMd, { color: colorSemanticTokens.text.tertiary }]}>
           Account
         </Text>
 
-        <View style={{ gap: 8 }}>
-          <Text
-            selectable
-            style={{
-              color: ink,
-              fontSize: 14,
-              lineHeight: 18,
-              fontWeight: "700",
-            }}
-          >
-            Username *
-          </Text>
-          <TextInput
-            value={draftDisplayName}
-            onChangeText={setDraftDisplayName}
-            placeholder="Choose a username"
-            placeholderTextColor="#A2ABBC"
-            selectionColor={accent}
-            autoCapitalize="words"
-            autoCorrect={false}
-            style={{
-              borderRadius: 14,
-              borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: displayNameValidationMessage ? "#E8B8B8" : stroke,
-              backgroundColor: "#FAFBFD",
-              paddingHorizontal: 14,
-              paddingVertical: 12,
-              color: ink,
-              fontSize: 16,
-              lineHeight: 20,
-              fontWeight: "600",
-            }}
-          />
-          <Text
-            selectable
-            style={{
-              color: muted,
-              fontSize: 13,
-              lineHeight: 16,
-              fontWeight: "500",
-            }}
-          >
-            Required
-          </Text>
-        </View>
+        <TextField
+          value={draftDisplayName}
+          onChangeText={setDraftDisplayName}
+          label="Username"
+          required
+          placeholder="Choose a username"
+          autoCapitalize="words"
+          autoCorrect={false}
+          error={profileError ?? displayNameValidationMessage}
+          helperText={!profileError && !displayNameValidationMessage ? "Required" : undefined}
+        />
 
-        <Text
-          selectable
-          style={{
-            color: muted,
-            fontSize: 15,
-            lineHeight: 20,
-            fontWeight: "500",
-          }}
-        >
+        <Text selectable style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}>
           {profileEmail}
         </Text>
-        <Text
-          selectable
-          style={{
-            color: muted,
-            fontSize: 15,
-            lineHeight: 20,
-            fontWeight: "500",
-          }}
-        >
+        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.tertiary }]}>
           Sign-in method: {providerLabel}
         </Text>
 
         {error ? (
-          <Text
-            selectable
-            style={{
-              color: "#B03030",
-              fontSize: 14,
-              lineHeight: 18,
-              fontWeight: "600",
-            }}
-          >
+          <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
             {error}
           </Text>
         ) : null}
 
-        {profileError ? (
-          <Text
-            selectable
-            style={{
-              color: "#B03030",
-              fontSize: 14,
-              lineHeight: 18,
-              fontWeight: "600",
-            }}
-          >
-            {profileError}
-          </Text>
-        ) : null}
-
-        <Pressable
+        <Button
+          label={isSaving ? "Saving..." : "Save Username"}
+          loading={isSaving}
           onPress={handleSaveProfile}
           disabled={
             isLoading ||
@@ -246,134 +145,35 @@ export default function SettingsTabScreen() {
             !hasPendingDisplayNameChange ||
             Boolean(displayNameValidationMessage)
           }
-          style={{
-            marginTop: 4,
-            borderRadius: 14,
-            borderCurve: "continuous",
-            backgroundColor: accent,
-            height: 46,
-            alignItems: "center",
-            justifyContent: "center",
-            opacity:
-              isLoading ||
-              isSaving ||
-              !hasPendingDisplayNameChange ||
-              Boolean(displayNameValidationMessage)
-                ? 0.6
-                : 1,
-          }}
-        >
-          <Text
-            selectable
-            style={{
-              color: "#FFFFFF",
-              fontSize: 15,
-              lineHeight: 18,
-              fontWeight: "700",
-            }}
-          >
-            {isSaving ? "Saving..." : "Save Username"}
-          </Text>
-        </Pressable>
-      </View>
+        />
+      </LiquidSurface>
 
-      <View
-        style={{
-          borderRadius: 20,
-          borderCurve: "continuous",
-          borderWidth: 1,
-          borderColor: stroke,
-          backgroundColor: surface,
-          padding: 16,
-          gap: 14,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: ink,
-            fontSize: 18,
-            lineHeight: 22,
-            fontWeight: "700",
-          }}
-        >
+      <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.md }}>
+        <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>
           Preferences
         </Text>
-        {settingRow(
-          "Payment reminders",
-          notificationsEnabled,
-          setNotificationsEnabled,
-        )}
-        {settingRow(
-          "Smart split suggestions",
-          smartRemindersEnabled,
-          setSmartRemindersEnabled,
-        )}
-      </View>
+        {settingRow("Payment reminders", notificationsEnabled, setNotificationsEnabled)}
+        {settingRow("Smart split suggestions", smartRemindersEnabled, setSmartRemindersEnabled)}
+      </LiquidSurface>
 
-      <View
-        style={{
-          borderRadius: 20,
-          borderCurve: "continuous",
-          borderWidth: 1,
-          borderColor: stroke,
-          backgroundColor: surface,
-          padding: 16,
-          gap: 12,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: ink,
-            fontSize: 18,
-            lineHeight: 22,
-            fontWeight: "700",
-          }}
-        >
+      <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+        <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>
           Sign Out
         </Text>
 
         {signOutError ? (
-          <Text
-            selectable
-            style={{
-              color: "#B03030",
-              fontSize: 14,
-              lineHeight: 18,
-              fontWeight: "600",
-            }}
-          >
+          <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
             {signOutError}
           </Text>
         ) : null}
 
-        <Pressable
+        <Button
+          label="Sign Out & Restart Onboarding"
+          loading={isSigningOut}
           onPress={handleSignOut}
-          disabled={isSigningOut}
-          style={{
-            borderRadius: 16,
-            borderCurve: "continuous",
-            backgroundColor: accent,
-            height: 54,
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: isSigningOut ? 0.65 : 1,
-          }}
-        >
-          <Text
-            selectable
-            style={{
-              color: "#FFFFFF",
-              fontSize: 17,
-              lineHeight: 20,
-              fontWeight: "700",
-            }}
-          >
-            Sign Out & Restart Onboarding
-          </Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+          tone="danger"
+        />
+      </LiquidSurface>
+    </ScreenContainer>
   );
 }

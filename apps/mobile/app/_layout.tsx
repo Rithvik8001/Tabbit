@@ -1,10 +1,17 @@
 import {
-  Sora_400Regular,
-  Sora_500Medium,
-  Sora_600SemiBold,
-  Sora_700Bold,
+  Geist_400Regular,
+  Geist_500Medium,
+  Geist_600SemiBold,
+  Geist_700Bold,
+  useFonts as useGeistFonts,
+} from "@expo-google-fonts/geist";
+import {
+  InstrumentSans_400Regular,
+  InstrumentSans_500Medium,
+  InstrumentSans_600SemiBold,
+  InstrumentSans_700Bold,
   useFonts,
-} from "@expo-google-fonts/sora";
+} from "@expo-google-fonts/instrument-sans";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -12,7 +19,7 @@ import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { AppProvider } from "@/providers/app-provider";
-import { colorTokens } from "@/design/tokens/color";
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { fontFamilyTokens } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
@@ -24,7 +31,7 @@ function RootNavigator() {
   if (isAuthLoading) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator color={colorTokens.brand.primary} />
+        <ActivityIndicator color={colorSemanticTokens.accent.primary} />
       </View>
     );
   }
@@ -32,13 +39,14 @@ function RootNavigator() {
   return (
     <Stack
       screenOptions={{
-        contentStyle: { backgroundColor: colorTokens.surface.base },
+        contentStyle: { backgroundColor: colorSemanticTokens.background.canvas },
         headerShadowVisible: false,
         headerBackButtonDisplayMode: "minimal",
+        headerTintColor: colorSemanticTokens.text.primary,
         headerTitleStyle: {
-          fontFamily: fontFamilyTokens.semibold,
+          fontFamily: fontFamilyTokens.bodySemiBold,
           fontSize: 17,
-          color: colorTokens.text.primary,
+          color: colorSemanticTokens.text.primary,
         },
       }}
     >
@@ -55,20 +63,36 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({
-    Sora_400Regular,
-    Sora_500Medium,
-    Sora_600SemiBold,
-    Sora_700Bold,
+  const [geistLoaded, geistError] = useGeistFonts({
+    Geist_400Regular,
+    Geist_500Medium,
+    Geist_600SemiBold,
+    Geist_700Bold,
+  });
+
+  const [instrumentLoaded, instrumentError] = useFonts({
+    InstrumentSans_400Regular,
+    InstrumentSans_500Medium,
+    InstrumentSans_600SemiBold,
+    InstrumentSans_700Bold,
   });
 
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    if (geistLoaded && instrumentLoaded) {
+      void SplashScreen.hideAsync();
+      return;
+    }
+
+    if (geistError || instrumentError) {
       void SplashScreen.hideAsync();
     }
-  }, [fontError, fontsLoaded]);
+  }, [geistError, geistLoaded, instrumentError, instrumentLoaded]);
 
-  if (!fontsLoaded && !fontError) {
+  if (!geistLoaded || !instrumentLoaded) {
+    if (!geistError && !instrumentError) {
+      return null;
+    }
+
     return null;
   }
 

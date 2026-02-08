@@ -4,7 +4,7 @@ export default function GroupsTabLayout() {
   return (
     <Stack
       screenOptions={{
-        headerLargeTitle: true,
+        headerLargeTitle: false,
         headerShadowVisible: false,
         headerBackButtonDisplayMode: "minimal",
       }}

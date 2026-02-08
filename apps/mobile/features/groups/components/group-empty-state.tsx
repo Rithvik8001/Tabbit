@@ -1,10 +1,12 @@
 import { Pressable, Text, View } from "react-native";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+
+const surface = colorSemanticTokens.surface.cardStrong;
+const stroke = colorSemanticTokens.border.subtle;
+const ink = colorSemanticTokens.text.primary;
+const muted = colorSemanticTokens.text.secondary;
+const accent = colorSemanticTokens.accent.primary;
 
 type GroupEmptyStateProps = {
   onCreate: () => void;
@@ -32,7 +34,7 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
           borderCurve: "continuous",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#ECE9FF",
+          backgroundColor: colorSemanticTokens.accent.soft,
         }}
       >
         <Text selectable style={{ fontSize: 30, lineHeight: 34 }}>
@@ -43,7 +45,12 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
       <View style={{ gap: 6, alignItems: "center" }}>
         <Text
           selectable
-          style={{ color: ink, fontSize: 22, lineHeight: 26, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 22,
+            lineHeight: 26,
+            fontWeight: "700",
+          }}
         >
           No groups yet
         </Text>
@@ -57,7 +64,8 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
             textAlign: "center",
           }}
         >
-          Create your first group to start organizing shared expenses in one place.
+          Create your first group to start organizing shared expenses in one
+          place.
         </Text>
       </View>
 
@@ -76,7 +84,7 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
         <Text
           selectable
           style={{
-            color: "#FFFFFF",
+            color: colorSemanticTokens.text.inverse,
             fontSize: 14,
             lineHeight: 18,
             fontWeight: "700",

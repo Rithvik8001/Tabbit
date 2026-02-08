@@ -1,15 +1,16 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { formatShortDate } from "@/features/app-shell/mock/tab-mock-data";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
+const surface = colorSemanticTokens.surface.cardStrong;
+const stroke = colorSemanticTokens.border.subtle;
+const ink = colorSemanticTokens.text.primary;
+const muted = colorSemanticTokens.text.secondary;
+const accent = colorSemanticTokens.accent.primary;
 
 export default function FriendDetailScreen() {
   const { friendId } = useLocalSearchParams<{ friendId: string }>();
@@ -123,7 +124,11 @@ export default function FriendDetailScreen() {
               <Text
                 selectable
                 style={{
-                  color: isSettled ? muted : isPositive ? accent : ink,
+                  color: isSettled
+                    ? muted
+                    : isPositive
+                      ? colorSemanticTokens.financial.positive
+                      : colorSemanticTokens.financial.negative,
                   fontSize: 22,
                   lineHeight: 28,
                   fontWeight: "700",
@@ -135,7 +140,9 @@ export default function FriendDetailScreen() {
                 <Text
                   selectable
                   style={{
-                    color: isPositive ? accent : ink,
+                    color: isPositive
+                      ? colorSemanticTokens.financial.positive
+                      : colorSemanticTokens.financial.negative,
                     fontSize: 28,
                     lineHeight: 34,
                     fontWeight: "700",
@@ -160,8 +167,8 @@ export default function FriendDetailScreen() {
                   borderRadius: 999,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: "#E2DDFF",
-                  backgroundColor: "#ECE9FF",
+                  borderColor: "rgba(50, 87, 226, 0.24)",
+                  backgroundColor: colorSemanticTokens.accent.soft,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                 }}
@@ -249,7 +256,7 @@ export default function FriendDetailScreen() {
                               alignSelf: "flex-start",
                               borderRadius: 999,
                               borderCurve: "continuous",
-                              backgroundColor: "#ECE9FF",
+                              backgroundColor: colorSemanticTokens.accent.soft,
                               paddingHorizontal: 8,
                               paddingVertical: 3,
                             }}

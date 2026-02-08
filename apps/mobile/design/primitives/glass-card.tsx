@@ -1,10 +1,8 @@
-import { BlurView } from "expo-blur";
 import type { ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
 import { View } from "react-native";
 
-import { colorTokens } from "@/design/tokens/color";
-import { radiusTokens } from "@/design/tokens/radius";
+import { LiquidSurface } from "@/design/primitives/liquid-surface";
 import { spacingTokens } from "@/design/tokens/spacing";
 
 type GlassCardProps = {
@@ -14,55 +12,33 @@ type GlassCardProps = {
   intensity?: number;
 };
 
-const isIOS = process.env.EXPO_OS === "ios";
-
 export function GlassCard({
   children,
   style,
   contentStyle,
-  intensity = 24,
+  intensity = 44,
 }: GlassCardProps) {
   return (
-    <View
-      style={[
+    <LiquidSurface
+      style={style}
+      blurIntensity={intensity}
+      contentStyle={[
         {
-          overflow: "hidden",
-          borderRadius: radiusTokens.card,
-          borderCurve: "continuous",
-          borderWidth: 1,
-          borderColor: colorTokens.border.glass,
-          boxShadow: "0 8px 22px rgba(20, 22, 29, 0.06)",
+          padding: spacingTokens.xl,
         },
-        style,
+        contentStyle,
       ]}
     >
-      {isIOS ? (
-        <BlurView intensity={intensity} tint="light">
-          <View
-            style={[
-              {
-                padding: spacingTokens.xl,
-                backgroundColor: "rgba(255, 255, 255, 0.52)",
-              },
-              contentStyle,
-            ]}
-          >
-            {children}
-          </View>
-        </BlurView>
-      ) : (
+      <View>
         <View
-          style={[
-            {
-              padding: spacingTokens.xl,
-              backgroundColor: colorTokens.surface.glass,
-            },
-            contentStyle,
-          ]}
+          style={{
+            borderRadius: 0,
+            borderCurve: "continuous",
+          }}
         >
           {children}
         </View>
-      )}
-    </View>
+      </View>
+    </LiquidSurface>
   );
 }

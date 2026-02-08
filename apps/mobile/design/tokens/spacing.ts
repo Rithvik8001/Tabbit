@@ -1,4 +1,6 @@
 export const spacingTokens = {
+  hairline: 2,
+  xxs: 4,
   xs: 4,
   sm: 8,
   md: 12,
@@ -7,7 +9,14 @@ export const spacingTokens = {
   xxl: 24,
   "3xl": 32,
   "4xl": 40,
+  "5xl": 48,
+  "6xl": 56,
   screenHorizontal: 20,
+  screenHorizontalTight: 16,
+  screenHorizontalWide: 24,
+  sectionGap: 14,
+  cardPadding: 16,
 } as const;
 
-export type SpacingTokens = typeof spacingTokens;
+export type SpacingScale = typeof spacingTokens;
+export type SpacingTokens = SpacingScale;

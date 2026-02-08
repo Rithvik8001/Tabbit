@@ -1,17 +1,18 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { getGroupTypeLabel } from "@/features/groups/constants/group-presets";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
+const surface = colorSemanticTokens.surface.cardStrong;
+const stroke = colorSemanticTokens.border.subtle;
+const ink = colorSemanticTokens.text.primary;
+const muted = colorSemanticTokens.text.secondary;
+const accent = colorSemanticTokens.accent.primary;
 
 function LoadingCard() {
   return (
@@ -31,7 +32,7 @@ function LoadingCard() {
           width: "60%",
           height: 14,
           borderRadius: 999,
-          backgroundColor: "#F1F4F8",
+          backgroundColor: colorSemanticTokens.background.subtle,
         }}
       />
       <View
@@ -39,7 +40,7 @@ function LoadingCard() {
           width: "40%",
           height: 12,
           borderRadius: 999,
-          backgroundColor: "#F1F4F8",
+          backgroundColor: colorSemanticTokens.background.subtle,
         }}
       />
     </View>
@@ -196,10 +197,10 @@ export default function GroupDetailScreen() {
               borderRadius: 999,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: "#D7DDE8",
+              borderColor: colorSemanticTokens.border.muted,
               paddingHorizontal: 12,
               paddingVertical: 8,
-              backgroundColor: "#F8FAFC",
+              backgroundColor: colorSemanticTokens.background.subtle,
             }}
           >
             <Text
@@ -235,7 +236,7 @@ export default function GroupDetailScreen() {
                 borderCurve: "continuous",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "#F4F2FF",
+                backgroundColor: colorSemanticTokens.accent.soft,
               }}
             >
               <Text selectable style={{ fontSize: 32, lineHeight: 38 }}>
@@ -293,8 +294,8 @@ export default function GroupDetailScreen() {
                     borderRadius: 999,
                     borderCurve: "continuous",
                     borderWidth: 1,
-                    borderColor: "#E2DDFF",
-                    backgroundColor: "#ECE9FF",
+                    borderColor: "rgba(50, 87, 226, 0.24)",
+                    backgroundColor: colorSemanticTokens.accent.soft,
                     paddingHorizontal: 12,
                     paddingVertical: 6,
                   }}
@@ -359,7 +360,7 @@ export default function GroupDetailScreen() {
                           <View
                             style={{
                               borderRadius: 999,
-                              backgroundColor: "#F3F0FF",
+                              backgroundColor: colorSemanticTokens.accent.soft,
                               paddingHorizontal: 6,
                               paddingVertical: 2,
                             }}
@@ -401,8 +402,8 @@ export default function GroupDetailScreen() {
                           borderRadius: 999,
                           borderCurve: "continuous",
                           borderWidth: 1,
-                          borderColor: "#F5D1D1",
-                          backgroundColor: "#FFF6F6",
+                          borderColor: "rgba(188, 43, 62, 0.24)",
+                          backgroundColor: colorSemanticTokens.state.dangerSoft,
                           paddingHorizontal: 10,
                           paddingVertical: 4,
                         }}
@@ -410,7 +411,7 @@ export default function GroupDetailScreen() {
                         <Text
                           selectable
                           style={{
-                            color: "#B03030",
+                            color: colorSemanticTokens.state.danger,
                             fontSize: 12,
                             lineHeight: 16,
                             fontWeight: "700",
@@ -450,9 +451,9 @@ export default function GroupDetailScreen() {
                 style={{
                   color:
                     userBalance.direction === "you_are_owed"
-                      ? accent
+                      ? colorSemanticTokens.financial.positive
                       : userBalance.direction === "you_owe"
-                        ? "#B03030"
+                        ? colorSemanticTokens.financial.negative
                         : muted,
                   fontSize: 28,
                   lineHeight: 34,
@@ -495,7 +496,7 @@ export default function GroupDetailScreen() {
                         style={{
                           borderRadius: 10,
                           borderCurve: "continuous",
-                          backgroundColor: "#F8FAFC",
+                          backgroundColor: colorSemanticTokens.background.subtle,
                           paddingHorizontal: 10,
                           paddingVertical: 8,
                         }}
@@ -538,8 +539,8 @@ export default function GroupDetailScreen() {
                                 borderRadius: 999,
                                 borderCurve: "continuous",
                                 borderWidth: 1,
-                                borderColor: "#E2DDFF",
-                                backgroundColor: "#ECE9FF",
+                                borderColor: "rgba(50, 87, 226, 0.24)",
+                                backgroundColor: colorSemanticTokens.accent.soft,
                                 paddingHorizontal: 10,
                                 paddingVertical: 4,
                               }}
@@ -602,8 +603,8 @@ export default function GroupDetailScreen() {
                   borderRadius: 999,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: "#E2DDFF",
-                  backgroundColor: "#ECE9FF",
+                  borderColor: "rgba(50, 87, 226, 0.24)",
+                  backgroundColor: colorSemanticTokens.accent.soft,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                 }}
@@ -679,7 +680,7 @@ export default function GroupDetailScreen() {
                               alignSelf: "flex-start",
                               borderRadius: 999,
                               borderCurve: "continuous",
-                              backgroundColor: "#ECE9FF",
+                              backgroundColor: colorSemanticTokens.accent.soft,
                               paddingHorizontal: 8,
                               paddingVertical: 3,
                             }}
@@ -735,8 +736,8 @@ export default function GroupDetailScreen() {
                           borderRadius: 999,
                           borderCurve: "continuous",
                           borderWidth: 1,
-                          borderColor: "#F5D1D1",
-                          backgroundColor: "#FFF6F6",
+                          borderColor: "rgba(188, 43, 62, 0.24)",
+                          backgroundColor: colorSemanticTokens.state.dangerSoft,
                           paddingHorizontal: 10,
                           paddingVertical: 4,
                           marginTop: 2,
@@ -745,7 +746,7 @@ export default function GroupDetailScreen() {
                         <Text
                           selectable
                           style={{
-                            color: "#B03030",
+                            color: colorSemanticTokens.state.danger,
                             fontSize: 12,
                             lineHeight: 16,
                             fontWeight: "700",
@@ -783,7 +784,7 @@ export default function GroupDetailScreen() {
                 <Text
                   selectable
                   style={{
-                    color: "#FFFFFF",
+                    color: colorSemanticTokens.text.inverse,
                     fontSize: 16,
                     lineHeight: 20,
                     fontWeight: "700",
@@ -800,8 +801,8 @@ export default function GroupDetailScreen() {
                   borderRadius: 16,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: "#F5D1D1",
-                  backgroundColor: "#FFF6F6",
+                  borderColor: "rgba(188, 43, 62, 0.24)",
+                  backgroundColor: colorSemanticTokens.state.dangerSoft,
                   paddingVertical: 14,
                   alignItems: "center",
                   justifyContent: "center",
@@ -811,7 +812,7 @@ export default function GroupDetailScreen() {
                 <Text
                   selectable
                   style={{
-                    color: "#B03030",
+                    color: colorSemanticTokens.state.danger,
                     fontSize: 16,
                     lineHeight: 20,
                     fontWeight: "700",

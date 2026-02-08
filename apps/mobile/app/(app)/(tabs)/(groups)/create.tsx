@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import {
   GROUP_DEFAULT_EMOJI_BY_TYPE,
   GROUP_EMOJI_OPTIONS,
@@ -10,11 +11,11 @@ import {
 import { useGroups } from "@/features/groups/hooks/use-groups";
 import type { GroupType } from "@/features/groups/types/group.types";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
+const surface = colorSemanticTokens.surface.cardStrong;
+const stroke = colorSemanticTokens.border.subtle;
+const ink = colorSemanticTokens.text.primary;
+const muted = colorSemanticTokens.text.secondary;
+const accent = colorSemanticTokens.accent.primary;
 const maxGroupNameLength = 40;
 
 export default function CreateGroupScreen() {
@@ -125,7 +126,7 @@ export default function CreateGroupScreen() {
           onChangeText={setName}
           maxLength={maxGroupNameLength}
           placeholder="e.g. Summer in Tokyo"
-          placeholderTextColor="#A2ABBC"
+          placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           autoFocus
           style={{
@@ -133,7 +134,7 @@ export default function CreateGroupScreen() {
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: "#FAFBFD",
+            backgroundColor: colorSemanticTokens.surface.cardMuted,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -174,8 +175,8 @@ export default function CreateGroupScreen() {
                   borderRadius: 14,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? "#D5CEFF" : stroke,
-                  backgroundColor: isSelected ? "#F3F0FF" : "#FFFFFF",
+                  borderColor: isSelected ? "rgba(50, 87, 226, 0.24)" : stroke,
+                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -242,7 +243,7 @@ export default function CreateGroupScreen() {
               borderCurve: "continuous",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "#F3F4F7",
+              backgroundColor: colorSemanticTokens.background.subtle,
             }}
           >
             <Text selectable style={{ fontSize: 18, lineHeight: 22 }}>
@@ -265,8 +266,8 @@ export default function CreateGroupScreen() {
                   borderRadius: 12,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? "#D5CEFF" : stroke,
-                  backgroundColor: isSelected ? "#F3F0FF" : "#FFFFFF",
+                  borderColor: isSelected ? "rgba(50, 87, 226, 0.24)" : stroke,
+                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -286,14 +287,14 @@ export default function CreateGroupScreen() {
             borderRadius: 14,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: "#F5D1D1",
-            backgroundColor: "#FFF6F6",
+            borderColor: "rgba(188, 43, 62, 0.24)",
+            backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
-            style={{ color: "#B03030", fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
           >
             {formError}
           </Text>
@@ -307,7 +308,7 @@ export default function CreateGroupScreen() {
         style={{
           borderRadius: 16,
           borderCurve: "continuous",
-          backgroundColor: isCreating ? "#9A8CFF" : accent,
+          backgroundColor: isCreating ? colorSemanticTokens.accent.softStrong : accent,
           paddingVertical: 14,
           alignItems: "center",
           justifyContent: "center",
@@ -317,7 +318,7 @@ export default function CreateGroupScreen() {
         <Text
           selectable
           style={{
-            color: "#FFFFFF",
+            color: colorSemanticTokens.text.inverse,
             fontSize: 16,
             lineHeight: 20,
             fontWeight: "700",

@@ -3,7 +3,9 @@ import * as Haptics from "expo-haptics";
 import { useSegments } from "expo-router";
 import { useEffect, useRef } from "react";
 
-const tabTint = "#4A29FF";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+
+const tabTint = colorSemanticTokens.accent.primary;
 
 function getActiveTabSegment(segments: string[]): string | null {
   const tabsIndex = segments.indexOf("(tabs)");
@@ -41,7 +43,11 @@ export default function AppTabsLayout() {
   }, [activeTabSegment]);
 
   return (
-    <NativeTabs tintColor={tabTint}>
+    <NativeTabs
+      tintColor={tabTint}
+      backgroundColor="rgba(248, 250, 253, 0.94)"
+      labelStyle={{ fontSize: 11, fontWeight: "600" }}
+    >
       <NativeTabs.Trigger name="(home)">
         <Label>Home</Label>
         <Icon sf={{ default: "house", selected: "house.fill" }} />

@@ -1,37 +1,28 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Stack, useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import { ScreenContainer } from "@/design/primitives/screen-container";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
+import { spacingTokens } from "@/design/tokens/spacing";
+import { typographyScale } from "@/design/tokens/typography";
 import { GroupEmptyState } from "@/features/groups/components/group-empty-state";
 import { getGroupTypeLabel } from "@/features/groups/constants/group-presets";
 import { useGroups } from "@/features/groups/hooks/use-groups";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
-
 function LoadingGroupCard() {
   return (
-    <View
-      style={{
-        borderRadius: 20,
-        borderCurve: "continuous",
-        borderWidth: 1,
-        borderColor: stroke,
-        backgroundColor: surface,
-        padding: 16,
-        gap: 10,
-      }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+    <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm }}>
         <View
           style={{
             width: 42,
             height: 42,
-            borderRadius: 999,
-            backgroundColor: "#F1F4F8",
+            borderRadius: radiusTokens.pill,
+            backgroundColor: "rgba(11, 17, 32, 0.08)",
           }}
         />
         <View style={{ flex: 1, gap: 8 }}>
@@ -40,7 +31,7 @@ function LoadingGroupCard() {
               width: "65%",
               height: 14,
               borderRadius: 999,
-              backgroundColor: "#F1F4F8",
+              backgroundColor: "rgba(11, 17, 32, 0.08)",
             }}
           />
           <View
@@ -48,21 +39,12 @@ function LoadingGroupCard() {
               width: "38%",
               height: 12,
               borderRadius: 999,
-              backgroundColor: "#F1F4F8",
+              backgroundColor: "rgba(11, 17, 32, 0.08)",
             }}
           />
         </View>
       </View>
-
-      <View
-        style={{
-          width: "52%",
-          height: 12,
-          borderRadius: 999,
-          backgroundColor: "#F1F4F8",
-        }}
-      />
-    </View>
+    </LiquidSurface>
   );
 }
 
@@ -75,16 +57,7 @@ export default function GroupsTabScreen() {
   };
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 24,
-        gap: 12,
-      }}
-    >
+    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.sm }}>
       <Stack.Screen
         options={{
           headerRight: () => (
@@ -96,72 +69,35 @@ export default function GroupsTabScreen() {
               style={{
                 width: 36,
                 height: 36,
-                borderRadius: 999,
+                borderRadius: radiusTokens.pill,
                 borderCurve: "continuous",
-                backgroundColor: "#ECE9FF",
+                backgroundColor: colorSemanticTokens.accent.soft,
                 borderWidth: 1,
-                borderColor: "#E2DDFF",
+                borderColor: colorSemanticTokens.border.accent,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <FontAwesome name="plus" size={14} color={accent} />
+              <FontAwesome name="plus" size={14} color={colorSemanticTokens.accent.primary} />
             </Pressable>
           ),
         }}
       />
 
       {isLoading
-        ? [0, 1, 2].map((index) => <LoadingGroupCard key={`group_loading_${index}`} />)
+        ? [0, 1, 2].map((index) => <LoadingGroupCard key={`group-loading-${index}`} />)
         : null}
 
       {!isLoading && error ? (
-        <View
-          style={{
-            borderRadius: 20,
-            borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: surface,
-            padding: 16,
-            gap: 10,
-          }}
-        >
-          <Text
-            selectable
-            style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
-          >
+        <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+          <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>
             We could not load your groups
           </Text>
-          <Text
-            selectable
-            style={{ color: muted, fontSize: 15, lineHeight: 20, fontWeight: "500" }}
-          >
+          <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}>
             {error}
           </Text>
-          <Pressable
-            onPress={() => {
-              void refresh();
-            }}
-            style={{
-              alignSelf: "flex-start",
-              borderRadius: 999,
-              borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: "#D7DDE8",
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              backgroundColor: "#F8FAFC",
-            }}
-          >
-            <Text
-              selectable
-              style={{ color: ink, fontSize: 13, lineHeight: 16, fontWeight: "700" }}
-            >
-              Try again
-            </Text>
-          </Pressable>
-        </View>
+          <Button label="Try Again" variant="soft" onPress={() => void refresh()} />
+        </LiquidSurface>
       ) : null}
 
       {!isLoading && !error && groups.length === 0 ? (
@@ -178,73 +114,57 @@ export default function GroupsTabScreen() {
               }}
               asChild
             >
-              <Pressable
-                style={{
-                  borderRadius: 20,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: stroke,
-                  backgroundColor: surface,
-                  padding: 16,
-                  gap: 10,
-                }}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                  <View
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 999,
-                      borderCurve: "continuous",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "#F4F2FF",
-                    }}
-                  >
-                    <Text selectable style={{ fontSize: 22, lineHeight: 26 }}>
-                      {group.emoji}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1, gap: 4 }}>
+              <Pressable>
+                <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm }}>
+                    <View
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: radiusTokens.pill,
+                        borderCurve: "continuous",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: colorSemanticTokens.accent.soft,
+                      }}
+                    >
+                      <Text selectable style={{ fontSize: 22, lineHeight: 26 }}>
+                        {group.emoji}
+                      </Text>
+                    </View>
+                    <View style={{ flex: 1, gap: 2 }}>
+                      <Text
+                        selectable
+                        style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                      >
+                        {group.name}
+                      </Text>
+                      <Text
+                        selectable
+                        style={[typographyScale.bodySm, { color: colorSemanticTokens.text.tertiary }]}
+                      >
+                        {getGroupTypeLabel(group.groupType)} group
+                      </Text>
+                    </View>
                     <Text
                       selectable
-                      style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
+                      style={[typographyScale.headingSm, { color: colorSemanticTokens.text.tertiary }]}
                     >
-                      {group.name}
-                    </Text>
-                    <Text
-                      selectable
-                      style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
-                    >
-                      {getGroupTypeLabel(group.groupType)} group
+                      ›
                     </Text>
                   </View>
-                  <Text
-                    selectable
-                    style={{ color: muted, fontSize: 20, lineHeight: 24, fontWeight: "600" }}
-                  >
-                    ›
-                  </Text>
-                </View>
 
-                <Text
-                  selectable
-                  style={{
-                    color: muted,
-                    fontSize: 14,
-                    lineHeight: 18,
-                    fontWeight: "500",
-                  }}
-                >
-                  {group.memberCount} {group.memberCount === 1 ? "member" : "members"} ·{" "}
-                  {group.expenseCount === 0
-                    ? "No expenses yet"
-                    : `${group.expenseCount} ${group.expenseCount === 1 ? "expense" : "expenses"}`}
-                </Text>
+                  <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}>
+                    {group.memberCount} {group.memberCount === 1 ? "member" : "members"} ·{" "}
+                    {group.expenseCount === 0
+                      ? "No expenses yet"
+                      : `${group.expenseCount} ${group.expenseCount === 1 ? "expense" : "expenses"}`}
+                  </Text>
+                </LiquidSurface>
               </Pressable>
             </Link>
           ))
         : null}
-    </ScrollView>
+    </ScreenContainer>
   );
 }

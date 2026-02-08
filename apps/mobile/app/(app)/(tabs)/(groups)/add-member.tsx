@@ -2,15 +2,16 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { isValidEmail } from "@/features/auth/utils/auth-validation";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import type { GroupMemberCandidate } from "@/features/groups/types/group-member.types";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
+const surface = colorSemanticTokens.surface.cardStrong;
+const stroke = colorSemanticTokens.border.subtle;
+const ink = colorSemanticTokens.text.primary;
+const muted = colorSemanticTokens.text.secondary;
+const accent = colorSemanticTokens.accent.primary;
 
 const SUGGESTION_LIMIT = 8;
 const DEBOUNCE_MS = 350;
@@ -169,7 +170,7 @@ export default function AddMemberScreen() {
           value={query}
           onChangeText={setQuery}
           placeholder="Name or email"
-          placeholderTextColor="#A2ABBC"
+          placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -180,7 +181,7 @@ export default function AddMemberScreen() {
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: "#FAFBFD",
+            backgroundColor: colorSemanticTokens.surface.cardMuted,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -202,7 +203,7 @@ export default function AddMemberScreen() {
         {searchError ? (
           <Text
             selectable
-            style={{ color: "#B03030", fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+            style={{ color: colorSemanticTokens.state.danger, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
           >
             {searchError}
           </Text>
@@ -250,7 +251,7 @@ export default function AddMemberScreen() {
                     paddingVertical: 11,
                     borderTopWidth: suggestions[0]?.id === candidate.id ? 0 : 1,
                     borderTopColor: stroke,
-                    backgroundColor: isSelected ? "#F3F0FF" : "#FFFFFF",
+                    backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                     gap: 2,
                   }}
                 >
@@ -291,14 +292,14 @@ export default function AddMemberScreen() {
             borderRadius: 14,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: "#F5D1D1",
-            backgroundColor: "#FFF6F6",
+            borderColor: "rgba(188, 43, 62, 0.24)",
+            backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
-            style={{ color: "#B03030", fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
           >
             {formError}
           </Text>
@@ -312,7 +313,7 @@ export default function AddMemberScreen() {
         style={{
           borderRadius: 16,
           borderCurve: "continuous",
-          backgroundColor: isAddingMember ? "#9A8CFF" : accent,
+          backgroundColor: isAddingMember ? colorSemanticTokens.accent.softStrong : accent,
           paddingVertical: 14,
           alignItems: "center",
           justifyContent: "center",
@@ -322,7 +323,7 @@ export default function AddMemberScreen() {
         <Text
           selectable
           style={{
-            color: "#FFFFFF",
+            color: colorSemanticTokens.text.inverse,
             fontSize: 16,
             lineHeight: 20,
             fontWeight: "700",

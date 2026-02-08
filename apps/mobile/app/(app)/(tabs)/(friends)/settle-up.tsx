@@ -2,16 +2,17 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
+const surface = colorSemanticTokens.surface.cardStrong;
+const stroke = colorSemanticTokens.border.subtle;
+const ink = colorSemanticTokens.text.primary;
+const muted = colorSemanticTokens.text.secondary;
+const accent = colorSemanticTokens.accent.primary;
 
 type FriendGroupOption = {
   id: string;
@@ -245,10 +246,10 @@ export default function FriendSettleUpScreen() {
               borderRadius: 999,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: "#D7DDE8",
+              borderColor: colorSemanticTokens.border.muted,
               paddingHorizontal: 12,
               paddingVertical: 8,
-              backgroundColor: "#F8FAFC",
+              backgroundColor: colorSemanticTokens.background.subtle,
             }}
           >
             <Text
@@ -364,8 +365,8 @@ export default function FriendSettleUpScreen() {
                         borderRadius: 14,
                         borderCurve: "continuous",
                         borderWidth: 1,
-                        borderColor: isSelected ? "#D5CEFF" : stroke,
-                        backgroundColor: isSelected ? "#F3F0FF" : "#FFFFFF",
+                        borderColor: isSelected ? "rgba(50, 87, 226, 0.24)" : stroke,
+                        backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                         paddingHorizontal: 12,
                         paddingVertical: 10,
                       }}
@@ -466,7 +467,7 @@ export default function FriendSettleUpScreen() {
                 borderCurve: "continuous",
                 borderWidth: 1,
                 borderColor: stroke,
-                backgroundColor: "#FAFBFD",
+                backgroundColor: colorSemanticTokens.surface.cardMuted,
                 paddingHorizontal: 14,
               }}
             >
@@ -486,7 +487,7 @@ export default function FriendSettleUpScreen() {
                 onChangeText={setAmountText}
                 keyboardType="decimal-pad"
                 placeholder="0.00"
-                placeholderTextColor="#A2ABBC"
+                placeholderTextColor={colorSemanticTokens.text.tertiary}
                 selectionColor={accent}
                 style={{
                   flex: 1,
@@ -528,14 +529,14 @@ export default function FriendSettleUpScreen() {
               value={dateText}
               onChangeText={setDateText}
               placeholder="YYYY-MM-DD"
-              placeholderTextColor="#A2ABBC"
+              placeholderTextColor={colorSemanticTokens.text.tertiary}
               selectionColor={accent}
               style={{
                 borderRadius: 14,
                 borderCurve: "continuous",
                 borderWidth: 1,
                 borderColor: stroke,
-                backgroundColor: "#FAFBFD",
+                backgroundColor: colorSemanticTokens.surface.cardMuted,
                 paddingHorizontal: 14,
                 paddingVertical: 12,
                 color: ink,
@@ -554,15 +555,15 @@ export default function FriendSettleUpScreen() {
             borderRadius: 14,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: "#F5D1D1",
-            backgroundColor: "#FFF6F6",
+            borderColor: "rgba(188, 43, 62, 0.24)",
+            backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
             style={{
-              color: "#B03030",
+              color: colorSemanticTokens.state.danger,
               fontSize: 14,
               lineHeight: 18,
               fontWeight: "600",
@@ -582,7 +583,7 @@ export default function FriendSettleUpScreen() {
           borderCurve: "continuous",
           backgroundColor:
             isSubmitting || !friend || !user || groupOptions.length === 0
-              ? "#9A8CFF"
+              ? colorSemanticTokens.accent.softStrong
               : accent,
           paddingVertical: 14,
           alignItems: "center",
@@ -596,7 +597,7 @@ export default function FriendSettleUpScreen() {
         <Text
           selectable
           style={{
-            color: "#FFFFFF",
+            color: colorSemanticTokens.text.inverse,
             fontSize: 16,
             lineHeight: 20,
             fontWeight: "700",

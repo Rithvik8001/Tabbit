@@ -1,5 +1,11 @@
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
+import { Badge } from "@/design/primitives/badge";
+import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import { ScreenContainer } from "@/design/primitives/screen-container";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { spacingTokens } from "@/design/tokens/spacing";
+import { typographyScale } from "@/design/tokens/typography";
 import {
   formatCurrency,
   formatShortDate,
@@ -7,15 +13,9 @@ import {
   type ReceiptStatus,
 } from "@/features/app-shell/mock/tab-mock-data";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
-
 function statusLabel(status: ReceiptStatus): string {
   if (status === "needs_review") {
-    return "Needs review";
+    return "Needs Review";
   }
   if (status === "processed") {
     return "Processed";
@@ -23,38 +23,25 @@ function statusLabel(status: ReceiptStatus): string {
   return "Scanned";
 }
 
-function statusColor(status: ReceiptStatus): string {
+function statusTone(status: ReceiptStatus): "success" | "accent" | "neutral" {
   if (status === "needs_review") {
-    return "#A65D00";
+    return "neutral";
   }
   if (status === "processed") {
-    return accent;
+    return "accent";
   }
-  return muted;
+  return "success";
 }
 
 export default function ReceiptsTabScreen() {
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingBottom: 24,
-        gap: 12,
-      }}
-    >
+    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.sm }}>
       {receiptItems.map((receipt) => (
-        <View
+        <LiquidSurface
           key={receipt.id}
-          style={{
-            borderRadius: 18,
-            borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: surface,
-            padding: 14,
-            gap: 8,
+          contentStyle={{
+            padding: spacingTokens.cardPadding,
+            gap: spacingTokens.sm,
           }}
         >
           <View
@@ -62,72 +49,39 @@ export default function ReceiptsTabScreen() {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 12,
+              gap: spacingTokens.sm,
             }}
           >
             <Text
               selectable
-              style={{
-                flex: 1,
-                color: ink,
-                fontSize: 18,
-                lineHeight: 22,
-                fontWeight: "700",
-              }}
+              style={[
+                typographyScale.headingMd,
+                { flex: 1, color: colorSemanticTokens.text.primary },
+              ]}
             >
               {receipt.merchant}
             </Text>
             <Text
               selectable
-              style={{
-                color: ink,
-                fontSize: 18,
-                lineHeight: 22,
-                fontWeight: "700",
-                fontVariant: ["tabular-nums"],
-              }}
+              style={[
+                typographyScale.headingMd,
+                {
+                  color: colorSemanticTokens.text.primary,
+                  fontVariant: ["tabular-nums"],
+                },
+              ]}
             >
               {formatCurrency(receipt.amount)}
             </Text>
           </View>
 
-          <Text
-            selectable
-            style={{ color: muted, fontSize: 14, lineHeight: 18, fontWeight: "500" }}
-          >
-            {receipt.groupName} • Added by {receipt.submittedBy} •{" "}
-            {formatShortDate(receipt.scannedAt)}
+          <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}>
+            {receipt.groupName} · Added by {receipt.submittedBy} · {formatShortDate(receipt.scannedAt)}
           </Text>
 
-          <View
-            style={{
-              alignSelf: "flex-start",
-              borderRadius: 999,
-              borderCurve: "continuous",
-              paddingHorizontal: 10,
-              paddingVertical: 4,
-              backgroundColor:
-                receipt.status === "processed"
-                  ? "#ECE9FF"
-                  : receipt.status === "needs_review"
-                    ? "#FFF4E5"
-                    : "#F2F4F8",
-            }}
-          >
-            <Text
-              selectable
-              style={{
-                color: statusColor(receipt.status),
-                fontSize: 12,
-                lineHeight: 16,
-                fontWeight: "700",
-              }}
-            >
-              {statusLabel(receipt.status)}
-            </Text>
-          </View>
-        </View>
+          <Badge label={statusLabel(receipt.status)} tone={statusTone(receipt.status)} />
+        </LiquidSurface>
       ))}
-    </ScrollView>
+    </ScreenContainer>
   );
 }

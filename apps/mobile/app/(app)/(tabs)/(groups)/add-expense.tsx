@@ -2,17 +2,18 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
 import type { SplitType, ExpenseSplitInput } from "@/features/groups/types/expense.types";
 
-const surface = "#FFFFFF";
-const stroke = "#E8ECF2";
-const ink = "#0F172A";
-const muted = "#5C6780";
-const accent = "#4A29FF";
+const surface = colorSemanticTokens.surface.cardStrong;
+const stroke = colorSemanticTokens.border.subtle;
+const ink = colorSemanticTokens.text.primary;
+const muted = colorSemanticTokens.text.secondary;
+const accent = colorSemanticTokens.accent.primary;
 const maxDescriptionLength = 100;
 
 const SPLIT_TYPE_OPTIONS: { type: SplitType; label: string; subtitle: string }[] = [
@@ -227,7 +228,7 @@ export default function AddExpenseScreen() {
           onChangeText={setDescription}
           maxLength={maxDescriptionLength}
           placeholder="e.g. Dinner at Nobu"
-          placeholderTextColor="#A2ABBC"
+          placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           autoFocus
           style={{
@@ -235,7 +236,7 @@ export default function AddExpenseScreen() {
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: "#FAFBFD",
+            backgroundColor: colorSemanticTokens.surface.cardMuted,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -273,7 +274,7 @@ export default function AddExpenseScreen() {
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: "#FAFBFD",
+            backgroundColor: colorSemanticTokens.surface.cardMuted,
             paddingHorizontal: 14,
           }}
         >
@@ -288,7 +289,7 @@ export default function AddExpenseScreen() {
             onChangeText={setAmountText}
             keyboardType="decimal-pad"
             placeholder="0.00"
-            placeholderTextColor="#A2ABBC"
+            placeholderTextColor={colorSemanticTokens.text.tertiary}
             selectionColor={accent}
             style={{
               flex: 1,
@@ -326,14 +327,14 @@ export default function AddExpenseScreen() {
           value={dateText}
           onChangeText={setDateText}
           placeholder="YYYY-MM-DD"
-          placeholderTextColor="#A2ABBC"
+          placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           style={{
             borderRadius: 14,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: "#FAFBFD",
+            backgroundColor: colorSemanticTokens.surface.cardMuted,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -377,8 +378,8 @@ export default function AddExpenseScreen() {
                   borderRadius: 14,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? "#D5CEFF" : stroke,
-                  backgroundColor: isSelected ? "#F3F0FF" : "#FFFFFF",
+                  borderColor: isSelected ? "rgba(50, 87, 226, 0.24)" : stroke,
+                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                 }}
@@ -431,8 +432,8 @@ export default function AddExpenseScreen() {
                   borderRadius: 14,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? "#D5CEFF" : stroke,
-                  backgroundColor: isSelected ? "#F3F0FF" : "#FFFFFF",
+                  borderColor: isSelected ? "rgba(50, 87, 226, 0.24)" : stroke,
+                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -501,8 +502,8 @@ export default function AddExpenseScreen() {
                     borderRadius: 14,
                     borderCurve: "continuous",
                     borderWidth: 1,
-                    borderColor: isChecked ? "#D5CEFF" : stroke,
-                    backgroundColor: isChecked ? "#F3F0FF" : "#FFFFFF",
+                    borderColor: isChecked ? "rgba(50, 87, 226, 0.24)" : stroke,
+                    backgroundColor: isChecked ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                     paddingHorizontal: 12,
                     paddingVertical: 10,
                     gap: 10,
@@ -515,7 +516,7 @@ export default function AddExpenseScreen() {
                       borderRadius: 6,
                       borderCurve: "continuous",
                       borderWidth: 2,
-                      borderColor: isChecked ? accent : "#C8CDD8",
+                      borderColor: isChecked ? accent : colorSemanticTokens.border.muted,
                       backgroundColor: isChecked ? accent : "transparent",
                       alignItems: "center",
                       justifyContent: "center",
@@ -524,7 +525,7 @@ export default function AddExpenseScreen() {
                     {isChecked ? (
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colorSemanticTokens.text.inverse,
                           fontSize: 13,
                           lineHeight: 15,
                           fontWeight: "800",
@@ -575,7 +576,7 @@ export default function AddExpenseScreen() {
                       borderCurve: "continuous",
                       borderWidth: 1,
                       borderColor: stroke,
-                      backgroundColor: "#FAFBFD",
+                      backgroundColor: colorSemanticTokens.surface.cardMuted,
                       paddingHorizontal: 10,
                     }}
                   >
@@ -592,7 +593,7 @@ export default function AddExpenseScreen() {
                       }
                       keyboardType="decimal-pad"
                       placeholder="0.00"
-                      placeholderTextColor="#A2ABBC"
+                      placeholderTextColor={colorSemanticTokens.text.tertiary}
                       selectionColor={accent}
                       style={{
                         flex: 1,
@@ -618,7 +619,7 @@ export default function AddExpenseScreen() {
                       borderCurve: "continuous",
                       borderWidth: 1,
                       borderColor: stroke,
-                      backgroundColor: "#FAFBFD",
+                      backgroundColor: colorSemanticTokens.surface.cardMuted,
                       paddingHorizontal: 10,
                     }}
                   >
@@ -629,7 +630,7 @@ export default function AddExpenseScreen() {
                       }
                       keyboardType="decimal-pad"
                       placeholder="0"
-                      placeholderTextColor="#A2ABBC"
+                      placeholderTextColor={colorSemanticTokens.text.tertiary}
                       selectionColor={accent}
                       style={{
                         flex: 1,
@@ -678,14 +679,14 @@ export default function AddExpenseScreen() {
             borderRadius: 14,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: "#F5D1D1",
-            backgroundColor: "#FFF6F6",
+            borderColor: "rgba(188, 43, 62, 0.24)",
+            backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
-            style={{ color: "#B03030", fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
           >
             {formError}
           </Text>
@@ -700,7 +701,7 @@ export default function AddExpenseScreen() {
         style={{
           borderRadius: 16,
           borderCurve: "continuous",
-          backgroundColor: isCreating ? "#9A8CFF" : accent,
+          backgroundColor: isCreating ? colorSemanticTokens.accent.softStrong : accent,
           paddingVertical: 14,
           alignItems: "center",
           justifyContent: "center",
@@ -710,7 +711,7 @@ export default function AddExpenseScreen() {
         <Text
           selectable
           style={{
-            color: "#FFFFFF",
+            color: colorSemanticTokens.text.inverse,
             fontSize: 16,
             lineHeight: 20,
             fontWeight: "700",
