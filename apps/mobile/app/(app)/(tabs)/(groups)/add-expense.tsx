@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
@@ -33,7 +33,7 @@ export default function AddExpenseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
-  const { members } = useGroupDetail(id);
+  const { group, members } = useGroupDetail(id);
   const { createExpense, isCreating } = useGroupExpenses(id, members);
 
   const [description, setDescription] = useState("");
@@ -45,13 +45,41 @@ export default function AddExpenseScreen() {
   const [exactAmounts, setExactAmounts] = useState<Record<string, string>>({});
   const [percentAmounts, setPercentAmounts] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const seededGroupIdRef = useRef<string | null>(null);
 
-  // Initialize paidBy and participants when members load
-  if (members.length > 0 && paidBy === null) {
-    const currentUserId = user?.id ?? members[0].userId;
-    setPaidBy(currentUserId);
-    setSelectedParticipants(new Set(members.map((m) => m.userId)));
-  }
+  useEffect(() => {
+    seededGroupIdRef.current = null;
+    setPaidBy(null);
+    setSelectedParticipants(new Set());
+    setExactAmounts({});
+    setPercentAmounts({});
+    setFormError(null);
+  }, [id]);
+
+  useEffect(() => {
+    if (!id || !group || group.id !== id || members.length === 0) {
+      return;
+    }
+
+    if (seededGroupIdRef.current === id) {
+      return;
+    }
+
+    const memberUserIds = members.map((member) => member.userId);
+    const fallbackPaidBy = members[0]?.userId ?? null;
+    const initialPaidBy =
+      user?.id && memberUserIds.includes(user.id) ? user.id : fallbackPaidBy;
+
+    if (!initialPaidBy) {
+      return;
+    }
+
+    setPaidBy((currentValue) => currentValue ?? initialPaidBy);
+    setSelectedParticipants((currentValue) =>
+      currentValue.size > 0 ? currentValue : new Set(memberUserIds),
+    );
+    seededGroupIdRef.current = id;
+  }, [group, id, members, user?.id]);
 
   const amountCents = Math.round(parseFloat(amountText || "0") * 100);
   const participantIds = Array.from(selectedParticipants);

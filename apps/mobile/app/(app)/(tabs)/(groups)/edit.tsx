@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
@@ -27,15 +27,26 @@ export default function EditGroupScreen() {
   const [emoji, setEmoji] = useState(group?.emoji ?? GROUP_DEFAULT_EMOJI_BY_TYPE.other);
   const [hasManuallySelectedEmoji, setHasManuallySelectedEmoji] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(false);
+  const hydratedGroupIdRef = useRef<string | null>(null);
 
-  // Sync initial values once group loads
-  if (group && !initialized) {
+  useEffect(() => {
+    hydratedGroupIdRef.current = null;
+  }, [id]);
+
+  useEffect(() => {
+    if (!group) {
+      return;
+    }
+
+    if (hydratedGroupIdRef.current === group.id) {
+      return;
+    }
+
     setName(group.name);
     setGroupType(group.groupType);
     setEmoji(group.emoji);
-    setInitialized(true);
-  }
+    hydratedGroupIdRef.current = group.id;
+  }, [group]);
 
   const handleSelectType = (nextType: GroupType) => {
     setGroupType(nextType);
