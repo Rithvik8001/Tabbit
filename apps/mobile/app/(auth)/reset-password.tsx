@@ -1,13 +1,9 @@
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 
-import { PrimaryButton } from "@/design/primitives/primary-button";
-import { colorSemanticTokens } from "@/design/tokens/colors";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyScale } from "@/design/tokens/typography";
+import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
-import { AuthTextField } from "@/features/auth/components/auth-text-field";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { isValidPassword } from "@/features/auth/utils/auth-validation";
 
@@ -54,74 +50,130 @@ export default function ResetPasswordScreen() {
 
   const disableSubmit = isSubmitting || isAuthLoading || !session;
 
+  if (!session && !isAuthLoading) {
+    return (
+      <AuthScreenShell title="Link expired">
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "400",
+            color: "#3C3C3C",
+            textAlign: "center",
+            lineHeight: 22,
+          }}
+        >
+          Recovery link missing or expired. Request a new link and try again.
+        </Text>
+        <Link href="/(auth)/forgot-password" asChild>
+          <Pressable
+            style={{
+              backgroundColor: "#E5E5E5",
+              borderRadius: 16,
+              borderCurve: "continuous",
+              minHeight: 50,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingVertical: 14,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "700",
+                color: "#AFAFAF",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              REQUEST NEW LINK
+            </Text>
+          </Pressable>
+        </Link>
+      </AuthScreenShell>
+    );
+  }
+
   return (
-    <AuthScreenShell
-      title="Set a new password"
-      subtitle="Choose a secure password and continue to your dashboard."
-      footer={
-        <View style={{ gap: spacingTokens.xs }}>
-          <PrimaryButton
-            visualStyle="premiumAuth"
-            label="Update Password"
-            disabled={disableSubmit}
-            onPress={handleUpdatePassword}
-          />
-        </View>
-      }
-    >
-      {!session && !isAuthLoading ? (
-        <View style={{ gap: spacingTokens.sm }}>
-          <Text selectable style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}>
-            Recovery link missing or expired. Request a new link and try again.
-          </Text>
-          <Link href="/(auth)/forgot-password" asChild>
-            <Pressable>
-              <Text
-                selectable
-                style={[typographyScale.labelMd, { color: colorSemanticTokens.accent.primary }]}
-              >
-                Request another reset link
-              </Text>
-            </Pressable>
-          </Link>
-        </View>
-      ) : (
-        <>
-          <AuthTextField
-            label="New Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="newPassword"
-            autoComplete="password-new"
-            placeholder="Minimum 8 characters"
-          />
-          <AuthTextField
-            label="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="newPassword"
-            autoComplete="password-new"
-            placeholder="Repeat password"
-          />
-        </>
-      )}
+    <AuthScreenShell title="Set a new password">
+      <AuthInputGroup
+        fields={[
+          {
+            placeholder: "New password",
+            value: password,
+            onChangeText: setPassword,
+            secureTextEntry: true,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            textContentType: "newPassword",
+            autoComplete: "password-new",
+          },
+          {
+            placeholder: "Confirm password",
+            value: confirmPassword,
+            onChangeText: setConfirmPassword,
+            secureTextEntry: true,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            textContentType: "newPassword",
+            autoComplete: "password-new",
+          },
+        ]}
+      />
 
       {formError ? (
-        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#FF4B4B",
+            textAlign: "center",
+          }}
+        >
           {formError}
         </Text>
       ) : null}
 
+      {/* Update Password button */}
+      <Pressable
+        disabled={disableSubmit}
+        onPress={handleUpdatePassword}
+        style={{
+          backgroundColor: "#E5E5E5",
+          borderRadius: 16,
+          borderCurve: "continuous",
+          minHeight: 50,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 14,
+          opacity: disableSubmit ? 0.5 : 1,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "700",
+            color: "#AFAFAF",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          }}
+        >
+          UPDATE PASSWORD
+        </Text>
+      </Pressable>
+
+      {/* Back to login */}
       <Link href="/(auth)/login" asChild>
-        <Pressable style={{ alignSelf: "flex-start", paddingVertical: 4 }}>
-          <Text selectable style={[typographyScale.labelMd, { color: colorSemanticTokens.text.primary }]}>
-            Back to login
+        <Pressable style={{ alignSelf: "center", paddingTop: 8 }}>
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: "700",
+              color: "#1CB0F6",
+              textTransform: "uppercase",
+              letterSpacing: 0.2,
+            }}
+          >
+            BACK TO LOGIN
           </Text>
         </Pressable>
       </Link>

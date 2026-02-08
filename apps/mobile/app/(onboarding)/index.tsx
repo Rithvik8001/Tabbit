@@ -1,24 +1,16 @@
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/primitives/button";
-import { LiquidSurface } from "@/design/primitives/liquid-surface";
-import { colorSemanticTokens } from "@/design/tokens/colors";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyScale } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
 export default function OnboardingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
   const { isAuthLoading, session } = useAuth();
-
-  const isCompact = height < 760;
 
   useEffect(() => {
     if (!isAuthLoading && session) {
@@ -27,123 +19,108 @@ export default function OnboardingScreen() {
   }, [isAuthLoading, router, session]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
-      <LinearGradient
-        colors={[
-          colorSemanticTokens.background.gradientStart,
-          colorSemanticTokens.background.gradientEnd,
-        ]}
-        start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.9, y: 1 }}
-        style={{ position: "absolute", inset: 0 }}
-      />
-      <LinearGradient
-        colors={["rgba(50, 87, 226, 0.18)", "rgba(50, 87, 226, 0.00)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={{
-          position: "absolute",
-          top: -48,
-          left: -24,
-          right: -24,
-          height: 260,
-        }}
-      />
-
+    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <View
         style={{
           flex: 1,
-          justifyContent: "space-between",
-          paddingTop: Math.max(insets.top + (isCompact ? 16 : 26), 40),
-          paddingBottom: Math.max(insets.bottom + 20, 26),
-          paddingHorizontal: spacingTokens.screenHorizontal,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+          paddingHorizontal: 24,
         }}
       >
-        <View style={{ gap: isCompact ? spacingTokens.lg : spacingTokens.xl }}>
-          <LiquidSurface
-            kind="strong"
-            contentStyle={{
-              alignSelf: "flex-start",
-              borderRadius: 32,
-              borderCurve: "continuous",
-              padding: 10,
-            }}
-          >
-            <View
-              style={{
-                width: 62,
-                height: 62,
-                borderRadius: 22,
-                borderCurve: "continuous",
-                backgroundColor: "rgba(255, 255, 255, 0.82)",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                source={require("@/assets/images/icon.png")}
-                contentFit="cover"
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 14,
-                }}
-              />
-            </View>
-          </LiquidSurface>
-
-          <View style={{ gap: spacingTokens.sm }}>
-            <Text
-              selectable
-              style={[
-                typographyScale.displayXl,
-                {
-                  color: colorSemanticTokens.text.primary,
-                  fontSize: isCompact ? 36 : typographyScale.displayXl.fontSize,
-                  lineHeight: isCompact ? 42 : typographyScale.displayXl.lineHeight,
-                },
-              ]}
-            >
-              Welcome to Tabbit
-            </Text>
-            <Text
-              selectable
-              style={[
-                typographyScale.bodyLg,
-                {
-                  color: colorSemanticTokens.text.secondary,
-                  maxWidth: 340,
-                },
-              ]}
-            >
-              Split expenses with friends, track balances instantly, and settle up with clarity.
-            </Text>
-          </View>
-        </View>
-
-        <LiquidSurface
-          kind="strong"
-          contentStyle={{
-            padding: spacingTokens.cardPadding,
-            gap: spacingTokens.sm,
+        {/* Icon */}
+        <View
+          style={{
+            borderRadius: 24,
+            borderCurve: "continuous",
+            marginBottom: 20,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 3,
           }}
         >
+          <Image
+            source={require("@/assets/images/icon.png")}
+            contentFit="cover"
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 24,
+            }}
+          />
+        </View>
+
+        {/* Title */}
+        <Text
+          style={{
+            fontSize: 32,
+            fontWeight: "800",
+            color: "#3C3C3C",
+            textAlign: "center",
+            marginBottom: 12,
+          }}
+        >
+          Tabbit
+        </Text>
+
+        {/* Subtitle */}
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "400",
+            color: "#AFAFAF",
+            textAlign: "center",
+            lineHeight: 22,
+            maxWidth: 280,
+            marginBottom: 48,
+          }}
+        >
+          Split expenses with friends and settle up effortlessly.
+        </Text>
+
+        {/* Buttons */}
+        <View style={{ width: "100%", gap: 12 }}>
           <Button
-            label="Create Account"
+            label="GET STARTED"
             size="lg"
+            tone="accent"
+            variant="solid"
             onPress={() => {
               router.push("/(auth)/signup");
             }}
           />
-          <Button
-            label="Log In"
-            variant="soft"
-            size="lg"
+          <Pressable
             onPress={() => {
               router.push("/(auth)/login");
             }}
-          />
-        </LiquidSurface>
+            style={{
+              backgroundColor: "#E5E5E5",
+              borderRadius: 16,
+              borderCurve: "continuous",
+              minHeight: 50,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingVertical: 14,
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "700",
+                color: "#AFAFAF",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              I ALREADY HAVE AN ACCOUNT
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );

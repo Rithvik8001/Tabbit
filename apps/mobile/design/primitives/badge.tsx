@@ -33,7 +33,7 @@ function getBadgeColors(tone: NonNullable<BadgeProps["tone"]>) {
   }
 
   return {
-    backgroundColor: "rgba(11, 17, 32, 0.08)",
+    backgroundColor: "#F7F7F7",
     color: colorSemanticTokens.text.secondary,
   };
 }
@@ -47,12 +47,23 @@ export function Badge({ label, tone = "neutral" }: BadgeProps) {
         alignSelf: "flex-start",
         borderRadius: radiusTokens.pill,
         borderCurve: "continuous",
-        paddingHorizontal: spacingTokens.sm,
-        paddingVertical: 3,
+        paddingHorizontal: spacingTokens.sm + 2,
+        paddingVertical: 4,
         backgroundColor: palette.backgroundColor,
       }}
     >
-      <Text selectable style={[typographyScale.caption, { color: palette.color }]}>
+      <Text
+        selectable
+        style={[
+          typographyScale.caption,
+          {
+            color: palette.color,
+            fontWeight: "700",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
+        ]}
+      >
         {label}
       </Text>
     </View>

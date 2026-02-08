@@ -1,12 +1,10 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
 import { colorSemanticTokens } from "@/design/tokens/colors";
 
-const surface = colorSemanticTokens.surface.cardStrong;
-const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
-const accent = colorSemanticTokens.accent.primary;
 
 type GroupEmptyStateProps = {
   onCreate: () => void;
@@ -16,11 +14,12 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
   return (
     <View
       style={{
-        borderRadius: 20,
+        borderRadius: 16,
         borderCurve: "continuous",
-        borderWidth: 1,
-        borderColor: stroke,
-        backgroundColor: surface,
+        borderWidth: 2,
+        borderColor: "#E5E5E5",
+        backgroundColor: "#FFFFFF",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
         padding: 20,
         gap: 12,
         alignItems: "center",
@@ -69,30 +68,13 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
         </Text>
       </View>
 
-      <Pressable
-        accessibilityRole="button"
-        onPress={onCreate}
-        style={{
-          marginTop: 6,
-          borderRadius: 999,
-          borderCurve: "continuous",
-          backgroundColor: accent,
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.text.inverse,
-            fontSize: 14,
-            lineHeight: 18,
-            fontWeight: "700",
-          }}
-        >
-          Create your first group
-        </Text>
-      </Pressable>
+      <View style={{ marginTop: 6 }}>
+        <Button
+          label="Create your first group"
+          onPress={onCreate}
+          size="md"
+        />
+      </View>
     </View>
   );
 }

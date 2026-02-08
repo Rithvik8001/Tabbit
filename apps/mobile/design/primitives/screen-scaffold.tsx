@@ -62,15 +62,12 @@ export function ScreenScaffold({
             bottom: footerMode === "floating" ? Math.max(insets.bottom, 8) : 0,
             borderTopWidth: footerMode === "floating" ? 0 : 1,
             borderTopColor: colorSemanticTokens.border.subtle,
-            backgroundColor:
-              footerMode === "floating"
-                ? colorSemanticTokens.background.chrome
-                : "rgba(248, 250, 253, 0.94)",
+            backgroundColor: "#FFFFFF",
             borderRadius: footerMode === "floating" ? radiusTokens.lg : 0,
             borderCurve: "continuous",
             paddingHorizontal: spacingTokens.screenHorizontal,
             paddingVertical: spacingTokens.sm,
-            boxShadow: footerMode === "floating" ? "0 10px 20px rgba(9, 14, 26, 0.10)" : undefined,
+            boxShadow: footerMode === "floating" ? "0 4px 12px rgba(0, 0, 0, 0.10)" : undefined,
           },
           footerStyle,
         ]}

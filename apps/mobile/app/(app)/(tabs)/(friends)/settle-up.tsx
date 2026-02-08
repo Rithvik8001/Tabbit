@@ -8,7 +8,6 @@ import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
 
-const surface = colorSemanticTokens.surface.cardStrong;
 const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -180,11 +179,12 @@ export default function FriendSettleUpScreen() {
       {isLoading ? (
         <View
           style={{
-            borderRadius: 20,
+            borderRadius: 16,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: surface,
+            borderWidth: 2,
+            borderColor: "#E5E5E5",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             padding: 16,
             gap: 8,
           }}
@@ -206,11 +206,12 @@ export default function FriendSettleUpScreen() {
       {error ? (
         <View
           style={{
-            borderRadius: 20,
+            borderRadius: 16,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: surface,
+            borderWidth: 2,
+            borderColor: "#E5E5E5",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             padding: 16,
             gap: 10,
           }}
@@ -271,11 +272,12 @@ export default function FriendSettleUpScreen() {
         <>
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
+              borderWidth: 2,
+              borderColor: "#E5E5E5",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               padding: 16,
               gap: 8,
             }}
@@ -318,11 +320,12 @@ export default function FriendSettleUpScreen() {
 
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
+              borderWidth: 2,
+              borderColor: "#E5E5E5",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               padding: 16,
               gap: 10,
             }}
@@ -362,10 +365,10 @@ export default function FriendSettleUpScreen() {
                         setSelectedGroupId(group.id);
                       }}
                       style={{
-                        borderRadius: 14,
+                        borderRadius: 16,
                         borderCurve: "continuous",
                         borderWidth: 1,
-                        borderColor: isSelected ? "rgba(50, 87, 226, 0.24)" : stroke,
+                        borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
                         backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
                         paddingHorizontal: 12,
                         paddingVertical: 10,
@@ -392,11 +395,12 @@ export default function FriendSettleUpScreen() {
 
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
+              borderWidth: 2,
+              borderColor: "#E5E5E5",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               padding: 16,
               gap: 8,
             }}
@@ -438,11 +442,12 @@ export default function FriendSettleUpScreen() {
 
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
+              borderWidth: 2,
+              borderColor: "#E5E5E5",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               padding: 16,
               gap: 10,
             }}
@@ -463,11 +468,11 @@ export default function FriendSettleUpScreen() {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                borderRadius: 14,
+                borderRadius: 16,
                 borderCurve: "continuous",
-                borderWidth: 1,
-                borderColor: stroke,
-                backgroundColor: colorSemanticTokens.surface.cardMuted,
+                borderWidth: 2,
+                borderColor: "#E5E5E5",
+                backgroundColor: "#FFFFFF",
                 paddingHorizontal: 14,
               }}
             >
@@ -532,11 +537,11 @@ export default function FriendSettleUpScreen() {
               placeholderTextColor={colorSemanticTokens.text.tertiary}
               selectionColor={accent}
               style={{
-                borderRadius: 14,
+                borderRadius: 16,
                 borderCurve: "continuous",
-                borderWidth: 1,
-                borderColor: stroke,
-                backgroundColor: colorSemanticTokens.surface.cardMuted,
+                borderWidth: 2,
+                borderColor: "#E5E5E5",
+                backgroundColor: "#FFFFFF",
                 paddingHorizontal: 14,
                 paddingVertical: 12,
                 color: ink,
@@ -552,10 +557,10 @@ export default function FriendSettleUpScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 14,
+            borderRadius: 16,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: "rgba(188, 43, 62, 0.24)",
+            borderColor: colorSemanticTokens.state.danger,
             backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}

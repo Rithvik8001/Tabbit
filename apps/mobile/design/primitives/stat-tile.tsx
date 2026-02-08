@@ -29,8 +29,13 @@ export function StatTile({ label, value, tone = "neutral" }: StatTileProps) {
       <Text
         selectable
         style={[
-          typographyScale.labelMd,
-          { color: colorSemanticTokens.text.tertiary },
+          typographyScale.labelSm,
+          {
+            color: colorSemanticTokens.text.tertiary,
+            fontWeight: "700",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
         ]}
       >
         {label}

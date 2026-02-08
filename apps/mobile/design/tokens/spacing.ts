@@ -11,11 +11,11 @@ export const spacingTokens = {
   "4xl": 40,
   "5xl": 48,
   "6xl": 56,
-  screenHorizontal: 20,
+  screenHorizontal: 24,
   screenHorizontalTight: 16,
-  screenHorizontalWide: 24,
-  sectionGap: 14,
-  cardPadding: 16,
+  screenHorizontalWide: 28,
+  sectionGap: 20,
+  cardPadding: 20,
 } as const;
 
 export type SpacingScale = typeof spacingTokens;

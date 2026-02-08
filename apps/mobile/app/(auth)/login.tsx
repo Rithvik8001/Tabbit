@@ -2,10 +2,8 @@ import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { PrimaryButton } from "@/design/primitives/primary-button";
-import { premiumAuthUiTokens } from "@/design/tokens/auth-ui";
+import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
-import { AuthTextField } from "@/features/auth/components/auth-text-field";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { isValidEmail } from "@/features/auth/utils/auth-validation";
 
@@ -52,112 +50,121 @@ export default function LoginScreen() {
   };
 
   return (
-    <AuthScreenShell
-      title="Welcome back"
-      subtitle="Pick up exactly where your shared balances left off."
-      footer={
-        <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
-          <Text
-            selectable
-            style={[
-              premiumAuthUiTokens.typography.caption,
-              { color: premiumAuthUiTokens.color.textMuted },
-            ]}
-          >
-            Email + password authentication.
-          </Text>
-          <PrimaryButton
-            visualStyle="premiumAuth"
-            label="Log In"
-            disabled={isSubmitting}
-            onPress={handleLogin}
-          />
-        </View>
-      }
-    >
-      <AuthTextField
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-        textContentType="emailAddress"
-        autoComplete="email"
-        placeholder="you@domain.com"
-      />
-      <AuthTextField
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-        autoCorrect={false}
-        textContentType="password"
-        autoComplete="password"
-        placeholder="Your password"
+    <AuthScreenShell title="Enter your details">
+      <AuthInputGroup
+        fields={[
+          {
+            placeholder: "Email",
+            value: email,
+            onChangeText: setEmail,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            keyboardType: "email-address",
+            textContentType: "emailAddress",
+            autoComplete: "email",
+          },
+          {
+            placeholder: "Password",
+            value: password,
+            onChangeText: setPassword,
+            secureTextEntry: true,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            textContentType: "password",
+            autoComplete: "password",
+          },
+        ]}
       />
 
       {formError ? (
         <Text
-          selectable
-          style={[
-            premiumAuthUiTokens.typography.caption,
-            { color: premiumAuthUiTokens.color.error },
-          ]}
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#FF4B4B",
+            textAlign: "center",
+          }}
         >
           {formError}
         </Text>
       ) : null}
 
+      {/* Log In button */}
+      <Pressable
+        disabled={isSubmitting}
+        onPress={handleLogin}
+        style={{
+          backgroundColor: "#E5E5E5",
+          borderRadius: 16,
+          borderCurve: "continuous",
+          minHeight: 50,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 14,
+          opacity: isSubmitting ? 0.5 : 1,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "700",
+            color: "#AFAFAF",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          }}
+        >
+          LOG IN
+        </Text>
+      </Pressable>
+
+      {/* Forgot password */}
       <Link href="/(auth)/forgot-password" asChild>
         <Pressable style={{ alignSelf: "center" }}>
           <Text
-            selectable
-            style={[
-              premiumAuthUiTokens.typography.link,
-              {
-                color: premiumAuthUiTokens.color.accent,
-                textDecorationLine: "underline",
-              },
-            ]}
+            style={{
+              fontSize: 13,
+              fontWeight: "700",
+              color: "#1CB0F6",
+              textTransform: "uppercase",
+              letterSpacing: 0.4,
+            }}
           >
-            Forgot password?
+            FORGOT PASSWORD
           </Text>
         </Pressable>
       </Link>
 
+      {/* Bottom row */}
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          gap: premiumAuthUiTokens.spacing.xs,
-          paddingTop: premiumAuthUiTokens.spacing.xs,
+          gap: 6,
+          paddingTop: 8,
         }}
       >
         <Text
-          selectable
-          style={[
-            premiumAuthUiTokens.typography.caption,
-            { color: premiumAuthUiTokens.color.textMuted },
-          ]}
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#AFAFAF",
+          }}
         >
           New to Tabbit?
         </Text>
         <Link href="/(auth)/signup" asChild>
           <Pressable>
             <Text
-              selectable
-              style={[
-                premiumAuthUiTokens.typography.link,
-                {
-                  color: premiumAuthUiTokens.color.accent,
-                  textDecorationLine: "underline",
-                },
-              ]}
+              style={{
+                fontSize: 13,
+                fontWeight: "700",
+                color: "#1CB0F6",
+                textTransform: "uppercase",
+                letterSpacing: 0.2,
+              }}
             >
-              Create account
+              CREATE ACCOUNT
             </Text>
           </Pressable>
         </Link>

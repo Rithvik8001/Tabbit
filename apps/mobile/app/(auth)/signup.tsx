@@ -2,10 +2,8 @@ import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { PrimaryButton } from "@/design/primitives/primary-button";
-import { premiumAuthUiTokens } from "@/design/tokens/auth-ui";
+import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
-import { AuthTextField } from "@/features/auth/components/auth-text-field";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import {
   getDisplayNameValidationMessage,
@@ -89,139 +87,171 @@ export default function SignupScreen() {
     })();
   };
 
-  return (
-    <AuthScreenShell
-      title="Create your account"
-      subtitle="A quieter way to manage shared expenses starts here."
-      footer={
-        <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
-          <Text
-            selectable
-            style={[
-              premiumAuthUiTokens.typography.caption,
-              { color: premiumAuthUiTokens.color.textMuted },
-            ]}
-          >
-            {verificationMessage
-              ? "Email confirmation is required before login."
-              : "Fields marked * are required. By continuing, you agree to Tabbit's terms and privacy policy."}
-          </Text>
-          <PrimaryButton
-            visualStyle="premiumAuth"
-            label={verificationMessage ? "Go to Login" : "Create Account"}
-            disabled={isSubmitting}
-            onPress={handleSignUp}
-          />
-        </View>
-      }
-    >
-      {verificationMessage ? (
-        <View style={{ gap: premiumAuthUiTokens.spacing.xs }}>
-          <Text
-            selectable
-            style={[
-              premiumAuthUiTokens.typography.body,
-              { color: premiumAuthUiTokens.color.textSecondary },
-            ]}
-          >
-            {verificationMessage}
-          </Text>
-        </View>
-      ) : (
-        <>
-          <AuthTextField
-            label="Username *"
-            value={displayName}
-            onChangeText={setDisplayName}
-            autoCapitalize="words"
-            autoCorrect={false}
-            textContentType="username"
-            autoComplete="name"
-            placeholder="What should we call you?"
-          />
-          <AuthTextField
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoComplete="email"
-            placeholder="you@domain.com"
-          />
-          <AuthTextField
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="newPassword"
-            autoComplete="password-new"
-            placeholder="Minimum 8 characters"
-          />
-          <AuthTextField
-            label="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="newPassword"
-            autoComplete="password-new"
-            placeholder="Repeat password"
-          />
+  if (verificationMessage) {
+    return (
+      <AuthScreenShell title="Check your email">
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "400",
+            color: "#3C3C3C",
+            textAlign: "center",
+            lineHeight: 22,
+          }}
+        >
+          {verificationMessage}
+        </Text>
 
-          {formError ? (
-            <Text
-              selectable
-              style={[
-                premiumAuthUiTokens.typography.caption,
-                { color: premiumAuthUiTokens.color.error },
-              ]}
-            >
-              {formError}
-            </Text>
-          ) : null}
-
-          <View
+        <Pressable
+          onPress={() => router.replace("/(auth)/login")}
+          style={{
+            backgroundColor: "#E5E5E5",
+            borderRadius: 16,
+            borderCurve: "continuous",
+            minHeight: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 14,
+          }}
+        >
+          <Text
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: premiumAuthUiTokens.spacing.xs,
-              paddingTop: premiumAuthUiTokens.spacing.xs,
+              fontSize: 15,
+              fontWeight: "700",
+              color: "#AFAFAF",
+              textTransform: "uppercase",
+              letterSpacing: 0.8,
             }}
           >
+            GO TO LOGIN
+          </Text>
+        </Pressable>
+      </AuthScreenShell>
+    );
+  }
+
+  return (
+    <AuthScreenShell title="Create your account">
+      <AuthInputGroup
+        fields={[
+          {
+            placeholder: "Username",
+            value: displayName,
+            onChangeText: setDisplayName,
+            autoCapitalize: "words",
+            autoCorrect: false,
+            textContentType: "username",
+            autoComplete: "name",
+          },
+          {
+            placeholder: "Email",
+            value: email,
+            onChangeText: setEmail,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            keyboardType: "email-address",
+            textContentType: "emailAddress",
+            autoComplete: "email",
+          },
+          {
+            placeholder: "Password",
+            value: password,
+            onChangeText: setPassword,
+            secureTextEntry: true,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            textContentType: "newPassword",
+            autoComplete: "password-new",
+          },
+          {
+            placeholder: "Confirm password",
+            value: confirmPassword,
+            onChangeText: setConfirmPassword,
+            secureTextEntry: true,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            textContentType: "newPassword",
+            autoComplete: "password-new",
+          },
+        ]}
+      />
+
+      {formError ? (
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#FF4B4B",
+            textAlign: "center",
+          }}
+        >
+          {formError}
+        </Text>
+      ) : null}
+
+      {/* Create Account button */}
+      <Pressable
+        disabled={isSubmitting}
+        onPress={handleSignUp}
+        style={{
+          backgroundColor: "#E5E5E5",
+          borderRadius: 16,
+          borderCurve: "continuous",
+          minHeight: 50,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 14,
+          opacity: isSubmitting ? 0.5 : 1,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "700",
+            color: "#AFAFAF",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          }}
+        >
+          CREATE ACCOUNT
+        </Text>
+      </Pressable>
+
+      {/* Bottom row */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          paddingTop: 8,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#AFAFAF",
+          }}
+        >
+          Already have an account?
+        </Text>
+        <Link href="/(auth)/login" asChild>
+          <Pressable>
             <Text
-              selectable
-              style={[
-                premiumAuthUiTokens.typography.caption,
-                { color: premiumAuthUiTokens.color.textMuted },
-              ]}
+              style={{
+                fontSize: 13,
+                fontWeight: "700",
+                color: "#1CB0F6",
+                textTransform: "uppercase",
+                letterSpacing: 0.2,
+              }}
             >
-              Already have an account?
+              LOG IN
             </Text>
-            <Link href="/(auth)/login" asChild>
-              <Pressable>
-                <Text
-                  selectable
-                  style={[
-                    premiumAuthUiTokens.typography.link,
-                    {
-                      color: premiumAuthUiTokens.color.accent,
-                      textDecorationLine: "underline",
-                    },
-                  ]}
-                >
-                  Log in
-                </Text>
-              </Pressable>
-            </Link>
-          </View>
-        </>
-      )}
+          </Pressable>
+        </Link>
+      </View>
     </AuthScreenShell>
   );
 }

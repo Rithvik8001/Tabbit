@@ -7,7 +7,6 @@ import { isValidEmail } from "@/features/auth/utils/auth-validation";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import type { GroupMemberCandidate } from "@/features/groups/types/group-member.types";
 
-const surface = colorSemanticTokens.surface.cardStrong;
 const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -143,11 +142,12 @@ export default function AddMemberScreen() {
     >
       <View
         style={{
-          borderRadius: 20,
+          borderRadius: 16,
           borderCurve: "continuous",
-          borderWidth: 1,
-          borderColor: stroke,
-          backgroundColor: surface,
+          borderWidth: 2,
+          borderColor: "#E5E5E5",
+          backgroundColor: "#FFFFFF",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
           padding: 16,
           gap: 10,
         }}
@@ -177,11 +177,11 @@ export default function AddMemberScreen() {
           autoCorrect={false}
           autoFocus
           style={{
-            borderRadius: 14,
+            borderRadius: 16,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: colorSemanticTokens.surface.cardMuted,
+            borderWidth: 2,
+            borderColor: "#E5E5E5",
+            backgroundColor: "#FFFFFF",
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -215,9 +215,10 @@ export default function AddMemberScreen() {
           style={{
             borderRadius: 16,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: surface,
+            borderWidth: 2,
+            borderColor: "#E5E5E5",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             overflow: "hidden",
           }}
         >
@@ -289,10 +290,10 @@ export default function AddMemberScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 14,
+            borderRadius: 16,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: "rgba(188, 43, 62, 0.24)",
+            borderColor: colorSemanticTokens.state.danger,
             backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}

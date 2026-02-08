@@ -18,11 +18,12 @@ function LoadingCard() {
   return (
     <View
       style={{
-        borderRadius: 20,
+        borderRadius: 16,
         borderCurve: "continuous",
-        borderWidth: 1,
-        borderColor: stroke,
-        backgroundColor: surface,
+        borderWidth: 2,
+        borderColor: "#E5E5E5",
+        backgroundColor: "#FFFFFF",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
         padding: 16,
         gap: 10,
       }}
@@ -167,7 +168,7 @@ export default function GroupDetailScreen() {
       {!isLoading && error ? (
         <View
           style={{
-            borderRadius: 20,
+            borderRadius: 16,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
@@ -218,7 +219,7 @@ export default function GroupDetailScreen() {
           {/* Group info card */}
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
               borderWidth: 1,
               borderColor: stroke,
@@ -260,7 +261,7 @@ export default function GroupDetailScreen() {
           {/* Members card */}
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
               borderWidth: 1,
               borderColor: stroke,
@@ -294,7 +295,7 @@ export default function GroupDetailScreen() {
                     borderRadius: 999,
                     borderCurve: "continuous",
                     borderWidth: 1,
-                    borderColor: "rgba(50, 87, 226, 0.24)",
+                    borderColor: colorSemanticTokens.accent.primary,
                     backgroundColor: colorSemanticTokens.accent.soft,
                     paddingHorizontal: 12,
                     paddingVertical: 6,
@@ -334,10 +335,10 @@ export default function GroupDetailScreen() {
                       flexDirection: "row",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      borderRadius: 14,
+                      borderRadius: 16,
                       borderCurve: "continuous",
-                      borderWidth: 1,
-                      borderColor: stroke,
+                      borderWidth: 2,
+                      borderColor: "#E5E5E5",
                       padding: 12,
                       gap: 8,
                     }}
@@ -402,7 +403,7 @@ export default function GroupDetailScreen() {
                           borderRadius: 999,
                           borderCurve: "continuous",
                           borderWidth: 1,
-                          borderColor: "rgba(188, 43, 62, 0.24)",
+                          borderColor: colorSemanticTokens.state.danger,
                           backgroundColor: colorSemanticTokens.state.dangerSoft,
                           paddingHorizontal: 10,
                           paddingVertical: 4,
@@ -431,7 +432,7 @@ export default function GroupDetailScreen() {
           {expenses.length > 0 ? (
             <View
               style={{
-                borderRadius: 20,
+                borderRadius: 16,
                 borderCurve: "continuous",
                 borderWidth: 1,
                 borderColor: stroke,
@@ -539,7 +540,7 @@ export default function GroupDetailScreen() {
                                 borderRadius: 999,
                                 borderCurve: "continuous",
                                 borderWidth: 1,
-                                borderColor: "rgba(50, 87, 226, 0.24)",
+                                borderColor: colorSemanticTokens.accent.primary,
                                 backgroundColor: colorSemanticTokens.accent.soft,
                                 paddingHorizontal: 10,
                                 paddingVertical: 4,
@@ -570,7 +571,7 @@ export default function GroupDetailScreen() {
           {/* Expenses card */}
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
               borderWidth: 1,
               borderColor: stroke,
@@ -603,7 +604,7 @@ export default function GroupDetailScreen() {
                   borderRadius: 999,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: "rgba(50, 87, 226, 0.24)",
+                  borderColor: colorSemanticTokens.accent.primary,
                   backgroundColor: colorSemanticTokens.accent.soft,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
@@ -646,10 +647,10 @@ export default function GroupDetailScreen() {
                   <View
                     key={expense.id}
                     style={{
-                      borderRadius: 14,
+                      borderRadius: 16,
                       borderCurve: "continuous",
-                      borderWidth: 1,
-                      borderColor: stroke,
+                      borderWidth: 2,
+                      borderColor: "#E5E5E5",
                       padding: 12,
                       gap: 6,
                     }}
@@ -736,7 +737,7 @@ export default function GroupDetailScreen() {
                           borderRadius: 999,
                           borderCurve: "continuous",
                           borderWidth: 1,
-                          borderColor: "rgba(188, 43, 62, 0.24)",
+                          borderColor: colorSemanticTokens.state.danger,
                           backgroundColor: colorSemanticTokens.state.dangerSoft,
                           paddingHorizontal: 10,
                           paddingVertical: 4,
@@ -801,7 +802,7 @@ export default function GroupDetailScreen() {
                   borderRadius: 16,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: "rgba(188, 43, 62, 0.24)",
+                  borderColor: colorSemanticTokens.state.danger,
                   backgroundColor: colorSemanticTokens.state.dangerSoft,
                   paddingVertical: 14,
                   alignItems: "center",

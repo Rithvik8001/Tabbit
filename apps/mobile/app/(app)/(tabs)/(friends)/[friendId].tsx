@@ -6,7 +6,6 @@ import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { formatShortDate } from "@/features/app-shell/mock/tab-mock-data";
 
-const surface = colorSemanticTokens.surface.cardStrong;
 const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -46,11 +45,12 @@ export default function FriendDetailScreen() {
       ) : error ? (
         <View
           style={{
-            borderRadius: 20,
+            borderRadius: 16,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: surface,
+            borderWidth: 2,
+            borderColor: "#E5E5E5",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             padding: 16,
             gap: 12,
             alignItems: "center",
@@ -69,11 +69,12 @@ export default function FriendDetailScreen() {
       ) : !friend ? (
         <View
           style={{
-            borderRadius: 20,
+            borderRadius: 16,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
-            backgroundColor: surface,
+            borderWidth: 2,
+            borderColor: "#E5E5E5",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             padding: 16,
             gap: 6,
           }}
@@ -96,11 +97,12 @@ export default function FriendDetailScreen() {
           {/* Balance card */}
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
+              borderWidth: 2,
+              borderColor: "#E5E5E5",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               padding: 16,
               gap: 8,
             }}
@@ -167,7 +169,7 @@ export default function FriendDetailScreen() {
                   borderRadius: 999,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: "rgba(50, 87, 226, 0.24)",
+                  borderColor: colorSemanticTokens.accent.primary,
                   backgroundColor: colorSemanticTokens.accent.soft,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
@@ -191,11 +193,12 @@ export default function FriendDetailScreen() {
           {/* Activity list */}
           <View
             style={{
-              borderRadius: 20,
+              borderRadius: 16,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
-              backgroundColor: surface,
+              borderWidth: 2,
+              borderColor: "#E5E5E5",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               padding: 16,
               gap: 10,
             }}
@@ -222,7 +225,7 @@ export default function FriendDetailScreen() {
                   <View
                     key={item.expenseId}
                     style={{
-                      borderRadius: 14,
+                      borderRadius: 16,
                       borderCurve: "continuous",
                       borderWidth: 1,
                       borderColor: stroke,

@@ -2,12 +2,8 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { PrimaryButton } from "@/design/primitives/primary-button";
-import { colorSemanticTokens } from "@/design/tokens/colors";
-import { spacingTokens } from "@/design/tokens/spacing";
-import { typographyScale } from "@/design/tokens/typography";
+import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
-import { AuthTextField } from "@/features/auth/components/auth-text-field";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { isValidEmail } from "@/features/auth/utils/auth-validation";
 
@@ -44,55 +40,107 @@ export default function ForgotPasswordScreen() {
   const disableSubmit = isSubmitting || isSent;
 
   return (
-    <AuthScreenShell
-      title="Reset your password"
-      subtitle="We will send a secure recovery link to continue in-app."
-      footer={
-        <View style={{ gap: spacingTokens.xs }}>
-          <PrimaryButton
-            visualStyle="premiumAuth"
-            label={isSent ? "Email Sent" : "Send Reset Link"}
-            disabled={disableSubmit}
-            onPress={handleResetRequest}
-          />
-        </View>
-      }
-    >
-      <AuthTextField
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        placeholder="you@domain.com"
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-        textContentType="emailAddress"
-        autoComplete="email"
+    <AuthScreenShell title="Reset your password">
+      <AuthInputGroup
+        fields={[
+          {
+            placeholder: "Email",
+            value: email,
+            onChangeText: setEmail,
+            autoCapitalize: "none",
+            autoCorrect: false,
+            keyboardType: "email-address",
+            textContentType: "emailAddress",
+            autoComplete: "email",
+          },
+        ]}
       />
 
       {formError ? (
-        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#FF4B4B",
+            textAlign: "center",
+          }}
+        >
           {formError}
         </Text>
       ) : null}
 
-      <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.tertiary }]}>
+      <Text
+        style={{
+          fontSize: 13,
+          fontWeight: "400",
+          color: "#AFAFAF",
+          textAlign: "center",
+        }}
+      >
         {isSent
           ? "If this email exists, a reset link has been sent."
-          : "Reset links open directly inside the app."}
+          : "We'll send a secure recovery link to your email."}
       </Text>
 
-      <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.xs }}>
-        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.tertiary }]}>
+      {/* Send Reset Link button */}
+      <Pressable
+        disabled={disableSubmit}
+        onPress={handleResetRequest}
+        style={{
+          backgroundColor: "#E5E5E5",
+          borderRadius: 16,
+          borderCurve: "continuous",
+          minHeight: 50,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 14,
+          opacity: disableSubmit ? 0.5 : 1,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "700",
+            color: "#AFAFAF",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          }}
+        >
+          {isSent ? "EMAIL SENT" : "SEND RESET LINK"}
+        </Text>
+      </Pressable>
+
+      {/* Back to login */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          paddingTop: 8,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#AFAFAF",
+          }}
+        >
           Remembered your password?
         </Text>
         <Link href="/(auth)/login" asChild>
           <Pressable>
             <Text
-              selectable
-              style={[typographyScale.labelMd, { color: colorSemanticTokens.accent.primary }]}
+              style={{
+                fontSize: 13,
+                fontWeight: "700",
+                color: "#1CB0F6",
+                textTransform: "uppercase",
+                letterSpacing: 0.2,
+              }}
             >
-              Back to login
+              BACK TO LOGIN
             </Text>
           </Pressable>
         </Link>

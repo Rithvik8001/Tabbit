@@ -58,13 +58,13 @@ export function TextField({
             minHeight: 48,
             borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 1,
+            borderWidth: 2,
             borderColor: error
               ? colorSemanticTokens.state.danger
               : isFocused
-                ? colorSemanticTokens.border.accent
-                : colorSemanticTokens.border.subtle,
-            backgroundColor: "rgba(255, 255, 255, 0.94)",
+                ? "#58CC02"
+                : "#E5E5E5",
+            backgroundColor: "#FFFFFF",
             color: colorSemanticTokens.text.primary,
             paddingHorizontal: spacingTokens.md,
             paddingVertical: 12,

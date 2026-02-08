@@ -38,7 +38,7 @@ function LoadingShell() {
             width: "38%",
             height: 12,
             borderRadius: 999,
-            backgroundColor: "rgba(11, 17, 32, 0.08)",
+            backgroundColor: "#E5E5E5",
           }}
         />
         <View
@@ -46,7 +46,7 @@ function LoadingShell() {
             width: "62%",
             height: 34,
             borderRadius: 999,
-            backgroundColor: "rgba(11, 17, 32, 0.08)",
+            backgroundColor: "#E5E5E5",
           }}
         />
       </LiquidSurface>
@@ -59,7 +59,7 @@ function LoadingShell() {
                   width: "60%",
                   height: 11,
                   borderRadius: 999,
-                  backgroundColor: "rgba(11, 17, 32, 0.08)",
+                  backgroundColor: "#E5E5E5",
                 }}
               />
               <View
@@ -67,7 +67,7 @@ function LoadingShell() {
                   width: "70%",
                   height: 23,
                   borderRadius: 999,
-                  backgroundColor: "rgba(11, 17, 32, 0.08)",
+                  backgroundColor: "#E5E5E5",
                 }}
               />
             </LiquidSurface>
@@ -192,9 +192,9 @@ export default function HomeTabScreen() {
                       style={{
                         borderRadius: 16,
                         borderCurve: "continuous",
-                        borderWidth: 1,
-                        borderColor: colorSemanticTokens.border.subtle,
-                        backgroundColor: "rgba(255, 255, 255, 0.52)",
+                        borderWidth: 2,
+                        borderColor: "#E5E5E5",
+                        backgroundColor: "#FFFFFF",
                         padding: spacingTokens.md,
                         gap: spacingTokens.xs,
                       }}

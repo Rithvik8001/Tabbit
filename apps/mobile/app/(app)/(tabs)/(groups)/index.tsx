@@ -22,7 +22,7 @@ function LoadingGroupCard() {
             width: 42,
             height: 42,
             borderRadius: radiusTokens.pill,
-            backgroundColor: "rgba(11, 17, 32, 0.08)",
+            backgroundColor: "#E5E5E5",
           }}
         />
         <View style={{ flex: 1, gap: 8 }}>
@@ -31,7 +31,7 @@ function LoadingGroupCard() {
               width: "65%",
               height: 14,
               borderRadius: 999,
-              backgroundColor: "rgba(11, 17, 32, 0.08)",
+              backgroundColor: "#E5E5E5",
             }}
           />
           <View
@@ -39,7 +39,7 @@ function LoadingGroupCard() {
               width: "38%",
               height: 12,
               borderRadius: 999,
-              backgroundColor: "rgba(11, 17, 32, 0.08)",
+              backgroundColor: "#E5E5E5",
             }}
           />
         </View>

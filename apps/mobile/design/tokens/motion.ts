@@ -6,7 +6,7 @@ export const motionTokens = {
     relaxed: 280,
     enter: 180,
     transition: 200,
-    press: 110,
+    press: 80,
   },
   easing: {
     standard: [0.2, 0, 0, 1] as const,
@@ -16,6 +16,7 @@ export const motionTokens = {
   offset: {
     screen: 10,
     listStagger: 26,
+    buttonPress: 4,
   },
 } as const;
 

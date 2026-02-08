@@ -16,14 +16,13 @@ export function AdaptiveGlassSurface({
   style,
   contentStyle,
   interactive = false,
-  blurIntensity = 90,
+  blurIntensity: _blurIntensity = 90,
 }: AdaptiveGlassSurfaceProps) {
   return (
     <LiquidSurface
       style={style}
       contentStyle={contentStyle}
       interactive={interactive}
-      blurIntensity={blurIntensity}
     >
       {children}
     </LiquidSurface>

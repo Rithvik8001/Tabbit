@@ -1,23 +1,23 @@
 import type { TextStyle } from "react-native";
 
 export const fontFamilyTokens = {
-  bodyRegular: "Geist_400Regular",
-  bodyMedium: "Geist_500Medium",
-  bodySemiBold: "Geist_600SemiBold",
-  bodyBold: "Geist_700Bold",
-  displayRegular: "InstrumentSans_400Regular",
-  displayMedium: "InstrumentSans_500Medium",
-  displaySemiBold: "InstrumentSans_600SemiBold",
-  displayBold: "InstrumentSans_700Bold",
-  regular: "Geist_400Regular",
-  medium: "Geist_500Medium",
-  semibold: "Geist_600SemiBold",
-  bold: "Geist_700Bold",
+  bodyRegular: undefined,
+  bodyMedium: undefined,
+  bodySemiBold: undefined,
+  bodyBold: undefined,
+  displayRegular: undefined,
+  displayMedium: undefined,
+  displaySemiBold: undefined,
+  displayBold: undefined,
+  regular: undefined,
+  medium: undefined,
+  semibold: undefined,
+  bold: undefined,
 } as const;
 
 type TypographyVariant = Pick<
   TextStyle,
-  "fontFamily" | "fontSize" | "lineHeight" | "letterSpacing" | "fontWeight"
+  "fontSize" | "lineHeight" | "letterSpacing" | "fontWeight"
 >;
 
 export type TypographyTokens = Record<
@@ -39,95 +39,82 @@ export type TypographyTokens = Record<
 
 export const typographyScale: TypographyTokens = {
   displayXl: {
-    fontFamily: fontFamilyTokens.displayBold,
     fontSize: 42,
-    lineHeight: 48,
-    fontWeight: "700",
-    letterSpacing: -0.9,
+    lineHeight: 52,
+    fontWeight: "800",
+    letterSpacing: -0.3,
   },
   displayLg: {
-    fontFamily: fontFamilyTokens.displaySemiBold,
     fontSize: 34,
-    lineHeight: 40,
-    fontWeight: "600",
-    letterSpacing: -0.65,
-  },
-  displayMd: {
-    fontFamily: fontFamilyTokens.displaySemiBold,
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: "600",
-    letterSpacing: -0.48,
-  },
-  headingLg: {
-    fontFamily: fontFamilyTokens.bodyBold,
-    fontSize: 24,
-    lineHeight: 30,
+    lineHeight: 42,
     fontWeight: "700",
-    letterSpacing: -0.38,
-  },
-  headingMd: {
-    fontFamily: fontFamilyTokens.bodySemiBold,
-    fontSize: 20,
-    lineHeight: 25,
-    fontWeight: "600",
-    letterSpacing: -0.28,
-  },
-  headingSm: {
-    fontFamily: fontFamilyTokens.bodySemiBold,
-    fontSize: 17,
-    lineHeight: 22,
-    fontWeight: "600",
     letterSpacing: -0.2,
   },
-  bodyLg: {
-    fontFamily: fontFamilyTokens.bodyRegular,
-    fontSize: 16,
+  displayMd: {
+    fontSize: 28,
+    lineHeight: 36,
+    fontWeight: "700",
+    letterSpacing: -0.1,
+  },
+  headingLg: {
+    fontSize: 24,
+    lineHeight: 32,
+    fontWeight: "700",
+    letterSpacing: 0,
+  },
+  headingMd: {
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: "600",
+    letterSpacing: 0,
+  },
+  headingSm: {
+    fontSize: 17,
     lineHeight: 24,
+    fontWeight: "600",
+    letterSpacing: 0,
+  },
+  bodyLg: {
+    fontSize: 16,
+    lineHeight: 26,
     fontWeight: "400",
-    letterSpacing: -0.12,
+    letterSpacing: 0,
   },
   bodyMd: {
-    fontFamily: fontFamilyTokens.bodyRegular,
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 24,
     fontWeight: "400",
-    letterSpacing: -0.08,
+    letterSpacing: 0,
   },
   bodySm: {
-    fontFamily: fontFamilyTokens.bodyRegular,
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 20,
     fontWeight: "400",
-    letterSpacing: -0.02,
+    letterSpacing: 0,
   },
   labelLg: {
-    fontFamily: fontFamilyTokens.bodySemiBold,
     fontSize: 15,
-    lineHeight: 20,
+    lineHeight: 22,
     fontWeight: "600",
-    letterSpacing: -0.05,
+    letterSpacing: 0.2,
   },
   labelMd: {
-    fontFamily: fontFamilyTokens.bodyMedium,
     fontSize: 13,
-    lineHeight: 17,
-    fontWeight: "500",
-    letterSpacing: 0.02,
+    lineHeight: 18,
+    fontWeight: "600",
+    letterSpacing: 0.2,
   },
   labelSm: {
-    fontFamily: fontFamilyTokens.bodyMedium,
     fontSize: 12,
-    lineHeight: 15,
-    fontWeight: "500",
-    letterSpacing: 0.08,
+    lineHeight: 16,
+    fontWeight: "600",
+    letterSpacing: 0.3,
   },
   caption: {
-    fontFamily: fontFamilyTokens.bodyRegular,
     fontSize: 11,
-    lineHeight: 15,
+    lineHeight: 16,
     fontWeight: "400",
-    letterSpacing: 0.12,
+    letterSpacing: 0.2,
   },
 };
 
