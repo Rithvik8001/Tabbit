@@ -3,17 +3,21 @@ import { useCallback, useState } from "react";
 
 import { useAuth } from "@/features/auth/state/auth-provider";
 import {
-  addGroupMember,
+  addGroupMemberByUserId,
   findUserByEmail,
   listGroupMembers,
   removeGroupMember,
+  searchGroupMemberCandidates,
 } from "@/features/groups/lib/group-members-repository";
 import {
   deleteGroup as deleteGroupRecord,
   getGroupById,
   updateGroup as updateGroupRecord,
 } from "@/features/groups/lib/groups-repository";
-import type { GroupMember } from "@/features/groups/types/group-member.types";
+import type {
+  GroupMember,
+  GroupMemberCandidate,
+} from "@/features/groups/types/group-member.types";
 import type { Group, UpdateGroupInput } from "@/features/groups/types/group.types";
 
 type ActionResult = { ok: true } | { ok: false; message: string };
@@ -24,7 +28,14 @@ type UseGroupDetailValue = {
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
+  addMemberByUserId: (userId: string) => Promise<ActionResult>;
   addMember: (email: string) => Promise<ActionResult>;
+  searchMemberCandidates: (
+    query: string,
+    limit?: number,
+  ) => Promise<
+    { ok: true; data: GroupMemberCandidate[] } | { ok: false; message: string }
+  >;
   removeMember: (memberId: string) => Promise<ActionResult>;
   updateGroup: (input: UpdateGroupInput) => Promise<ActionResult>;
   deleteGroup: () => Promise<ActionResult>;
@@ -83,28 +94,21 @@ export function useGroupDetail(groupId: string | undefined): UseGroupDetailValue
     }, [refresh]),
   );
 
-  const addMember = useCallback(
-    async (email: string): Promise<ActionResult> => {
+  const addMemberByUserId = useCallback(
+    async (userId: string): Promise<ActionResult> => {
       if (!groupId) {
         return { ok: false, message: "No group selected." };
       }
 
       setIsAddingMember(true);
 
-      const userResult = await findUserByEmail(email);
-
-      if (!userResult.ok) {
-        setIsAddingMember(false);
-        return { ok: false, message: userResult.message };
-      }
-
-      const existingMember = members.find((m) => m.userId === userResult.data.id);
+      const existingMember = members.find((m) => m.userId === userId);
       if (existingMember) {
         setIsAddingMember(false);
         return { ok: false, message: "This user is already a member of the group." };
       }
 
-      const result = await addGroupMember(groupId, userResult.data.id);
+      const result = await addGroupMemberByUserId(groupId, userId);
 
       setIsAddingMember(false);
 
@@ -115,6 +119,50 @@ export function useGroupDetail(groupId: string | undefined): UseGroupDetailValue
       setMembers((prev) => [...prev, result.data]);
 
       return { ok: true };
+    },
+    [groupId, members],
+  );
+
+  const addMember = useCallback(
+    async (email: string): Promise<ActionResult> => {
+      if (!groupId) {
+        return { ok: false, message: "No group selected." };
+      }
+
+      const userResult = await findUserByEmail(groupId, email);
+
+      if (!userResult.ok) {
+        return { ok: false, message: userResult.message };
+      }
+
+      return await addMemberByUserId(userResult.data.id);
+    },
+    [addMemberByUserId, groupId],
+  );
+
+  const searchMemberCandidates = useCallback(
+    async (
+      query: string,
+      limit = 8,
+    ): Promise<
+      { ok: true; data: GroupMemberCandidate[] } | { ok: false; message: string }
+    > => {
+      if (!groupId) {
+        return { ok: false, message: "No group selected." };
+      }
+
+      const result = await searchGroupMemberCandidates(groupId, query, limit);
+
+      if (!result.ok) {
+        return result;
+      }
+
+      const existingUserIds = new Set(members.map((member) => member.userId));
+
+      return {
+        ok: true,
+        data: result.data.filter((candidate) => !existingUserIds.has(candidate.id)),
+      };
     },
     [groupId, members],
   );
@@ -181,7 +229,9 @@ export function useGroupDetail(groupId: string | undefined): UseGroupDetailValue
     isLoading,
     error,
     refresh,
+    addMemberByUserId,
     addMember,
+    searchMemberCandidates,
     removeMember,
     updateGroup,
     deleteGroup,

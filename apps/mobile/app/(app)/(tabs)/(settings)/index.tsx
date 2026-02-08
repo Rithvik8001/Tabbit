@@ -1,10 +1,10 @@
+import { useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 import { useAuth } from "@/features/auth/state/auth-provider";
-import { settingsPreview } from "@/features/app-shell/mock/tab-mock-data";
-import { useOnboardingStore } from "@/features/onboarding/state/onboarding.store";
+import { getDisplayNameValidationMessage } from "@/features/auth/utils/auth-validation";
+import { useProfile } from "@/features/profile/hooks/use-profile";
 
 const surface = "#FFFFFF";
 const stroke = "#E8ECF2";
@@ -44,21 +44,51 @@ function settingRow(
 export default function SettingsTabScreen() {
   const router = useRouter();
   const { signOut, user } = useAuth();
-  const { resetDraft } = useOnboardingStore();
+  const { profile, isLoading, isSaving, error, saveDisplayName } = useProfile();
+
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(
-    settingsPreview.notificationsEnabled,
-  );
-  const [smartRemindersEnabled, setSmartRemindersEnabled] = useState(
-    settingsPreview.smartRemindersEnabled,
-  );
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [draftDisplayName, setDraftDisplayName] = useState("");
 
-  const profileEmail = user?.email ?? settingsPreview.email;
-  const providerLabel = useMemo(() => {
-    const provider = user?.app_metadata.provider ?? settingsPreview.provider;
-    return provider === "google" ? "Google" : "Email + Password";
-  }, [user?.app_metadata.provider]);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [smartRemindersEnabled, setSmartRemindersEnabled] = useState(false);
+
+  useEffect(() => {
+    if (profile?.displayName) {
+      setDraftDisplayName(profile.displayName);
+      return;
+    }
+
+    if (user?.email) {
+      setDraftDisplayName(user.email.split("@")[0] ?? "");
+    }
+  }, [profile?.displayName, user?.email]);
+
+  const profileEmail = profile?.email ?? user?.email ?? "-";
+  const providerLabel = useMemo(() => "Email + Password", []);
+
+  const displayNameValidationMessage = getDisplayNameValidationMessage(draftDisplayName);
+  const hasPendingDisplayNameChange =
+    draftDisplayName.trim() !== (profile?.displayName ?? "").trim();
+
+  const handleSaveProfile = () => {
+    setProfileError(null);
+
+    if (displayNameValidationMessage) {
+      setProfileError(displayNameValidationMessage);
+      return;
+    }
+
+    void (async () => {
+      const result = await saveDisplayName(draftDisplayName);
+
+      if (!result.ok) {
+        setProfileError(result.message);
+        return;
+      }
+    })();
+  };
 
   const handleSignOut = () => {
     setSignOutError(null);
@@ -73,7 +103,6 @@ export default function SettingsTabScreen() {
         return;
       }
 
-      resetDraft();
       router.replace("/(onboarding)");
     })();
   };
@@ -96,7 +125,7 @@ export default function SettingsTabScreen() {
           borderColor: stroke,
           backgroundColor: surface,
           padding: 16,
-          gap: 8,
+          gap: 10,
         }}
       >
         <Text
@@ -110,17 +139,54 @@ export default function SettingsTabScreen() {
         >
           Account
         </Text>
-        <Text
-          selectable
-          style={{
-            color: ink,
-            fontSize: 22,
-            lineHeight: 26,
-            fontWeight: "700",
-          }}
-        >
-          {settingsPreview.displayName}
-        </Text>
+
+        <View style={{ gap: 8 }}>
+          <Text
+            selectable
+            style={{
+              color: ink,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "700",
+            }}
+          >
+            Username *
+          </Text>
+          <TextInput
+            value={draftDisplayName}
+            onChangeText={setDraftDisplayName}
+            placeholder="Choose a username"
+            placeholderTextColor="#A2ABBC"
+            selectionColor={accent}
+            autoCapitalize="words"
+            autoCorrect={false}
+            style={{
+              borderRadius: 14,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: displayNameValidationMessage ? "#E8B8B8" : stroke,
+              backgroundColor: "#FAFBFD",
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+              color: ink,
+              fontSize: 16,
+              lineHeight: 20,
+              fontWeight: "600",
+            }}
+          />
+          <Text
+            selectable
+            style={{
+              color: muted,
+              fontSize: 13,
+              lineHeight: 16,
+              fontWeight: "500",
+            }}
+          >
+            Required
+          </Text>
+        </View>
+
         <Text
           selectable
           style={{
@@ -143,6 +209,72 @@ export default function SettingsTabScreen() {
         >
           Sign-in method: {providerLabel}
         </Text>
+
+        {error ? (
+          <Text
+            selectable
+            style={{
+              color: "#B03030",
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
+          >
+            {error}
+          </Text>
+        ) : null}
+
+        {profileError ? (
+          <Text
+            selectable
+            style={{
+              color: "#B03030",
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
+          >
+            {profileError}
+          </Text>
+        ) : null}
+
+        <Pressable
+          onPress={handleSaveProfile}
+          disabled={
+            isLoading ||
+            isSaving ||
+            !hasPendingDisplayNameChange ||
+            Boolean(displayNameValidationMessage)
+          }
+          style={{
+            marginTop: 4,
+            borderRadius: 14,
+            borderCurve: "continuous",
+            backgroundColor: accent,
+            height: 46,
+            alignItems: "center",
+            justifyContent: "center",
+            opacity:
+              isLoading ||
+              isSaving ||
+              !hasPendingDisplayNameChange ||
+              Boolean(displayNameValidationMessage)
+                ? 0.6
+                : 1,
+          }}
+        >
+          <Text
+            selectable
+            style={{
+              color: "#FFFFFF",
+              fontSize: 15,
+              lineHeight: 18,
+              fontWeight: "700",
+            }}
+          >
+            {isSaving ? "Saving..." : "Save Username"}
+          </Text>
+        </Pressable>
       </View>
 
       <View

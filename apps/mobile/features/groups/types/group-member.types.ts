@@ -21,3 +21,15 @@ export type GroupMemberRow = {
     | { display_name: string | null; email: string | null }
     | null;
 };
+
+export type GroupMemberCandidateRow = {
+  id: string;
+  display_name: string;
+  email: string | null;
+};
+
+export type GroupMemberCandidate = {
+  id: string;
+  displayName: string;
+  email: string | null;
+};

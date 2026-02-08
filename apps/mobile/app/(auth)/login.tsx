@@ -11,8 +11,7 @@ import { isValidEmail } from "@/features/auth/utils/auth-validation";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { session, isAuthLoading, signInWithGoogle, signInWithPassword } =
-    useAuth();
+  const { session, isAuthLoading, signInWithPassword } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,23 +51,6 @@ export default function LoginScreen() {
     })();
   };
 
-  const handleGoogleLogin = () => {
-    setFormError(null);
-    setIsSubmitting(true);
-
-    void (async () => {
-      const result = await signInWithGoogle();
-      setIsSubmitting(false);
-
-      if (!result.ok) {
-        setFormError(result.message ?? "Google sign in failed.");
-        return;
-      }
-
-      router.replace("/(app)/(tabs)/(home)");
-    })();
-  };
-
   return (
     <AuthScreenShell
       title="Welcome back"
@@ -82,7 +64,7 @@ export default function LoginScreen() {
               { color: premiumAuthUiTokens.color.textMuted },
             ]}
           >
-            Email/password and Google are both supported.
+            Email + password authentication.
           </Text>
           <PrimaryButton
             visualStyle="premiumAuth"
@@ -127,28 +109,6 @@ export default function LoginScreen() {
           {formError}
         </Text>
       ) : null}
-
-      <View
-        style={{
-          marginTop: premiumAuthUiTokens.spacing.xs,
-          gap: premiumAuthUiTokens.spacing.sm,
-        }}
-      >
-        <View
-          style={{
-            height: 1,
-            backgroundColor: premiumAuthUiTokens.color.divider,
-          }}
-        />
-
-        <PrimaryButton
-          visualStyle="premiumAuth"
-          label="Continue with Google"
-          variant="secondary"
-          disabled={isSubmitting}
-          onPress={handleGoogleLogin}
-        />
-      </View>
 
       <Link href="/(auth)/forgot-password" asChild>
         <Pressable style={{ alignSelf: "center" }}>

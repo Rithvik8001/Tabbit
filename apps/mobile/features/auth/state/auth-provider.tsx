@@ -1,6 +1,5 @@
 import type { Session, User } from "@supabase/supabase-js";
 import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
 import {
   type ReactNode,
   createContext,
@@ -8,7 +7,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { AppState, type AppStateStatus } from "react-native";
@@ -21,15 +19,8 @@ import {
   isSupportedAuthUrl,
 } from "@/features/auth/utils/auth-callback";
 import {
-  AUTH_CALLBACK_URL,
   RESET_PASSWORD_URL,
 } from "@/features/auth/utils/auth-urls";
-import {
-  clearPendingOnboarding,
-  getPendingOnboarding,
-} from "@/features/onboarding/storage/pending-onboarding";
-
-void WebBrowser.maybeCompleteAuthSession();
 
 type AuthContextValue = {
   session: Session | null;
@@ -40,10 +31,10 @@ type AuthContextValue = {
     password: string,
   ) => Promise<AuthActionResult>;
   signUpWithPassword: (
+    displayName: string,
     email: string,
     password: string,
   ) => Promise<AuthActionResult>;
-  signInWithGoogle: () => Promise<AuthActionResult>;
   requestPasswordReset: (email: string) => Promise<AuthActionResult>;
   updatePassword: (nextPassword: string) => Promise<AuthActionResult>;
   signOut: () => Promise<AuthActionResult>;
@@ -55,7 +46,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const onboardingSyncAttemptedByUserId = useRef<Set<string>>(new Set());
 
   const applySessionFromAuthUrl = useCallback(async (url: string) => {
     if (!isSupportedAuthUrl(url)) {
@@ -143,45 +133,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [applySessionFromAuthUrl]);
 
-  useEffect(() => {
-    const activeUserId = session?.user.id;
-
-    if (!activeUserId) {
-      return;
-    }
-
-    if (onboardingSyncAttemptedByUserId.current.has(activeUserId)) {
-      return;
-    }
-
-    onboardingSyncAttemptedByUserId.current.add(activeUserId);
-
-    const persistPendingPreferences = async () => {
-      const pendingOnboarding = await getPendingOnboarding();
-      if (!pendingOnboarding) {
-        return;
-      }
-
-      const { error } = await supabase.from("profiles").upsert(
-        {
-          id: activeUserId,
-          email: session?.user.email ?? null,
-          split_style: pendingOnboarding.splitStyle,
-          use_context: pendingOnboarding.useContext,
-          display_name: pendingOnboarding.displayName ?? null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "id" },
-      );
-
-      if (!error) {
-        await clearPendingOnboarding();
-      }
-    };
-
-    void persistPendingPreferences();
-  }, [session?.user.email, session?.user.id]);
-
   const signInWithPassword = useCallback(
     async (email: string, password: string): Promise<AuthActionResult> => {
       const { error } = await supabase.auth.signInWithPassword({
@@ -199,10 +150,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signUpWithPassword = useCallback(
-    async (email: string, password: string): Promise<AuthActionResult> => {
+    async (
+      displayName: string,
+      email: string,
+      password: string,
+    ): Promise<AuthActionResult> => {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
+        options: {
+          data: {
+            display_name: displayName.trim(),
+          },
+        },
       });
 
       if (error) {
@@ -221,69 +181,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [],
   );
-
-  const signInWithGoogle = useCallback(async (): Promise<AuthActionResult> => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: AUTH_CALLBACK_URL,
-        skipBrowserRedirect: true,
-      },
-    });
-
-    if (error) {
-      return mapAuthError(error);
-    }
-
-    if (!data?.url) {
-      return {
-        ok: false,
-        code: "oauth_failed",
-        message: "Unable to start Google sign in.",
-      };
-    }
-
-    const result = await WebBrowser.openAuthSessionAsync(
-      data.url,
-      AUTH_CALLBACK_URL,
-    );
-
-    if (result.type !== "success" || !("url" in result)) {
-      const { data: currentSessionData } = await supabase.auth.getSession();
-      if (currentSessionData.session) {
-        return { ok: true };
-      }
-
-      return {
-        ok: false,
-        code: "oauth_cancelled",
-        message:
-          result.type === "cancel" || result.type === "dismiss"
-            ? "Google sign in was canceled."
-            : "Google sign in could not be completed.",
-      };
-    }
-
-    const parsedSession = parseAuthSessionFromUrl(result.url);
-    if (!parsedSession) {
-      return {
-        ok: false,
-        code: "oauth_failed",
-        message: "Google sign in did not return a valid session.",
-      };
-    }
-
-    const { error: sessionError } = await supabase.auth.setSession({
-      access_token: parsedSession.accessToken,
-      refresh_token: parsedSession.refreshToken,
-    });
-
-    if (sessionError) {
-      return mapAuthError(sessionError);
-    }
-
-    return { ok: true };
-  }, []);
 
   const requestPasswordReset = useCallback(
     async (email: string): Promise<AuthActionResult> => {
@@ -335,7 +232,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthLoading,
       signInWithPassword,
       signUpWithPassword,
-      signInWithGoogle,
       requestPasswordReset,
       updatePassword,
       signOut,
@@ -344,7 +240,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthLoading,
     requestPasswordReset,
     session,
-    signInWithGoogle,
     signInWithPassword,
     signOut,
     signUpWithPassword,

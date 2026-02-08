@@ -40,14 +40,6 @@ export type ReceiptItem = {
   scannedAt: string;
 };
 
-export type SettingsPreview = {
-  displayName: string;
-  email: string;
-  provider: "email" | "google";
-  notificationsEnabled: boolean;
-  smartRemindersEnabled: boolean;
-};
-
 export const dashboardSnapshot: DashboardSnapshot = {
   totalBalance: 248.4,
   dueSoon: 64.75,
@@ -138,14 +130,6 @@ export const receiptItems: ReceiptItem[] = [
   },
 ];
 
-export const settingsPreview: SettingsPreview = {
-  displayName: "Rithvik",
-  email: "rithvik1188@gmail.com",
-  provider: "google",
-  notificationsEnabled: true,
-  smartRemindersEnabled: false,
-};
-
 export function formatCurrency(amount: number): string {
   const sign = amount < 0 ? "-" : "";
   return `${sign}$${Math.abs(amount).toFixed(2)}`;
@@ -166,4 +150,3 @@ export function formatShortDate(value: string): string {
     return parsed.toISOString().slice(0, 10);
   }
 }
-

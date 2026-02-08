@@ -1,5 +1,7 @@
 import { supabase } from "@/features/auth/lib/supabase-client";
 import type {
+  GroupMemberCandidate,
+  GroupMemberCandidateRow,
   GroupMember,
   GroupMemberRow,
 } from "@/features/groups/types/group-member.types";
@@ -20,6 +22,14 @@ function mapMemberRow(row: GroupMemberRow): GroupMember {
     joinedAt: row.joined_at,
     displayName: profile?.display_name ?? null,
     email: profile?.email ?? null,
+  };
+}
+
+function mapCandidateRow(row: GroupMemberCandidateRow): GroupMemberCandidate {
+  return {
+    id: row.id,
+    displayName: row.display_name,
+    email: row.email,
   };
 }
 
@@ -70,7 +80,7 @@ export async function listGroupMembers(
   };
 }
 
-export async function addGroupMember(
+export async function addGroupMemberByUserId(
   groupId: string,
   userId: string,
 ): Promise<GroupMembersResult<GroupMember>> {
@@ -111,12 +121,49 @@ export async function removeGroupMember(
   return { ok: true, data: undefined };
 }
 
-export async function findUserByEmail(
-  email: string,
-): Promise<GroupMembersResult<{ id: string; displayName: string | null; email: string | null }>> {
-  const { data, error } = await supabase.rpc("find_user_id_by_email", {
-    p_email: email.trim(),
+export async function searchGroupMemberCandidates(
+  groupId: string,
+  query: string,
+  limit = 8,
+): Promise<GroupMembersResult<GroupMemberCandidate[]>> {
+  const normalizedQuery = query.trim();
+
+  if (normalizedQuery.length < 2) {
+    return { ok: true, data: [] };
+  }
+
+  const { data, error } = await supabase.rpc("search_group_member_candidates", {
+    p_group_id: groupId,
+    p_query: normalizedQuery,
+    p_limit: limit,
   });
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to search users.", error),
+    };
+  }
+
+  const rows = (data ?? []) as GroupMemberCandidateRow[];
+
+  return {
+    ok: true,
+    data: rows.map(mapCandidateRow),
+  };
+}
+
+export async function findGroupMemberCandidateByEmail(
+  groupId: string,
+  email: string,
+): Promise<GroupMembersResult<GroupMemberCandidate>> {
+  const { data, error } = await supabase.rpc(
+    "find_group_member_candidate_by_email",
+    {
+      p_group_id: groupId,
+      p_email: email.trim(),
+    },
+  );
 
   if (error) {
     return {
@@ -125,23 +172,46 @@ export async function findUserByEmail(
     };
   }
 
-  const rows = data as { id: string; display_name: string | null; email: string | null }[] | null;
+  const rows = data as GroupMemberCandidateRow[] | null;
 
   if (!rows || rows.length === 0) {
     return {
       ok: false,
-      message: "No user found with that email address.",
+      message: "No available user found with that email address.",
     };
   }
 
-  const user = rows[0];
-
   return {
     ok: true,
-    data: {
-      id: user.id,
-      displayName: user.display_name,
-      email: user.email,
-    },
+    data: mapCandidateRow(rows[0]),
   };
+}
+
+export async function findUserByEmail(
+  groupId: string,
+  email: string,
+): Promise<GroupMembersResult<GroupMemberCandidate>> {
+  const result = await findGroupMemberCandidateByEmail(groupId, email);
+
+  if (!result.ok) {
+    if (
+      result.message === "No available user found with that email address."
+    ) {
+      return {
+        ok: false,
+        message: "No user found with that email address.",
+      };
+    }
+
+    return result;
+  }
+
+  return result;
+}
+
+export async function addGroupMember(
+  groupId: string,
+  userId: string,
+): Promise<GroupMembersResult<GroupMember>> {
+  return await addGroupMemberByUserId(groupId, userId);
 }

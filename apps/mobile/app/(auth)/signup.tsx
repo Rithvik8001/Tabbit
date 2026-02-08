@@ -8,15 +8,17 @@ import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { AuthTextField } from "@/features/auth/components/auth-text-field";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import {
+  getDisplayNameValidationMessage,
+  normalizeDisplayName,
   isValidEmail,
   isValidPassword,
 } from "@/features/auth/utils/auth-validation";
 
 export default function SignupScreen() {
   const router = useRouter();
-  const { session, isAuthLoading, signInWithGoogle, signUpWithPassword } =
-    useAuth();
+  const { session, isAuthLoading, signUpWithPassword } = useAuth();
 
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -35,6 +37,12 @@ export default function SignupScreen() {
   const handleSignUp = () => {
     if (verificationMessage) {
       router.replace("/(auth)/login");
+      return;
+    }
+
+    const displayNameMessage = getDisplayNameValidationMessage(displayName);
+    if (displayNameMessage) {
+      setFormError(displayNameMessage);
       return;
     }
 
@@ -57,7 +65,11 @@ export default function SignupScreen() {
     setIsSubmitting(true);
 
     void (async () => {
-      const result = await signUpWithPassword(email.trim(), password);
+      const result = await signUpWithPassword(
+        normalizeDisplayName(displayName),
+        email.trim(),
+        password,
+      );
       setIsSubmitting(false);
 
       if (!result.ok) {
@@ -70,23 +82,6 @@ export default function SignupScreen() {
           result.message ??
             "Check your inbox and confirm your email to continue.",
         );
-        return;
-      }
-
-      router.replace("/(app)/(tabs)/(home)");
-    })();
-  };
-
-  const handleGoogleSignUp = () => {
-    setFormError(null);
-    setIsSubmitting(true);
-
-    void (async () => {
-      const result = await signInWithGoogle();
-      setIsSubmitting(false);
-
-      if (!result.ok) {
-        setFormError(result.message ?? "Google sign in failed.");
         return;
       }
 
@@ -109,7 +104,7 @@ export default function SignupScreen() {
           >
             {verificationMessage
               ? "Email confirmation is required before login."
-              : "By continuing, you agree to Tabbit's terms and privacy policy."}
+              : "Fields marked * are required. By continuing, you agree to Tabbit's terms and privacy policy."}
           </Text>
           <PrimaryButton
             visualStyle="premiumAuth"
@@ -134,6 +129,16 @@ export default function SignupScreen() {
         </View>
       ) : (
         <>
+          <AuthTextField
+            label="Username *"
+            value={displayName}
+            onChangeText={setDisplayName}
+            autoCapitalize="words"
+            autoCorrect={false}
+            textContentType="username"
+            autoComplete="name"
+            placeholder="What should we call you?"
+          />
           <AuthTextField
             label="Email"
             value={email}
@@ -179,27 +184,6 @@ export default function SignupScreen() {
               {formError}
             </Text>
           ) : null}
-
-          <View
-            style={{
-              marginTop: premiumAuthUiTokens.spacing.xs,
-              gap: premiumAuthUiTokens.spacing.sm,
-            }}
-          >
-            <View
-              style={{
-                height: 1,
-                backgroundColor: premiumAuthUiTokens.color.divider,
-              }}
-            />
-            <PrimaryButton
-              visualStyle="premiumAuth"
-              label="Continue with Google"
-              variant="secondary"
-              disabled={isSubmitting}
-              onPress={handleGoogleSignUp}
-            />
-          </View>
 
           <View
             style={{

@@ -1,4 +1,3 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -17,10 +16,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colorTokens } from "@/design/tokens/color";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import {
+  getDisplayNameValidationMessage,
+  normalizeDisplayName,
   isValidEmail,
   isValidPassword,
 } from "@/features/auth/utils/auth-validation";
-import { setPendingOnboarding } from "@/features/onboarding/storage/pending-onboarding";
 
 type AuthModalType = "signup" | "login" | null;
 
@@ -58,6 +58,7 @@ function lunaInput(
   onChangeText: (text: string) => void,
   placeholder: string,
   secureTextEntry = false,
+  autoCapitalize: "none" | "sentences" | "words" | "characters" = "none",
 ) {
   return (
     <TextInput
@@ -66,7 +67,7 @@ function lunaInput(
       placeholder={placeholder}
       placeholderTextColor="#C9CDD4"
       secureTextEntry={secureTextEntry}
-      autoCapitalize="none"
+      autoCapitalize={autoCapitalize}
       autoCorrect={false}
       selectionColor={primaryPurple}
       style={{
@@ -83,50 +84,6 @@ function lunaInput(
   );
 }
 
-function GoogleAuthButton({
-  label,
-  disabled,
-  onPress,
-}: {
-  label: string;
-  disabled: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      style={{
-        marginTop: 8,
-        borderRadius: 22,
-        borderCurve: "continuous",
-        borderWidth: 1,
-        borderColor: "#E3E6EC",
-        backgroundColor: "#FFFFFF",
-        height: 58,
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "row",
-        gap: 10,
-        opacity: disabled ? 0.6 : 1,
-      }}
-    >
-      <FontAwesome name="google" size={18} color="#0E1116" />
-      <Text
-        selectable
-        style={{
-          color: "#0E1116",
-          fontSize: 18,
-          lineHeight: 20,
-          fontWeight: "600",
-        }}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
 export default function OnboardingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -135,7 +92,6 @@ export default function OnboardingScreen() {
     isAuthLoading,
     requestPasswordReset,
     session,
-    signInWithGoogle,
     signInWithPassword,
     signUpWithPassword,
   } = useAuth();
@@ -154,7 +110,6 @@ export default function OnboardingScreen() {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoginSubmitting, setIsLoginSubmitting] = useState(false);
-  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isAuthLoading && session) {
@@ -170,6 +125,12 @@ export default function OnboardingScreen() {
   };
 
   const handleSignup = () => {
+    const displayNameMessage = getDisplayNameValidationMessage(signupName);
+    if (displayNameMessage) {
+      setSignupError(displayNameMessage);
+      return;
+    }
+
     if (!isValidEmail(signupEmail)) {
       setSignupError("Enter a valid email address");
       return;
@@ -188,18 +149,12 @@ export default function OnboardingScreen() {
     setSignupError(null);
     setIsSignupSubmitting(true);
 
-    const trimmedName = signupName.trim();
-    if (trimmedName) {
-      void setPendingOnboarding({
-        splitStyle: "equal",
-        useContext: "friends",
-        displayName: trimmedName,
-        createdAt: new Date().toISOString(),
-      });
-    }
-
     void (async () => {
-      const result = await signUpWithPassword(signupEmail.trim(), signupPassword);
+      const result = await signUpWithPassword(
+        normalizeDisplayName(signupName),
+        signupEmail.trim(),
+        signupPassword,
+      );
       setIsSignupSubmitting(false);
 
       if (!result.ok) {
@@ -239,35 +194,6 @@ export default function OnboardingScreen() {
 
       if (!result.ok) {
         setLoginError(result.message ?? "Unable to sign in");
-        return;
-      }
-
-      closeModal();
-      router.replace("/(app)/(tabs)/(home)");
-    })();
-  };
-
-  const handleGoogleAuth = (mode: Exclude<AuthModalType, null>) => {
-    if (mode === "signup") {
-      setSignupError(null);
-      setSignupMessage(null);
-    } else {
-      setLoginError(null);
-    }
-
-    setIsGoogleSubmitting(true);
-
-    void (async () => {
-      const result = await signInWithGoogle();
-      setIsGoogleSubmitting(false);
-
-      if (!result.ok) {
-        if (mode === "signup") {
-          setSignupError(result.message ?? "Google sign in failed");
-          return;
-        }
-
-        setLoginError(result.message ?? "Google sign in failed");
         return;
       }
 
@@ -555,9 +481,26 @@ export default function OnboardingScreen() {
                         fontWeight: "700",
                       }}
                     >
-                      Your name
+                      Username *
                     </Text>
-                    {lunaInput(signupName, setSignupName, "What should we call you?")}
+                    <Text
+                      selectable
+                      style={{
+                        color: "#737C8D",
+                        fontSize: 13,
+                        lineHeight: 16,
+                        fontWeight: "600",
+                      }}
+                    >
+                      Required
+                    </Text>
+                    {lunaInput(
+                      signupName,
+                      setSignupName,
+                      "What should we call you?",
+                      false,
+                      "words",
+                    )}
                   </View>
 
                   <View style={{ gap: 10 }}>
@@ -635,7 +578,7 @@ export default function OnboardingScreen() {
 
                   <Pressable
                     onPress={handleSignup}
-                    disabled={isSignupSubmitting || isGoogleSubmitting}
+                    disabled={isSignupSubmitting}
                     style={{
                       marginTop: 8,
                       borderRadius: 26,
@@ -644,7 +587,7 @@ export default function OnboardingScreen() {
                       height: 66,
                       alignItems: "center",
                       justifyContent: "center",
-                      opacity: isSignupSubmitting || isGoogleSubmitting ? 0.6 : 1,
+                      opacity: isSignupSubmitting ? 0.6 : 1,
                     }}
                   >
                     <Text
@@ -659,14 +602,6 @@ export default function OnboardingScreen() {
                       Create account
                     </Text>
                   </Pressable>
-
-                  <GoogleAuthButton
-                    label="Continue with Google"
-                    disabled={isSignupSubmitting || isGoogleSubmitting}
-                    onPress={() => {
-                      handleGoogleAuth("signup");
-                    }}
-                  />
                 </>
               ) : null}
 
@@ -718,7 +653,7 @@ export default function OnboardingScreen() {
 
                   <Pressable
                     onPress={handleLogin}
-                    disabled={isLoginSubmitting || isGoogleSubmitting}
+                    disabled={isLoginSubmitting}
                     style={{
                       marginTop: 8,
                       borderRadius: 26,
@@ -727,7 +662,7 @@ export default function OnboardingScreen() {
                       height: 66,
                       alignItems: "center",
                       justifyContent: "center",
-                      opacity: isLoginSubmitting || isGoogleSubmitting ? 0.6 : 1,
+                      opacity: isLoginSubmitting ? 0.6 : 1,
                     }}
                   >
                     <Text
@@ -742,14 +677,6 @@ export default function OnboardingScreen() {
                       Sign In
                     </Text>
                   </Pressable>
-
-                  <GoogleAuthButton
-                    label="Continue with Google"
-                    disabled={isLoginSubmitting || isGoogleSubmitting}
-                    onPress={() => {
-                      handleGoogleAuth("login");
-                    }}
-                  />
 
                   <Pressable
                     onPress={handleForgotPassword}

@@ -1,9 +1,10 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { isValidEmail } from "@/features/auth/utils/auth-validation";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
+import type { GroupMemberCandidate } from "@/features/groups/types/group-member.types";
 
 const surface = "#FFFFFF";
 const stroke = "#E8ECF2";
@@ -11,26 +12,112 @@ const ink = "#0F172A";
 const muted = "#5C6780";
 const accent = "#4A29FF";
 
+const SUGGESTION_LIMIT = 8;
+const DEBOUNCE_MS = 350;
+
+function getCandidateInputValue(candidate: GroupMemberCandidate) {
+  return candidate.email ?? candidate.displayName;
+}
+
 export default function AddMemberScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { addMember, isAddingMember } = useGroupDetail(id);
+  const { addMember, addMemberByUserId, isAddingMember, searchMemberCandidates } =
+    useGroupDetail(id);
 
-  const [email, setEmail] = useState("");
+  const [query, setQuery] = useState("");
+  const [selectedCandidate, setSelectedCandidate] =
+    useState<GroupMemberCandidate | null>(null);
+  const [suggestions, setSuggestions] = useState<GroupMemberCandidate[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const handleAdd = () => {
-    const trimmed = email.trim();
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
+  const cacheRef = useRef<Map<string, GroupMemberCandidate[]>>(new Map());
 
-    if (!isValidEmail(trimmed)) {
-      setFormError("Enter a valid email address.");
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const normalized = query.trim().toLowerCase();
+
+    if (
+      selectedCandidate &&
+      normalized !== getCandidateInputValue(selectedCandidate).trim().toLowerCase()
+    ) {
+      setSelectedCandidate(null);
+    }
+
+    setSearchError(null);
+
+    if (normalized.length < 2) {
+      setSuggestions([]);
+      setIsSearching(false);
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
       return;
     }
 
+    const cached = cacheRef.current.get(normalized);
+    if (cached) {
+      setSuggestions(cached);
+      setIsSearching(false);
+      return;
+    }
+
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    setIsSearching(true);
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      const requestId = requestIdRef.current + 1;
+      requestIdRef.current = requestId;
+
+      void (async () => {
+        const result = await searchMemberCandidates(normalized, SUGGESTION_LIMIT);
+
+        if (requestIdRef.current !== requestId) {
+          return;
+        }
+
+        setIsSearching(false);
+
+        if (!result.ok) {
+          setSuggestions([]);
+          setSearchError(result.message);
+          return;
+        }
+
+        cacheRef.current.set(normalized, result.data);
+        setSuggestions(result.data);
+      })();
+    }, DEBOUNCE_MS);
+  }, [query, searchMemberCandidates, selectedCandidate]);
+
+  const handleAdd = () => {
+    const trimmed = query.trim();
+
     setFormError(null);
 
+    if (!selectedCandidate && !isValidEmail(trimmed)) {
+      setFormError("Select a user from suggestions or enter a valid email address.");
+      return;
+    }
+
     void (async () => {
-      const result = await addMember(trimmed);
+      const result = selectedCandidate
+        ? await addMemberByUserId(selectedCandidate.id)
+        : await addMember(trimmed);
 
       if (!result.ok) {
         setFormError(result.message);
@@ -68,20 +155,20 @@ export default function AddMemberScreen() {
           selectable
           style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
         >
-          Member email
+          Add member
         </Text>
 
         <Text
           selectable
           style={{ color: muted, fontSize: 14, lineHeight: 18, fontWeight: "500" }}
         >
-          Enter the email address of a Tabbit user to add them to this group.
+          Search by username or email. You can also paste an exact email.
         </Text>
 
         <TextInput
-          value={email}
-          onChangeText={setEmail}
-          placeholder="friend@example.com"
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Name or email"
           placeholderTextColor="#A2ABBC"
           selectionColor={accent}
           keyboardType="email-address"
@@ -102,7 +189,101 @@ export default function AddMemberScreen() {
             fontWeight: "600",
           }}
         />
+
+        {isSearching ? (
+          <Text
+            selectable
+            style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+          >
+            Looking up users...
+          </Text>
+        ) : null}
+
+        {searchError ? (
+          <Text
+            selectable
+            style={{ color: "#B03030", fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+          >
+            {searchError}
+          </Text>
+        ) : null}
       </View>
+
+      {query.trim().length >= 2 && !isSearching ? (
+        <View
+          style={{
+            borderRadius: 16,
+            borderCurve: "continuous",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: surface,
+            overflow: "hidden",
+          }}
+        >
+          {suggestions.length === 0 ? (
+            <Text
+              selectable
+              style={{
+                color: muted,
+                fontSize: 14,
+                lineHeight: 18,
+                fontWeight: "500",
+                padding: 12,
+              }}
+            >
+              No users found.
+            </Text>
+          ) : (
+            suggestions.map((candidate) => {
+              const isSelected = selectedCandidate?.id === candidate.id;
+
+              return (
+                <Pressable
+                  key={candidate.id}
+                  onPress={() => {
+                    setSelectedCandidate(candidate);
+                    setQuery(getCandidateInputValue(candidate));
+                    setFormError(null);
+                  }}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 11,
+                    borderTopWidth: suggestions[0]?.id === candidate.id ? 0 : 1,
+                    borderTopColor: stroke,
+                    backgroundColor: isSelected ? "#F3F0FF" : "#FFFFFF",
+                    gap: 2,
+                  }}
+                >
+                  <Text
+                    selectable
+                    style={{
+                      color: ink,
+                      fontSize: 15,
+                      lineHeight: 19,
+                      fontWeight: "700",
+                    }}
+                  >
+                    {candidate.displayName}
+                  </Text>
+                  {candidate.email ? (
+                    <Text
+                      selectable
+                      style={{
+                        color: muted,
+                        fontSize: 13,
+                        lineHeight: 17,
+                        fontWeight: "500",
+                      }}
+                    >
+                      {candidate.email}
+                    </Text>
+                  ) : null}
+                </Pressable>
+              );
+            })
+          )}
+        </View>
+      ) : null}
 
       {formError ? (
         <View

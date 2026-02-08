@@ -1,4 +1,4 @@
-import { AUTH_CALLBACK_URL, RESET_PASSWORD_URL } from "@/features/auth/utils/auth-urls";
+import { RESET_PASSWORD_URL } from "@/features/auth/utils/auth-urls";
 
 export type ParsedAuthSession = {
   accessToken: string;
@@ -29,7 +29,7 @@ function getAllParams(url: string) {
 }
 
 export function isSupportedAuthUrl(url: string) {
-  return url.startsWith(AUTH_CALLBACK_URL) || url.startsWith(RESET_PASSWORD_URL);
+  return url.startsWith(RESET_PASSWORD_URL);
 }
 
 export function parseAuthSessionFromUrl(url: string): ParsedAuthSession | null {
