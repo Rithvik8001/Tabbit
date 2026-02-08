@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Switch, Text, View } from "react-native";
+import { ActivityIndicator, Switch, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { Button } from "@/design/primitives/button";
@@ -11,6 +11,7 @@ import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { getDisplayNameValidationMessage } from "@/features/auth/utils/auth-validation";
+import { useNotificationPreferences } from "@/features/notifications/hooks/use-notification-preferences";
 import { useProfile } from "@/features/profile/hooks/use-profile";
 
 function settingRow(
@@ -43,14 +44,18 @@ export default function SettingsTabScreen() {
   const router = useRouter();
   const { signOut, user } = useAuth();
   const { profile, isLoading, isSaving, error, saveDisplayName } = useProfile();
+  const {
+    preferences,
+    isLoading: isLoadingPrefs,
+    toggleFriendRequests,
+    toggleGroupInvitations,
+    toggleExpenseUpdates,
+  } = useNotificationPreferences();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [draftDisplayName, setDraftDisplayName] = useState("");
-
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [smartRemindersEnabled, setSmartRemindersEnabled] = useState(false);
 
   useEffect(() => {
     if (profile?.displayName) {
@@ -150,10 +155,29 @@ export default function SettingsTabScreen() {
 
       <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.md }}>
         <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>
-          Preferences
+          Email Notifications
         </Text>
-        {settingRow("Payment reminders", notificationsEnabled, setNotificationsEnabled)}
-        {settingRow("Smart split suggestions", smartRemindersEnabled, setSmartRemindersEnabled)}
+        {isLoadingPrefs ? (
+          <ActivityIndicator size="small" color={colorSemanticTokens.accent.primary} />
+        ) : (
+          <>
+            {settingRow(
+              "Friend requests",
+              preferences?.friend_request_received ?? true,
+              toggleFriendRequests,
+            )}
+            {settingRow(
+              "Group invitations",
+              preferences?.added_to_group ?? true,
+              toggleGroupInvitations,
+            )}
+            {settingRow(
+              "Expense & settlement updates",
+              preferences?.new_expense ?? true,
+              toggleExpenseUpdates,
+            )}
+          </>
+        )}
       </LiquidSurface>
 
       {signOutError ? (

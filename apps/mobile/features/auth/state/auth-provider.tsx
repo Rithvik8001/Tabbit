@@ -19,6 +19,7 @@ import {
   isSupportedAuthUrl,
 } from "@/features/auth/utils/auth-callback";
 import {
+  EMAIL_CONFIRMED_URL,
   RESET_PASSWORD_URL,
 } from "@/features/auth/utils/auth-urls";
 
@@ -159,6 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: email.trim(),
         password,
         options: {
+          emailRedirectTo: EMAIL_CONFIRMED_URL,
           data: {
             display_name: displayName.trim(),
           },
