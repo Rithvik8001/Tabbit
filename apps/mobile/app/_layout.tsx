@@ -1,3 +1,4 @@
+import { useFonts, Pacifico_400Regular } from "@expo-google-fonts/pacifico";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -12,14 +13,15 @@ void SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { session, isAuthLoading } = useAuth();
+  const [fontsLoaded] = useFonts({ Pacifico_400Regular });
 
   useEffect(() => {
-    if (!isAuthLoading) {
+    if (!isAuthLoading && fontsLoaded) {
       void SplashScreen.hideAsync();
     }
-  }, [isAuthLoading]);
+  }, [isAuthLoading, fontsLoaded]);
 
-  if (isAuthLoading) {
+  if (isAuthLoading || !fontsLoaded) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator color={colorSemanticTokens.accent.primary} />

@@ -1,11 +1,17 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/primitives/button";
 import { useAuth } from "@/features/auth/state/auth-provider";
+
+const FEATURES = [
+  { emoji: "👥", text: "Create groups for any occasion" },
+  { emoji: "💰", text: "Track balances in real time" },
+  { emoji: "✅", text: "Settle up with one tap" },
+];
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -23,67 +29,84 @@ export default function OnboardingScreen() {
       <View
         style={{
           flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
+          paddingTop: insets.top + 48,
+          paddingBottom: insets.bottom + 16,
           paddingHorizontal: 24,
         }}
       >
-        {/* Icon */}
-        <View
-          style={{
-            borderRadius: 24,
-            borderCurve: "continuous",
-            marginBottom: 20,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
+        {/* Top: Logo + Title + Tagline */}
+        <View style={{ alignItems: "center" }}>
           <Image
             source={require("@/assets/images/icon.png")}
             contentFit="cover"
             style={{
-              width: 80,
-              height: 80,
-              borderRadius: 24,
+              width: 120,
+              height: 120,
+              borderRadius: 32,
+              marginBottom: 20,
             }}
           />
+
+          <Text
+            style={{
+              fontFamily: "Pacifico_400Regular",
+              fontSize: 42,
+              color: "#3C3C3C",
+              textAlign: "center",
+              marginBottom: 12,
+            }}
+          >
+            Tabbit
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 17,
+              fontWeight: "500",
+              color: "#6B6B6B",
+              textAlign: "center",
+              lineHeight: 24,
+              maxWidth: 300,
+            }}
+          >
+            Split expenses with friends{"\n"}and settle up effortlessly.
+          </Text>
         </View>
 
-        {/* Title */}
-        <Text
+        {/* Middle: Feature highlights — clean, no cards */}
+        <View
           style={{
-            fontSize: 32,
-            fontWeight: "800",
-            color: "#3C3C3C",
-            textAlign: "center",
-            marginBottom: 12,
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 20,
           }}
         >
-          Tabbit
-        </Text>
+          {FEATURES.map((feature) => (
+            <View
+              key={feature.text}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              <Text style={{ fontSize: 28 }}>{feature.emoji}</Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: "#3C3C3C",
+                }}
+              >
+                {feature.text}
+              </Text>
+            </View>
+          ))}
+        </View>
 
-        {/* Subtitle */}
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "400",
-            color: "#AFAFAF",
-            textAlign: "center",
-            lineHeight: 22,
-            maxWidth: 280,
-            marginBottom: 48,
-          }}
-        >
-          Split expenses with friends and settle up effortlessly.
-        </Text>
-
-        {/* Buttons */}
-        <View style={{ width: "100%", gap: 12 }}>
+        {/* Bottom: Buttons */}
+        <View style={{ gap: 12 }}>
           <Button
             label="GET STARTED"
             size="lg"
@@ -93,33 +116,15 @@ export default function OnboardingScreen() {
               router.push("/(auth)/signup");
             }}
           />
-          <Pressable
+          <Button
+            label="I ALREADY HAVE AN ACCOUNT"
+            size="lg"
+            tone="blue"
+            variant="solid"
             onPress={() => {
               router.push("/(auth)/login");
             }}
-            style={{
-              backgroundColor: "#1CB0F6",
-              borderRadius: 16,
-              borderCurve: "continuous",
-              minHeight: 50,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingVertical: 14,
-              paddingHorizontal: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: "700",
-                color: "#FFFFFF",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              I ALREADY HAVE AN ACCOUNT
-            </Text>
-          </Pressable>
+          />
         </View>
       </View>
     </View>
