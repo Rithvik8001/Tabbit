@@ -1,7 +1,15 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useDirectFriendGroup } from "@/features/friends/hooks/use-direct-friend-group";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { formatShortDate } from "@/features/app-shell/mock/tab-mock-data";
@@ -14,11 +22,33 @@ const accent = colorSemanticTokens.accent.primary;
 export default function FriendDetailScreen() {
   const { friendId } = useLocalSearchParams<{ friendId: string }>();
   const router = useRouter();
-  const { friend, activity, isLoading, error, refresh } = useFriendDetail(friendId);
+  const { friend, activity, isLoading, error, refresh } =
+    useFriendDetail(friendId);
+  const { ensureDirectGroup, isEnsuring } = useDirectFriendGroup(friendId);
 
   const friendName = friend?.displayName ?? friend?.email ?? "Friend";
   const isSettled = friend?.direction === "settled";
   const isPositive = friend?.direction === "you_are_owed";
+
+  const handleAddExpense = () => {
+    if (!friend) {
+      return;
+    }
+
+    void (async () => {
+      const result = await ensureDirectGroup();
+
+      if (!result.ok) {
+        Alert.alert("Could not start direct split", result.message);
+        return;
+      }
+
+      router.push({
+        pathname: "/(app)/(tabs)/(groups)/add-expense" as never,
+        params: { id: result.data } as never,
+      });
+    })();
+  };
 
   return (
     <ScrollView
@@ -58,12 +88,19 @@ export default function FriendDetailScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 16, fontWeight: "600", textAlign: "center" }}
+            style={{
+              color: ink,
+              fontSize: 16,
+              fontWeight: "600",
+              textAlign: "center",
+            }}
           >
             {error}
           </Text>
           <Pressable onPress={() => void refresh()}>
-            <Text style={{ color: accent, fontSize: 16, fontWeight: "600" }}>Retry</Text>
+            <Text style={{ color: accent, fontSize: 16, fontWeight: "600" }}>
+              Retry
+            </Text>
           </Pressable>
         </View>
       ) : !friend ? (
@@ -81,13 +118,23 @@ export default function FriendDetailScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
+            style={{
+              color: ink,
+              fontSize: 20,
+              lineHeight: 24,
+              fontWeight: "700",
+            }}
           >
             Friend not found
           </Text>
           <Text
             selectable
-            style={{ color: muted, fontSize: 15, lineHeight: 20, fontWeight: "500" }}
+            style={{
+              color: muted,
+              fontSize: 15,
+              lineHeight: 20,
+              fontWeight: "500",
+            }}
           >
             Go back to Friends and choose an available profile.
           </Text>
@@ -109,7 +156,12 @@ export default function FriendDetailScreen() {
           >
             <Text
               selectable
-              style={{ color: muted, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+              style={{
+                color: muted,
+                fontSize: 14,
+                lineHeight: 18,
+                fontWeight: "600",
+              }}
             >
               Current balance
             </Text>
@@ -136,7 +188,11 @@ export default function FriendDetailScreen() {
                   fontWeight: "700",
                 }}
               >
-                {isSettled ? "Settled up" : isPositive ? "You are owed" : "You owe"}
+                {isSettled
+                  ? "Settled up"
+                  : isPositive
+                    ? "You are owed"
+                    : "You owe"}
               </Text>
               {!isSettled && (
                 <Text
@@ -155,39 +211,72 @@ export default function FriendDetailScreen() {
                 </Text>
               )}
             </View>
-            {!isSettled ? (
+            <View
+              style={{
+                marginTop: 4,
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 8,
+              }}
+            >
               <Pressable
-                onPress={() => {
-                  router.push({
-                    pathname: "/(app)/(tabs)/(friends)/settle-up" as never,
-                    params: { friendId: friend.userId } as never,
-                  });
-                }}
+                onPress={handleAddExpense}
+                disabled={isEnsuring}
                 style={{
-                  marginTop: 4,
-                  alignSelf: "flex-start",
                   borderRadius: 999,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: colorSemanticTokens.accent.primary,
-                  backgroundColor: colorSemanticTokens.accent.soft,
+                  borderColor: colorSemanticTokens.state.info,
+                  backgroundColor: colorSemanticTokens.state.infoSoft,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
+                  opacity: isEnsuring ? 0.7 : 1,
                 }}
               >
                 <Text
                   selectable
                   style={{
-                    color: accent,
+                    color: colorSemanticTokens.state.info,
                     fontSize: 13,
                     lineHeight: 16,
                     fontWeight: "700",
                   }}
                 >
-                  Settle Up
+                  {isEnsuring ? "Starting..." : "Add Expense"}
                 </Text>
               </Pressable>
-            ) : null}
+              {!isSettled ? (
+                <Pressable
+                  onPress={() => {
+                    router.push({
+                      pathname: "/(app)/(tabs)/(friends)/settle-up" as never,
+                      params: { friendId: friend.userId } as never,
+                    });
+                  }}
+                  style={{
+                    borderRadius: 999,
+                    borderCurve: "continuous",
+                    borderWidth: 1,
+                    borderColor: colorSemanticTokens.accent.primary,
+                    backgroundColor: colorSemanticTokens.accent.soft,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                  }}
+                >
+                  <Text
+                    selectable
+                    style={{
+                      color: accent,
+                      fontSize: 13,
+                      lineHeight: 16,
+                      fontWeight: "700",
+                    }}
+                  >
+                    Settle Up
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
           </View>
 
           {/* Activity list */}
@@ -205,7 +294,12 @@ export default function FriendDetailScreen() {
           >
             <Text
               selectable
-              style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+              style={{
+                color: ink,
+                fontSize: 18,
+                lineHeight: 22,
+                fontWeight: "700",
+              }}
             >
               Recent items
             </Text>
@@ -213,7 +307,12 @@ export default function FriendDetailScreen() {
             {activity.length === 0 ? (
               <Text
                 selectable
-                style={{ color: muted, fontSize: 15, lineHeight: 20, fontWeight: "500" }}
+                style={{
+                  color: muted,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  fontWeight: "500",
+                }}
               >
                 No shared expenses yet.
               </Text>
@@ -294,7 +393,12 @@ export default function FriendDetailScreen() {
                     </View>
                     <Text
                       selectable
-                      style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "500" }}
+                      style={{
+                        color: muted,
+                        fontSize: 13,
+                        lineHeight: 16,
+                        fontWeight: "500",
+                      }}
                     >
                       {item.groupEmoji ? `${item.groupEmoji} ` : ""}
                       {item.groupName} · {formatShortDate(item.expenseDate)}

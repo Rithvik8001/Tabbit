@@ -14,7 +14,9 @@ const groupColumns =
 const groupListColumns =
   "id, name, emoji, group_type, created_by, created_at, updated_at, group_members(count), expenses(count)";
 
-type GroupsRepositoryResult<T> = { ok: true; data: T } | { ok: false; message: string };
+type GroupsRepositoryResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string };
 
 function mapGroupRow(row: GroupRow): Group {
   return {
@@ -63,10 +65,13 @@ function normalizeGroupsError(
   return error.message || fallbackMessage;
 }
 
-export async function listGroupsForUser(): Promise<GroupsRepositoryResult<GroupListItem[]>> {
+export async function listGroupsForUser(): Promise<
+  GroupsRepositoryResult<GroupListItem[]>
+> {
   const { data, error } = await supabase
     .from("groups")
     .select(groupListColumns)
+    .eq("group_kind", "standard")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -166,10 +171,7 @@ export async function updateGroup(
 export async function deleteGroup(
   groupId: string,
 ): Promise<GroupsRepositoryResult<void>> {
-  const { error } = await supabase
-    .from("groups")
-    .delete()
-    .eq("id", groupId);
+  const { error } = await supabase.from("groups").delete().eq("id", groupId);
 
   if (error) {
     return {

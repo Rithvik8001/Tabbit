@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useAuth } from "@/features/auth/state/auth-provider";
+import { useDirectFriendGroup } from "@/features/friends/hooks/use-direct-friend-group";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
@@ -17,6 +18,7 @@ type FriendGroupOption = {
   id: string;
   name: string;
   emoji: string | null;
+  isDirect: boolean;
 };
 
 function getTodayString(): string {
@@ -33,6 +35,11 @@ export default function FriendSettleUpScreen() {
   const { user } = useAuth();
   const { friend, activity, isLoading, error, refresh } =
     useFriendDetail(friendId);
+  const {
+    directGroupId,
+    isLoading: isDirectGroupLoading,
+    error: directGroupError,
+  } = useDirectFriendGroup(friendId);
 
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [amountText, setAmountText] = useState("");
@@ -41,6 +48,7 @@ export default function FriendSettleUpScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const maxAmountCents = friend ? Math.abs(friend.netCents) : 0;
+  const friendLabel = friend?.displayName ?? friend?.email ?? "Friend";
 
   const groupOptions = useMemo<FriendGroupOption[]>(() => {
     const groupMap = new Map<string, FriendGroupOption>();
@@ -51,12 +59,32 @@ export default function FriendSettleUpScreen() {
           id: item.groupId,
           name: item.groupName,
           emoji: item.groupEmoji,
+          isDirect: false,
         });
       }
     }
 
-    return Array.from(groupMap.values());
-  }, [activity]);
+    const options = Array.from(groupMap.values());
+
+    if (!directGroupId) {
+      return options;
+    }
+
+    const existingDirect = groupMap.get(directGroupId);
+    const directOption: FriendGroupOption = existingDirect
+      ? { ...existingDirect, isDirect: true }
+      : {
+          id: directGroupId,
+          name: `Direct with ${friendLabel}`,
+          emoji: "🤝",
+          isDirect: true,
+        };
+
+    return [
+      directOption,
+      ...options.filter((group) => group.id !== directGroupId),
+    ];
+  }, [activity, directGroupId, friendLabel]);
 
   useEffect(() => {
     if (groupOptions.length === 0) {
@@ -90,7 +118,6 @@ export default function FriendSettleUpScreen() {
   const payerId = friend && user ? (isYouOwe ? user.id : friend.userId) : null;
   const payeeId = friend && user ? (isYouOwe ? friend.userId : user.id) : null;
 
-  const friendLabel = friend?.displayName ?? friend?.email ?? "Friend";
   const payerLabel = payerId === user?.id ? "You" : friendLabel;
   const payeeLabel = payeeId === user?.id ? "You" : friendLabel;
 
@@ -111,7 +138,7 @@ export default function FriendSettleUpScreen() {
     }
 
     if (!selectedGroupId) {
-      setFormError("Pick a shared group to record this settlement.");
+      setFormError("Pick a settlement group to record this settlement.");
       return;
     }
 
@@ -339,8 +366,34 @@ export default function FriendSettleUpScreen() {
                 fontWeight: "700",
               }}
             >
-              Shared group
+              Settlement group
             </Text>
+            {isDirectGroupLoading ? (
+              <Text
+                selectable
+                style={{
+                  color: muted,
+                  fontSize: 13,
+                  lineHeight: 16,
+                  fontWeight: "500",
+                }}
+              >
+                Checking direct split group...
+              </Text>
+            ) : null}
+            {directGroupError ? (
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.state.danger,
+                  fontSize: 13,
+                  lineHeight: 16,
+                  fontWeight: "600",
+                }}
+              >
+                {directGroupError}
+              </Text>
+            ) : null}
             {groupOptions.length === 0 ? (
               <Text
                 selectable
@@ -351,7 +404,7 @@ export default function FriendSettleUpScreen() {
                   fontWeight: "500",
                 }}
               >
-                No shared group found in recent activity.
+                No available settlement group found.
               </Text>
             ) : (
               <View style={{ gap: 8 }}>
@@ -368,8 +421,12 @@ export default function FriendSettleUpScreen() {
                         borderRadius: 16,
                         borderCurve: "continuous",
                         borderWidth: 1,
-                        borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                        backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                        borderColor: isSelected
+                          ? colorSemanticTokens.accent.primary
+                          : stroke,
+                        backgroundColor: isSelected
+                          ? colorSemanticTokens.accent.soft
+                          : colorSemanticTokens.surface.cardStrong,
                         paddingHorizontal: 12,
                         paddingVertical: 10,
                       }}
@@ -385,6 +442,7 @@ export default function FriendSettleUpScreen() {
                       >
                         {group.emoji ? `${group.emoji} ` : ""}
                         {group.name}
+                        {group.isDirect ? " · Direct" : ""}
                       </Text>
                     </Pressable>
                   );
@@ -581,20 +639,34 @@ export default function FriendSettleUpScreen() {
 
       <Pressable
         accessibilityRole="button"
-        disabled={isSubmitting || !friend || !user || groupOptions.length === 0}
+        disabled={
+          isSubmitting ||
+          !friend ||
+          !user ||
+          !selectedGroupId ||
+          isDirectGroupLoading
+        }
         onPress={handleSubmit}
         style={{
           borderRadius: 16,
           borderCurve: "continuous",
           backgroundColor:
-            isSubmitting || !friend || !user || groupOptions.length === 0
+            isSubmitting ||
+            !friend ||
+            !user ||
+            !selectedGroupId ||
+            isDirectGroupLoading
               ? colorSemanticTokens.accent.softStrong
               : accent,
           paddingVertical: 14,
           alignItems: "center",
           justifyContent: "center",
           opacity:
-            isSubmitting || !friend || !user || groupOptions.length === 0
+            isSubmitting ||
+            !friend ||
+            !user ||
+            !selectedGroupId ||
+            isDirectGroupLoading
               ? 0.8
               : 1,
         }}
