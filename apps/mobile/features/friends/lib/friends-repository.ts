@@ -9,6 +9,9 @@ import type {
 
 type FriendsResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
+export const FRIENDS_RPC_UNAVAILABLE_MESSAGE =
+  "Friends data is temporarily unavailable due to a backend update. Please apply latest DB migrations and retry.";
+
 function deriveDirection(netCents: number): BalanceDirection {
   if (netCents > 0) return "you_are_owed";
   if (netCents < 0) return "you_owe";
@@ -48,7 +51,22 @@ function normalizeError(
 ): string {
   if (!error) return fallbackMessage;
 
-  if (error.message.toLowerCase().includes("network")) {
+  const normalizedMessage = error.message.toLowerCase();
+  const normalizedCode = (error.code ?? "").toUpperCase();
+
+  const referencesFriendRpc =
+    normalizedMessage.includes("get_cross_group_balances") ||
+    normalizedMessage.includes("get_friend_activity");
+
+  if (
+    normalizedCode === "PGRST202" ||
+    normalizedCode === "42883" ||
+    (normalizedMessage.includes("schema cache") && referencesFriendRpc)
+  ) {
+    return FRIENDS_RPC_UNAVAILABLE_MESSAGE;
+  }
+
+  if (normalizedMessage.includes("network")) {
     return "Network issue while contacting Supabase. Try again.";
   }
 

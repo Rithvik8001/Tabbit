@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
+import { FRIENDS_RPC_UNAVAILABLE_MESSAGE } from "@/features/friends/lib/friends-repository";
 import { useFriends } from "@/features/friends/hooks/use-friends";
 import { formatCents } from "@/features/groups/lib/format-currency";
 
@@ -12,6 +13,7 @@ const accent = "#4A29FF";
 
 export default function FriendsTabScreen() {
   const { friends, isLoading, error, refresh } = useFriends();
+  const showMigrationHint = error === FRIENDS_RPC_UNAVAILABLE_MESSAGE;
 
   if (isLoading) {
     return (
@@ -35,6 +37,19 @@ export default function FriendsTabScreen() {
         <Text style={{ color: ink, fontSize: 16, fontWeight: "600", textAlign: "center" }}>
           {error}
         </Text>
+        {showMigrationHint ? (
+          <Text
+            style={{
+              color: muted,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "500",
+              textAlign: "center",
+            }}
+          >
+            If you are developing locally, run the latest Supabase migrations and retry.
+          </Text>
+        ) : null}
         <Pressable onPress={() => void refresh()}>
           <Text style={{ color: accent, fontSize: 16, fontWeight: "600" }}>Retry</Text>
         </Pressable>
