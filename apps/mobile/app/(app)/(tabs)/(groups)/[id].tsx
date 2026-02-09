@@ -113,7 +113,7 @@ export default function GroupDetailScreen() {
         }}
       >
         <Pressable onPress={() => router.back()}>
-          {" "}
+          
           <Text
             selectable
             style={[
@@ -178,11 +178,11 @@ export default function GroupDetailScreen() {
               { color: colorSemanticTokens.state.danger },
             ]}
           >
-            {" "}
+            
             {error}
           </Text>
           <Pressable onPress={() => void refresh()}>
-            {" "}
+            
             <Text
               selectable
               style={[
@@ -190,7 +190,7 @@ export default function GroupDetailScreen() {
                 { color: colorSemanticTokens.accent.primary },
               ]}
             >
-              {" "}
+              
               Retry
             </Text>
           </Pressable>
@@ -211,7 +211,7 @@ export default function GroupDetailScreen() {
             }}
           >
             <Text selectable style={{ fontSize: 48, lineHeight: 54 }}>
-              {" "}
+              
               {group.emoji}
             </Text>
             <Text
@@ -240,7 +240,7 @@ export default function GroupDetailScreen() {
                 gap: spacingTokens.sm,
               }}
             >
-              {" "}
+              
               <Pressable
                 onPress={() => {
                   router.push({
@@ -263,7 +263,7 @@ export default function GroupDetailScreen() {
                     { color: colorSemanticTokens.text.inverse },
                   ]}
                 >
-                  {" "}
+                  
                   Add expense
                 </Text>
               </Pressable>
@@ -289,7 +289,7 @@ export default function GroupDetailScreen() {
                     { color: colorSemanticTokens.text.primary },
                   ]}
                 >
-                  {" "}
+                  
                   Group settings
                 </Text>
               </Pressable>
@@ -365,9 +365,8 @@ export default function GroupDetailScreen() {
                     ]}
                   >
                     {isPayer
-                      ? `You owe ${debt.toName ?? "member"}`
-                      : `${debt.fromName ?? "member"} owes you`}{" "}
-                    {formatCents(debt.amountCents)}
+                      ? `You owe ${debt.toName ?? "member"} ${formatCents(debt.amountCents)}`
+                      : `${debt.fromName ?? "member"} owes you ${formatCents(debt.amountCents)}`}
                   </Text>
                   <Pressable
                     onPress={() => {
@@ -399,7 +398,7 @@ export default function GroupDetailScreen() {
 
           {groupedExpenses.map((bucket) => (
             <View key={bucket.label} style={{ gap: spacingTokens.sm }}>
-              {" "}
+              
               <Text
                 selectable
                 style={[
@@ -439,7 +438,7 @@ export default function GroupDetailScreen() {
                       }}
                     >
                       <View style={{ flex: 1, gap: 2 }}>
-                        {" "}
+                        
                         <Text
                           selectable
                           style={[
@@ -456,8 +455,7 @@ export default function GroupDetailScreen() {
                             { color: colorSemanticTokens.text.secondary },
                           ]}
                         >
-                          Paid by {expense.paidByName ?? "Unknown"} ·{" "}
-                          {shortDate(expense.expenseDate)}
+                          {`Paid by ${expense.paidByName ?? "Unknown"} · ${shortDate(expense.expenseDate)}`}
                         </Text>
                       </View>
                       <Text
@@ -475,7 +473,7 @@ export default function GroupDetailScreen() {
                       <View
                         style={{ flexDirection: "row", gap: spacingTokens.sm }}
                       >
-                        {" "}
+                        
                         {canEdit ? (
                           <Pressable
                             onPress={() => {

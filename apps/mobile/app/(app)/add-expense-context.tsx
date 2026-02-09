@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, ScrollView, Text, TextInput, View } from "@/design/primitives/sora-native";
 
@@ -42,11 +42,28 @@ function SelectionDot({ isSelected }: { isSelected: boolean }) {
 }
 
 type ReturnTab = "friends" | "groups";
+type ExpenseContextScope = "friends" | "groups" | "all";
+
+function normalizeScope(
+  value: string | string[] | undefined,
+): ExpenseContextScope {
+  const first = Array.isArray(value) ? value[0] : value;
+  if (first === "friends" || first === "groups") {
+    return first;
+  }
+
+  return "all";
+}
 
 export default function AddExpenseContextScreen() {
   const router = useRouter();
+  const { scope: scopeParam } = useLocalSearchParams<{ scope?: string | string[] }>();
   const { groups, isLoading: isGroupsLoading } = useGroups();
   const { friends, isLoading: isFriendsLoading } = useFriends();
+
+  const scope = normalizeScope(scopeParam);
+  const showGroups = scope !== "friends";
+  const showFriends = scope !== "groups";
 
   const [query, setQuery] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
@@ -57,6 +74,10 @@ export default function AddExpenseContextScreen() {
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleGroups = useMemo(() => {
+    if (!showGroups) {
+      return [];
+    }
+
     if (!normalizedQuery) {
       return groups;
     }
@@ -64,9 +85,13 @@ export default function AddExpenseContextScreen() {
     return groups.filter((group) =>
       group.name.toLowerCase().includes(normalizedQuery),
     );
-  }, [groups, normalizedQuery]);
+  }, [groups, normalizedQuery, showGroups]);
 
   const visibleFriends = useMemo(() => {
+    if (!showFriends) {
+      return [];
+    }
+
     if (!normalizedQuery) {
       return friends;
     }
@@ -75,23 +100,12 @@ export default function AddExpenseContextScreen() {
       const title = (friend.displayName ?? friend.email ?? "").toLowerCase();
       return title.includes(normalizedQuery);
     });
-  }, [friends, normalizedQuery]);
+  }, [friends, normalizedQuery, showFriends]);
 
   const openExpenseForm = (groupId: string, returnTab: ReturnTab) => {
-    const tabRoute =
-      returnTab === "groups"
-        ? "/(app)/(tabs)/(groups)"
-        : "/(app)/(tabs)/(friends)";
-
-    // Ensure the underlying tab route is the back target before opening add-expense.
-    router.dismissTo(tabRoute);
-
-    // Queue the modal push for the next frame after tab transition settles.
-    requestAnimationFrame(() => {
-      router.push({
-        pathname: "/(app)/(tabs)/(groups)/add-expense",
-        params: { id: groupId, returnTab },
-      });
+    router.replace({
+      pathname: "/(app)/(tabs)/(groups)/add-expense",
+      params: { id: groupId, returnTab },
     });
   };
 
@@ -102,7 +116,17 @@ export default function AddExpenseContextScreen() {
 
     setError(null);
 
-    if (!selectedGroupId && !selectedFriendId) {
+    if (scope === "groups" && !selectedGroupId) {
+      setError("Choose one group.");
+      return;
+    }
+
+    if (scope === "friends" && !selectedFriendId) {
+      setError("Choose one friend.");
+      return;
+    }
+
+    if (scope === "all" && !selectedGroupId && !selectedFriendId) {
       setError("Choose one group or one friend.");
       return;
     }
@@ -111,7 +135,7 @@ export default function AddExpenseContextScreen() {
 
     void (async () => {
       if (selectedGroupId) {
-        openExpenseForm(selectedGroupId, "groups");
+        openExpenseForm(selectedGroupId, scope === "friends" ? "friends" : "groups");
         return;
       }
 
@@ -128,11 +152,24 @@ export default function AddExpenseContextScreen() {
         return;
       }
 
-      openExpenseForm(directGroupResult.data, "friends");
+      openExpenseForm(directGroupResult.data, scope === "groups" ? "groups" : "friends");
     })();
   };
 
-  const isDisabled = isSubmitting || (!selectedGroupId && !selectedFriendId);
+  const isDisabled =
+    isSubmitting ||
+    (scope === "groups"
+      ? !selectedGroupId
+      : scope === "friends"
+        ? !selectedFriendId
+        : !selectedGroupId && !selectedFriendId);
+
+  const searchPlaceholder =
+    scope === "groups"
+      ? "Search groups"
+      : scope === "friends"
+        ? "Search friends"
+        : "Enter names or emails";
 
   return (
     <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
@@ -194,7 +231,7 @@ export default function AddExpenseContextScreen() {
               selectable
               style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
             >
-              {isSubmitting ? "Saving..." : "Save"}
+              {isSubmitting ? "Adding..." : "Add"}
             </Text>
           </Pressable>
         </View>
@@ -216,7 +253,7 @@ export default function AddExpenseContextScreen() {
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Enter names or emails"
+            placeholder={searchPlaceholder}
             placeholderTextColor={colorSemanticTokens.text.tertiary}
             selectionColor={colorSemanticTokens.accent.primary}
             autoCapitalize="none"
@@ -237,164 +274,168 @@ export default function AddExpenseContextScreen() {
           />
         </View>
 
-        <View style={{ gap: spacingTokens.sm }}>
-          <Text
-            selectable
-            style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
-          >
-            Groups
-          </Text>
-
-          {isGroupsLoading ? (
+        {showGroups ? (
+          <View style={{ gap: spacingTokens.sm }}>
             <Text
               selectable
-              style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
             >
-              Loading groups...
+              Groups
             </Text>
-          ) : null}
 
-          {visibleGroups.map((group) => {
-            const isSelected = selectedGroupId === group.id;
-
-            return (
-              <Pressable
-                key={group.id}
-                accessibilityRole="button"
-                onPress={() => {
-                  setSelectedGroupId(group.id);
-                  setSelectedFriendId(null);
-                }}
-                style={{
-                  borderRadius: radiusTokens.card,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: isSelected
-                    ? colorSemanticTokens.accent.primary
-                    : colorSemanticTokens.border.subtle,
-                  backgroundColor: colorSemanticTokens.surface.card,
-                  padding: spacingTokens.sm,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: spacingTokens.sm,
-                }}
+            {isGroupsLoading ? (
+              <Text
+                selectable
+                style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
               >
-                <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm, flex: 1 }}>
-                  <View
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: radiusTokens.pill,
-                      backgroundColor: colorSemanticTokens.background.subtle,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text selectable style={{ fontSize: 20, lineHeight: 22 }}>
-                      {group.emoji}
-                    </Text>
-                  </View>
-                  <Text
-                    selectable
-                    numberOfLines={1}
-                    style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary, flex: 1 }]}
-                  >
-                    {group.name}
-                  </Text>
-                </View>
-                <SelectionDot isSelected={isSelected} />
-              </Pressable>
-            );
-          })}
-        </View>
+                Loading groups...
+              </Text>
+            ) : null}
 
-        <View style={{ gap: spacingTokens.sm }}>
-          <Text
-            selectable
-            style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
-          >
-            Friends
-          </Text>
+            {visibleGroups.map((group) => {
+              const isSelected = selectedGroupId === group.id;
 
-          {isFriendsLoading ? (
-            <Text
-              selectable
-              style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
-            >
-              Loading friends...
-            </Text>
-          ) : null}
-
-          {visibleFriends.map((friend) => {
-            const isSelected = selectedFriendId === friend.userId;
-            const title = friend.displayName ?? friend.email ?? "Unknown";
-
-            return (
-              <Pressable
-                key={friend.userId}
-                accessibilityRole="button"
-                onPress={() => {
-                  setSelectedFriendId(friend.userId);
-                  setSelectedGroupId(null);
-                }}
-                style={{
-                  borderRadius: radiusTokens.card,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: isSelected
-                    ? colorSemanticTokens.accent.primary
-                    : colorSemanticTokens.border.subtle,
-                  backgroundColor: colorSemanticTokens.surface.card,
-                  padding: spacingTokens.sm,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: spacingTokens.sm,
-                }}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm, flex: 1 }}>
-                  <View
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: radiusTokens.pill,
-                      backgroundColor: colorSemanticTokens.background.subtle,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      selectable
-                      style={[typographyScale.headingSm, { color: colorSemanticTokens.text.secondary }]}
+              return (
+                <Pressable
+                  key={group.id}
+                  accessibilityRole="button"
+                  onPress={() => {
+                    setSelectedGroupId(group.id);
+                    setSelectedFriendId(null);
+                  }}
+                  style={{
+                    borderRadius: radiusTokens.card,
+                    borderCurve: "continuous",
+                    borderWidth: 1,
+                    borderColor: isSelected
+                      ? colorSemanticTokens.accent.primary
+                      : colorSemanticTokens.border.subtle,
+                    backgroundColor: colorSemanticTokens.surface.card,
+                    padding: spacingTokens.sm,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: spacingTokens.sm,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm, flex: 1 }}>
+                    <View
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: radiusTokens.pill,
+                        backgroundColor: colorSemanticTokens.background.subtle,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
-                      {title.trim().slice(0, 1).toUpperCase()}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1, gap: 2 }}>
+                      <Text selectable style={{ fontSize: 20, lineHeight: 22 }}>
+                        {group.emoji}
+                      </Text>
+                    </View>
                     <Text
                       selectable
                       numberOfLines={1}
-                      style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                      style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary, flex: 1 }]}
                     >
-                      {title}
+                      {group.name}
                     </Text>
-                    {friend.email ? (
+                  </View>
+                  <SelectionDot isSelected={isSelected} />
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : null}
+
+        {showFriends ? (
+          <View style={{ gap: spacingTokens.sm }}>
+            <Text
+              selectable
+              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+            >
+              Friends
+            </Text>
+
+            {isFriendsLoading ? (
+              <Text
+                selectable
+                style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+              >
+                Loading friends...
+              </Text>
+            ) : null}
+
+            {visibleFriends.map((friend) => {
+              const isSelected = selectedFriendId === friend.userId;
+              const title = friend.displayName ?? friend.email ?? "Unknown";
+
+              return (
+                <Pressable
+                  key={friend.userId}
+                  accessibilityRole="button"
+                  onPress={() => {
+                    setSelectedFriendId(friend.userId);
+                    setSelectedGroupId(null);
+                  }}
+                  style={{
+                    borderRadius: radiusTokens.card,
+                    borderCurve: "continuous",
+                    borderWidth: 1,
+                    borderColor: isSelected
+                      ? colorSemanticTokens.accent.primary
+                      : colorSemanticTokens.border.subtle,
+                    backgroundColor: colorSemanticTokens.surface.card,
+                    padding: spacingTokens.sm,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: spacingTokens.sm,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm, flex: 1 }}>
+                    <View
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: radiusTokens.pill,
+                        backgroundColor: colorSemanticTokens.background.subtle,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        selectable
+                        style={[typographyScale.headingSm, { color: colorSemanticTokens.text.secondary }]}
+                      >
+                        {title.trim().slice(0, 1).toUpperCase()}
+                      </Text>
+                    </View>
+                    <View style={{ flex: 1, gap: 2 }}>
                       <Text
                         selectable
                         numberOfLines={1}
-                        style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                        style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
                       >
-                        {friend.email}
+                        {title}
                       </Text>
-                    ) : null}
+                      {friend.email ? (
+                        <Text
+                          selectable
+                          numberOfLines={1}
+                          style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                        >
+                          {friend.email}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
-                </View>
-                <SelectionDot isSelected={isSelected} />
-              </Pressable>
-            );
-          })}
-        </View>
+                  <SelectionDot isSelected={isSelected} />
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : null}
 
         {error ? (
           <Text

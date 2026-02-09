@@ -97,7 +97,7 @@ export default function GroupSettingsScreen() {
         }}
       >
         <Pressable onPress={() => router.back()}>
-          {" "}
+          
           <Text
             selectable
             style={[
@@ -153,11 +153,11 @@ export default function GroupSettingsScreen() {
               { color: colorSemanticTokens.state.danger },
             ]}
           >
-            {" "}
+            
             {error}
           </Text>
           <Pressable onPress={() => void refresh()}>
-            {" "}
+            
             <Text
               selectable
               style={[
@@ -165,7 +165,7 @@ export default function GroupSettingsScreen() {
                 { color: colorSemanticTokens.accent.primary },
               ]}
             >
-              {" "}
+              
               Retry
             </Text>
           </Pressable>
@@ -192,13 +192,13 @@ export default function GroupSettingsScreen() {
                 gap: spacingTokens.sm,
               }}
             >
-              {" "}
+              
               <Text selectable style={{ fontSize: 30, lineHeight: 36 }}>
-                {" "}
+                
                 {group.emoji}
               </Text>
               <View style={{ flex: 1, gap: 2 }}>
-                {" "}
+                
                 <Text
                   selectable
                   style={[
@@ -242,7 +242,7 @@ export default function GroupSettingsScreen() {
           </View>
 
           <View style={{ gap: spacingTokens.sm }}>
-            {" "}
+            
             <Text
               selectable
               style={[
@@ -285,7 +285,7 @@ export default function GroupSettingsScreen() {
                   }}
                 >
                   <View style={{ flex: 1, gap: 2 }}>
-                    {" "}
+                    
                     <Text
                       selectable
                       style={[

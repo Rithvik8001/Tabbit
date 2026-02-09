@@ -417,7 +417,10 @@ export default function FriendsTabScreen() {
 
       <FloatingAddExpenseCta
         onPress={() => {
-          router.push("/(app)/add-expense-context");
+          router.push({
+            pathname: "/(app)/add-expense-context",
+            params: { scope: "friends" },
+          });
         }}
       />
     </View>

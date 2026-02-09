@@ -350,7 +350,10 @@ export default function GroupsTabScreen() {
 
       <FloatingAddExpenseCta
         onPress={() => {
-          router.push("/(app)/add-expense-context");
+          router.push({
+            pathname: "/(app)/add-expense-context",
+            params: { scope: "groups" },
+          });
         }}
       />
     </View>
