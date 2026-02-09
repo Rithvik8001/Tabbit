@@ -6,18 +6,35 @@ import {
   shouldNotify,
   supabaseAdmin,
 } from "../_shared/supabase-admin.ts";
+import {
+  isObjectRecord,
+  parseWebhookPayload,
+  validateWebhookRequest,
+} from "../_shared/webhook-auth.ts";
 
 serve(async (req) => {
-  try {
-    const payload = await req.json();
-    const record = payload.record;
+  const authError = validateWebhookRequest(req);
+  if (authError) {
+    return authError;
+  }
 
-    if (!record) {
-      return new Response("Skipped: no record", { status: 200 });
+  try {
+    const parsedPayload = await parseWebhookPayload(req);
+    if (!parsedPayload.ok) {
+      return parsedPayload.response;
     }
 
-    const memberId: string = record.user_id;
-    const groupId: string = record.group_id;
+    const rawRecord = parsedPayload.payload.record;
+    if (!isObjectRecord(rawRecord)) {
+      return new Response("Invalid webhook payload", { status: 400 });
+    }
+
+    const memberId = rawRecord.user_id;
+    const groupId = rawRecord.group_id;
+
+    if (typeof memberId !== "string" || typeof groupId !== "string") {
+      return new Response("Invalid webhook payload", { status: 400 });
+    }
 
     // Look up group — skip direct_friendship groups
     const { data: group, error: groupError } = await supabaseAdmin

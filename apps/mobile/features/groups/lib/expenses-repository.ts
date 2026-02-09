@@ -20,7 +20,6 @@ export type CreateSettlementInput = {
   expenseDate: string;
   paidBy: string;
   paidTo: string;
-  createdBy: string;
 };
 
 function mapExpenseRow(row: ExpenseRow): Expense {
@@ -113,62 +112,43 @@ export async function listExpensesForGroup(
 export async function createExpense(
   groupId: string,
   input: CreateExpenseInput,
-  userId: string,
 ): Promise<ExpensesResult<Expense>> {
-  // Step 1: Insert the expense
-  const { data: expenseData, error: expenseError } = await supabase
-    .from("expenses")
-    .insert({
-      group_id: groupId,
-      description: input.description.trim(),
-      amount_cents: input.amountCents,
-      currency: input.currency ?? "USD",
-      expense_date: input.expenseDate,
-      split_type: input.splitType,
-      entry_type: input.entryType ?? "expense",
-      paid_by: input.paidBy,
-      created_by: userId,
-    })
-    .select(
-      "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at",
-    )
-    .single();
-
-  if (expenseError) {
-    return {
-      ok: false,
-      message: normalizeError("Unable to create expense.", expenseError),
-    };
-  }
-
-  const expense = mapExpenseRow(expenseData as ExpenseRow);
-
-  // Step 2: Insert splits
-  const splitRows = input.participants.map((p) => ({
-    expense_id: expense.id,
-    user_id: p.userId,
-    share_cents: p.shareCents,
-    percent_share: p.percentShare ?? null,
+  const participants = input.participants.map((participant) => ({
+    user_id: participant.userId,
+    share_cents: participant.shareCents,
+    percent_share: participant.percentShare ?? null,
   }));
 
-  const { error: splitsError } = await supabase
-    .from("expense_splits")
-    .insert(splitRows);
+  const { data, error } = await supabase.rpc("create_expense_with_splits", {
+    p_group_id: groupId,
+    p_description: input.description.trim(),
+    p_amount_cents: input.amountCents,
+    p_currency: input.currency ?? "USD",
+    p_expense_date: input.expenseDate,
+    p_split_type: input.splitType,
+    p_entry_type: input.entryType ?? "expense",
+    p_paid_by: input.paidBy,
+    p_participants: participants,
+  });
 
-  if (splitsError) {
-    // Roll back: delete the expense (cascade will clean up any partial splits)
-    await supabase.from("expenses").delete().eq("id", expense.id);
-
+  if (error) {
     return {
       ok: false,
-      message: normalizeError("Unable to save expense splits.", splitsError),
+      message: normalizeError("Unable to create expense.", error),
     };
   }
 
-  return {
-    ok: true,
-    data: expense,
-  };
+  const rows = (data ?? []) as ExpenseRow[];
+  const row = rows[0];
+
+  if (!row) {
+    return {
+      ok: false,
+      message: "Expense did not return a result.",
+    };
+  }
+
+  return { ok: true, data: mapExpenseRow(row) };
 }
 
 export async function createSettlement(
@@ -204,7 +184,6 @@ export async function createSettlement(
         },
       ],
     },
-    input.createdBy,
   );
 }
 
@@ -234,67 +213,43 @@ export async function updateExpense(
   expenseId: string,
   input: CreateExpenseInput,
 ): Promise<ExpensesResult<Expense>> {
-  // Step 1: Update the expense row
-  const { data: expenseData, error: expenseError } = await supabase
-    .from("expenses")
-    .update({
-      description: input.description.trim(),
-      amount_cents: input.amountCents,
-      currency: input.currency ?? "USD",
-      expense_date: input.expenseDate,
-      split_type: input.splitType,
-      paid_by: input.paidBy,
-    })
-    .eq("id", expenseId)
-    .select(
-      "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at",
-    )
-    .single();
-
-  if (expenseError) {
-    return {
-      ok: false,
-      message: normalizeError("Unable to update expense.", expenseError),
-    };
-  }
-
-  const expense = mapExpenseRow(expenseData as ExpenseRow);
-
-  // Step 2: Delete old splits
-  const { error: deleteError } = await supabase
-    .from("expense_splits")
-    .delete()
-    .eq("expense_id", expenseId);
-
-  if (deleteError) {
-    return {
-      ok: false,
-      message: normalizeError("Unable to update expense splits.", deleteError),
-    };
-  }
-
-  // Step 3: Insert new splits
-  const splitRows = input.participants.map((p) => ({
-    expense_id: expenseId,
-    user_id: p.userId,
-    share_cents: p.shareCents,
-    percent_share: p.percentShare ?? null,
+  const participants = input.participants.map((participant) => ({
+    user_id: participant.userId,
+    share_cents: participant.shareCents,
+    percent_share: participant.percentShare ?? null,
   }));
 
-  const { error: splitsError } = await supabase
-    .from("expense_splits")
-    .insert(splitRows);
+  const { data, error } = await supabase.rpc("update_expense_with_splits", {
+    p_expense_id: expenseId,
+    p_description: input.description.trim(),
+    p_amount_cents: input.amountCents,
+    p_currency: input.currency ?? "USD",
+    p_expense_date: input.expenseDate,
+    p_split_type: input.splitType,
+    p_paid_by: input.paidBy,
+    p_participants: participants,
+  });
 
-  if (splitsError) {
+  if (error) {
     return {
       ok: false,
-      message: normalizeError("Unable to save expense splits.", splitsError),
+      message: normalizeError("Unable to update expense.", error),
+    };
+  }
+
+  const rows = (data ?? []) as ExpenseRow[];
+  const row = rows[0];
+
+  if (!row) {
+    return {
+      ok: false,
+      message: "Expense update did not return a result.",
     };
   }
 
   return {
     ok: true,
-    data: expense,
+    data: mapExpenseRow(row),
   };
 }
 

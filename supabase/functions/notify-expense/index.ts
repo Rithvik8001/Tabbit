@@ -9,23 +9,51 @@ import {
   shouldNotify,
   supabaseAdmin,
 } from "../_shared/supabase-admin.ts";
+import {
+  isObjectRecord,
+  parseWebhookPayload,
+  validateWebhookRequest,
+} from "../_shared/webhook-auth.ts";
 
 function formatCents(cents: number): string {
   return `$${(Math.abs(cents) / 100).toFixed(2)}`;
 }
 
 serve(async (req) => {
-  try {
-    const payload = await req.json();
-    const record = payload.record;
+  const authError = validateWebhookRequest(req);
+  if (authError) {
+    return authError;
+  }
 
-    if (!record) {
-      return new Response("Skipped: no record", { status: 200 });
+  try {
+    const parsedPayload = await parseWebhookPayload(req);
+    if (!parsedPayload.ok) {
+      return parsedPayload.response;
     }
 
-    const splitUserId: string = record.user_id;
-    const expenseId: string = record.expense_id;
-    const splitAmountCents: number = record.share_cents;
+    const rawRecord = parsedPayload.payload.record;
+    if (!isObjectRecord(rawRecord)) {
+      return new Response("Invalid webhook payload", { status: 400 });
+    }
+
+    const splitUserId = rawRecord.user_id;
+    const expenseId = rawRecord.expense_id;
+    const rawShareCents = rawRecord.share_cents;
+
+    const splitAmountCents =
+      typeof rawShareCents === "number"
+        ? rawShareCents
+        : typeof rawShareCents === "string"
+          ? Number.parseInt(rawShareCents, 10)
+          : Number.NaN;
+
+    if (
+      typeof splitUserId !== "string" ||
+      typeof expenseId !== "string" ||
+      !Number.isFinite(splitAmountCents)
+    ) {
+      return new Response("Invalid webhook payload", { status: 400 });
+    }
 
     // Look up the parent expense
     const { data: expense, error: expenseError } = await supabaseAdmin

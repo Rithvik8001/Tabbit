@@ -134,7 +134,6 @@ export default function GroupSettleUpScreen() {
         expenseDate: dateText,
         paidBy: fromUserId,
         paidTo: toUserId,
-        createdBy: user.id,
       });
 
       setIsSubmitting(false);

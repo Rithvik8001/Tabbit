@@ -177,7 +177,6 @@ export default function FriendSettleUpScreen() {
         expenseDate: dateText,
         paidBy: payerId,
         paidTo: payeeId,
-        createdBy: user.id,
       });
 
       setIsSubmitting(false);

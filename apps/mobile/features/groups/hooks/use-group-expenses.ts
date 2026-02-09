@@ -98,7 +98,7 @@ export function useGroupExpenses(
 
       setIsCreating(true);
 
-      const result = await createExpenseRecord(groupId, input, user.id);
+      const result = await createExpenseRecord(groupId, input);
 
       setIsCreating(false);
 
