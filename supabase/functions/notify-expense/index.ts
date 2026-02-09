@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { sendEmail } from "../_shared/send-email.ts";
 import {
+  newExpenseEmail,
+  settlementRecordedEmail,
+} from "../_shared/email-templates.ts";
+import {
   getProfile,
   shouldNotify,
   supabaseAdmin,
@@ -75,8 +79,11 @@ serve(async (req) => {
       await sendEmail(
         recipient.email,
         `${payerName} settled ${formatCents(splitAmountCents)} with you`,
-        `<p><strong>${payerName}</strong> settled <strong>${formatCents(splitAmountCents)}</strong> with you in ${groupLabel}.</p>
-         <p>Open the app to see the details.</p>`,
+        settlementRecordedEmail(
+          payerName,
+          formatCents(splitAmountCents),
+          groupLabel,
+        ),
       );
     } else {
       // Regular expense: notify split participant (skip the payer / creator)
@@ -105,8 +112,12 @@ serve(async (req) => {
       await sendEmail(
         participant.email,
         `${payerName} added ${formatCents(splitAmountCents)} in ${groupLabel}`,
-        `<p><strong>${payerName}</strong> added <strong>"${description}"</strong> (${formatCents(splitAmountCents)}) in ${groupLabel}.</p>
-         <p>Open the app to see the details.</p>`,
+        newExpenseEmail(
+          payerName,
+          description,
+          formatCents(splitAmountCents),
+          groupLabel,
+        ),
       );
     }
 

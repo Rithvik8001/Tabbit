@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { sendEmail } from "../_shared/send-email.ts";
+import { friendRequestEmail } from "../_shared/email-templates.ts";
 import { getProfile, shouldNotify } from "../_shared/supabase-admin.ts";
 
 serve(async (req) => {
@@ -33,8 +34,7 @@ serve(async (req) => {
     await sendEmail(
       addressee.email,
       `${requesterName} sent you a friend request`,
-      `<p><strong>${requesterName}</strong> sent you a friend request on Tabbit.</p>
-       <p>Open the app to accept or decline.</p>`,
+      friendRequestEmail(requesterName),
     );
 
     return new Response("OK", { status: 200 });

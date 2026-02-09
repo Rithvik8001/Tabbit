@@ -8,3 +8,4 @@ dist/
 .cursor/
 AGENTS.md
 CLAUDE.md
+supabase/.temp

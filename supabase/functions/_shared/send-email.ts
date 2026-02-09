@@ -1,5 +1,5 @@
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
-const FROM_ADDRESS = Deno.env.get("EMAIL_FROM") ?? "Tabbit <onboarding@resend.dev>";
+const FROM_ADDRESS = Deno.env.get("EMAIL_FROM") ?? "Tabbit <notifications@tabbit.sh>";
 
 export async function sendEmail(
   to: string,

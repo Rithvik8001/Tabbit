@@ -8,9 +8,27 @@ import { Button } from "@/design/primitives/button";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
 const FEATURES = [
-  { emoji: "👥", text: "Create groups for any occasion" },
-  { emoji: "💰", text: "Track balances in real time" },
-  { emoji: "✅", text: "Settle up with one tap" },
+  {
+    emoji: "👥",
+    title: "Groups",
+    text: "Create groups for any occasion",
+    bg: "#E8F5E9",
+    accent: "#58CC02",
+  },
+  {
+    emoji: "💰",
+    title: "Balances",
+    text: "Track who owes what in real time",
+    bg: "#E3F2FD",
+    accent: "#1CB0F6",
+  },
+  {
+    emoji: "✅",
+    title: "Settle up",
+    text: "Pay back friends with one tap",
+    bg: "#FFF3E0",
+    accent: "#FF9800",
+  },
 ];
 
 export default function OnboardingScreen() {
@@ -73,34 +91,65 @@ export default function OnboardingScreen() {
           </Text>
         </View>
 
-        {/* Middle: Feature highlights — clean, no cards */}
+        {/* Middle: Feature highlight cards */}
         <View
           style={{
             flex: 1,
             justifyContent: "center",
-            alignItems: "center",
-            gap: 20,
+            gap: 12,
+            paddingVertical: 24,
           }}
         >
           {FEATURES.map((feature) => (
             <View
-              key={feature.text}
+              key={feature.title}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 12,
+                backgroundColor: feature.bg,
+                borderRadius: 16,
+                borderCurve: "continuous",
+                padding: 16,
+                gap: 14,
               }}
             >
-              <Text style={{ fontSize: 28 }}>{feature.emoji}</Text>
-              <Text
+              <View
                 style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: "#3C3C3C",
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  borderCurve: "continuous",
+                  backgroundColor: "#FFFFFF",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {feature.text}
-              </Text>
+                <Text style={{ fontSize: 24 }}>{feature.emoji}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "800",
+                    color: feature.accent,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                    marginBottom: 2,
+                  }}
+                >
+                  {feature.title}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "500",
+                    color: "#3C3C3C",
+                    lineHeight: 20,
+                  }}
+                >
+                  {feature.text}
+                </Text>
+              </View>
             </View>
           ))}
         </View>

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { sendEmail } from "../_shared/send-email.ts";
+import { addedToGroupEmail } from "../_shared/email-templates.ts";
 import {
   getProfile,
   shouldNotify,
@@ -46,8 +47,7 @@ serve(async (req) => {
     await sendEmail(
       member.email,
       `You were added to ${groupLabel}`,
-      `<p>You were added to <strong>${groupLabel}</strong> on Tabbit.</p>
-       <p>Open the app to see the group.</p>`,
+      addedToGroupEmail(groupLabel),
     );
 
     return new Response("OK", { status: 200 });
