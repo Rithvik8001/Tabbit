@@ -54,7 +54,9 @@ export type ExpenseWithSplits = Expense & {
 
 export type ExpenseWithSplitsRow = ExpenseRow & {
   expense_splits: ExpenseSplitRow[];
-  paid_by_profile: { display_name: string | null; email: string | null }[] | null;
+  paid_by_profile:
+    | { display_name: string | null; email: string | null }[]
+    | null;
 };
 
 export type CreateExpenseInput = {

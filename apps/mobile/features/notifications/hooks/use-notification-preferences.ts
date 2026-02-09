@@ -14,6 +14,7 @@ import type {
 type UseNotificationPreferencesValue = {
   preferences: NotificationPreferencesRow | null;
   isLoading: boolean;
+  error: string | null;
   toggleFriendRequests: (enabled: boolean) => void;
   toggleGroupInvitations: (enabled: boolean) => void;
   toggleExpenseUpdates: (enabled: boolean) => void;
@@ -24,6 +25,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesValue {
   const [preferences, setPreferences] =
     useState<NotificationPreferencesRow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user?.id) {
@@ -52,6 +54,8 @@ export function useNotificationPreferences(): UseNotificationPreferencesValue {
     (updates: Partial<Record<NotificationPreferenceKey, boolean>>) => {
       if (!user?.id || !preferences) return;
 
+      setError(null);
+
       // Optimistic update
       setPreferences((prev) => (prev ? { ...prev, ...updates } : prev));
 
@@ -60,6 +64,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesValue {
         if (result.ok) {
           setPreferences(result.data);
         } else {
+          setError(result.message);
           // Revert on failure
           void refresh();
         }
@@ -98,6 +103,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesValue {
   return {
     preferences,
     isLoading,
+    error,
     toggleFriendRequests,
     toggleGroupInvitations,
     toggleExpenseUpdates,

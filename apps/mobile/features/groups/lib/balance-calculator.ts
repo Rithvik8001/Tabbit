@@ -24,7 +24,10 @@ export function computeMemberBalances(
       // Payer is owed this amount
       netMap.set(payerId, (netMap.get(payerId) ?? 0) + split.shareCents);
       // Participant owes this amount
-      netMap.set(split.userId, (netMap.get(split.userId) ?? 0) - split.shareCents);
+      netMap.set(
+        split.userId,
+        (netMap.get(split.userId) ?? 0) - split.shareCents,
+      );
     }
   }
 

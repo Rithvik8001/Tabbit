@@ -178,6 +178,12 @@ export default function AddExpenseScreen() {
       return;
     }
 
+    const parsedDate = new Date(dateText + "T00:00:00");
+    if (isNaN(parsedDate.getTime())) {
+      setFormError("That date doesn't exist. Check the month and day.");
+      return;
+    }
+
     setFormError(null);
 
     void (async () => {

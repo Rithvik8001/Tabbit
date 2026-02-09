@@ -129,7 +129,9 @@ export async function createExpense(
       paid_by: input.paidBy,
       created_by: userId,
     })
-    .select("id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at")
+    .select(
+      "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at",
+    )
     .single();
 
   if (expenseError) {

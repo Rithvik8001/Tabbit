@@ -6,14 +6,17 @@ import type {
   GroupMemberRow,
 } from "@/features/groups/types/group-member.types";
 
-type GroupMembersResult<T> = { ok: true; data: T } | { ok: false; message: string };
+type GroupMembersResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string };
 
-const memberColumns = "id, group_id, user_id, role, joined_at, profiles!group_members_user_id_profiles_fk(display_name, email)";
+const memberColumns =
+  "id, group_id, user_id, role, joined_at, profiles!group_members_user_id_profiles_fk(display_name, email)";
 
 function mapMemberRow(row: GroupMemberRow): GroupMember {
   const profile = Array.isArray(row.profiles)
-    ? row.profiles[0] ?? null
-    : row.profiles ?? null;
+    ? (row.profiles[0] ?? null)
+    : (row.profiles ?? null);
   return {
     id: row.id,
     groupId: row.group_id,
@@ -194,9 +197,7 @@ export async function findUserByEmail(
   const result = await findGroupMemberCandidateByEmail(groupId, email);
 
   if (!result.ok) {
-    if (
-      result.message === "No available user found with that email address."
-    ) {
+    if (result.message === "No available user found with that email address.") {
       return {
         ok: false,
         message: "No user found with that email address.",

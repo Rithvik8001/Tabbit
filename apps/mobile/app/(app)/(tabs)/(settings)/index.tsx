@@ -47,6 +47,7 @@ export default function SettingsTabScreen() {
   const {
     preferences,
     isLoading: isLoadingPrefs,
+    error: prefsError,
     toggleFriendRequests,
     toggleGroupInvitations,
     toggleExpenseUpdates,
@@ -176,6 +177,11 @@ export default function SettingsTabScreen() {
               preferences?.new_expense ?? true,
               toggleExpenseUpdates,
             )}
+            {prefsError ? (
+              <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
+                {prefsError}
+              </Text>
+            ) : null}
           </>
         )}
       </LiquidSurface>
