@@ -48,9 +48,9 @@ export default function AppTabsLayout() {
       backgroundColor={colorSemanticTokens.background.chrome}
       labelStyle={{ fontSize: 11, fontWeight: "500", fontFamily: "Sora_500Medium" }}
     >
-      <NativeTabs.Trigger name="(home)">
-        <Label>Home</Label>
-        <Icon sf={{ default: "house", selected: "house.fill" }} />
+      <NativeTabs.Trigger name="(friends)">
+        <Label>Friends</Label>
+        <Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="(groups)">
@@ -58,24 +58,14 @@ export default function AppTabsLayout() {
         <Icon sf={{ default: "person.3", selected: "person.3.fill" }} />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="(friends)">
-        <Label>Friends</Label>
-        <Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
-      </NativeTabs.Trigger>
-
-      <NativeTabs.Trigger name="(receipts)">
-        <Label>Receipts</Label>
-        <Icon
-          sf={{
-            default: "doc.text.viewfinder",
-            selected: "doc.text.viewfinder",
-          }}
-        />
+      <NativeTabs.Trigger name="(activity)">
+        <Label>Activity</Label>
+        <Icon sf={{ default: "chart.line.uptrend.xyaxis", selected: "chart.line.uptrend.xyaxis" }} />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="(settings)">
-        <Label>Settings</Label>
-        <Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} />
+        <Label>Account</Label>
+        <Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

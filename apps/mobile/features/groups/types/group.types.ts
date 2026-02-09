@@ -37,6 +37,16 @@ export type GroupListItem = Group & {
   expenseCount: number;
 };
 
+export type GroupListRowVM = {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  leadingEmoji: string | null;
+  statusLabel: string;
+  statusAmount: string | null;
+  tone: "positive" | "negative" | "neutral";
+};
+
 export type GroupListRow = GroupRow & {
   group_members: { count: number }[];
   expenses: { count: number }[];

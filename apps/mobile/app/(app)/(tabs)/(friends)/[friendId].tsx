@@ -1,38 +1,83 @@
+import { useMemo } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "@/design/primitives/sora-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "@/design/primitives/sora-native";
 
-import {
-  HeaderPillButton,
-  PageHeading,
-} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";
+import { spacingTokens } from "@/design/tokens/spacing";
+import { typographyScale } from "@/design/tokens/typography";
 import { useDirectFriendGroup } from "@/features/friends/hooks/use-direct-friend-group";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { formatCents } from "@/features/groups/lib/format-currency";
-import { formatShortDate } from "@/features/app-shell/mock/tab-mock-data";
 
-const ink = colorSemanticTokens.text.primary;
-const muted = colorSemanticTokens.text.secondary;
-const accent = colorSemanticTokens.accent.primary;
+type ActivityGroup = {
+  monthLabel: string;
+  items: {
+    expenseId: string;
+    description: string;
+    netCents: number;
+    groupName: string;
+    groupEmoji: string | null;
+    expenseDate: string;
+    entryType: "expense" | "settlement";
+  }[];
+};
+
+function monthLabel(value: string): string {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(parsed);
+}
+
+function shortDate(value: string): string {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "2-digit",
+  }).format(parsed);
+}
 
 export default function FriendDetailScreen() {
   const { friendId } = useLocalSearchParams<{ friendId: string }>();
   const router = useRouter();
-  const { friend, activity, isLoading, error, refresh } =
-    useFriendDetail(friendId);
+
+  const { friend, activity, isLoading, error, refresh } = useFriendDetail(friendId);
   const { ensureDirectGroup, isEnsuring } = useDirectFriendGroup(friendId);
 
   const friendName = friend?.displayName ?? friend?.email ?? "Friend";
   const isSettled = friend?.direction === "settled";
   const isPositive = friend?.direction === "you_are_owed";
+
+  const groupedActivity = useMemo<ActivityGroup[]>(() => {
+    const map = new Map<string, ActivityGroup>();
+
+    for (const item of activity) {
+      const key = monthLabel(item.expenseDate);
+      const current = map.get(key);
+
+      if (current) {
+        current.items.push(item);
+        continue;
+      }
+
+      map.set(key, {
+        monthLabel: key,
+        items: [item],
+      });
+    }
+
+    return Array.from(map.values());
+  }, [activity]);
 
   const handleAddExpense = () => {
     if (!friend) {
@@ -43,13 +88,12 @@ export default function FriendDetailScreen() {
       const result = await ensureDirectGroup();
 
       if (!result.ok) {
-        Alert.alert("Could not start direct split", result.message);
         return;
       }
 
       router.push({
-        pathname: "/(app)/(tabs)/(groups)/add-expense" as never,
-        params: { id: result.data } as never,
+        pathname: "/(app)/(tabs)/(groups)/add-expense",
+        params: { id: result.data },
       });
     })();
   };
@@ -59,346 +103,199 @@ export default function FriendDetailScreen() {
       contentInsetAdjustmentBehavior="automatic"
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 24,
-        gap: 12,
+        paddingHorizontal: spacingTokens.xl,
+        paddingTop: spacingTokens.sm,
+        paddingBottom: spacingTokens["4xl"],
+        gap: spacingTokens.md,
       }}
     >
-      <PageHeading
-        size="section"
-        title={friendName}
-        subtitle="Track your shared activity and settle fast."
-        leading={
-          <HeaderPillButton label="Back" onPress={() => router.back()} />
-        }
-      />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          minHeight: 40,
+        }}
+      >
+        <Pressable onPress={() => router.back()}>          <Text
+            selectable
+            style={[typographyScale.headingSm, { color: colorSemanticTokens.text.secondary }]}
+          >
+            Back
+          </Text>
+        </Pressable>
+      </View>
 
       {isLoading ? (
-        <View style={{ paddingTop: 40, alignItems: "center" }}>
-          <ActivityIndicator size="large" color={accent} />
+        <View style={{ paddingTop: spacingTokens.xl, alignItems: "center" }}>          <ActivityIndicator size="large" color={colorSemanticTokens.accent.primary} />
         </View>
-      ) : error ? (
+      ) : null}
+
+      {error ? (
         <View
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
-            padding: 16,
-            gap: 12,
-            alignItems: "center",
+            borderWidth: 1,
+            borderColor: colorSemanticTokens.state.danger,
+            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            padding: spacingTokens.md,
+            gap: spacingTokens.sm,
           }}
         >
-          <Text
-            selectable
-            style={{
-              color: ink,
-              fontSize: 16,
-              fontWeight: "600",
-              textAlign: "center",
-            }}
-          >
-            {error}
+          <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}>            {error}
           </Text>
-          <Pressable onPress={() => void refresh()}>
-            <Text style={{ color: accent, fontSize: 16, fontWeight: "600" }}>
-              Retry
+          <Pressable onPress={() => void refresh()}>            <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}>              Retry
             </Text>
           </Pressable>
         </View>
-      ) : !friend ? (
-        <View
-          style={{
-            borderRadius: radiusTokens.card,
-            borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
-            padding: 16,
-            gap: 6,
-          }}
-        >
-          <Text
-            selectable
-            style={{
-              color: ink,
-              fontSize: 20,
-              lineHeight: 24,
-              fontWeight: "600",
-            }}
-          >
-            Friend not found
-          </Text>
-          <Text
-            selectable
-            style={{
-              color: muted,
-              fontSize: 15,
-              lineHeight: 20,
-              fontWeight: "500",
-            }}
-          >
-            Go back to Friends and choose an available profile.
-          </Text>
-        </View>
-      ) : (
+      ) : null}
+
+      {!isLoading && !error && friend ? (
         <>
-          {/* Balance card */}
           <View
             style={{
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.border.subtle,
               backgroundColor: colorSemanticTokens.surface.card,
-              padding: 16,
-              gap: 8,
+              padding: spacingTokens.cardPadding,
+              gap: spacingTokens.sm,
             }}
           >
             <Text
               selectable
-              style={{
-                color: muted,
-                fontSize: 14,
-                lineHeight: 18,
-                fontWeight: "600",
-              }}
+              style={[typographyScale.displayMd, { color: colorSemanticTokens.text.primary }]}
             >
-              Current balance
+              {friendName}
             </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                rowGap: 6,
-                columnGap: 12,
-              }}
-            >
-              <Text
-                selectable
-                style={{
+
+            <Text
+              selectable
+              style={[
+                typographyScale.headingMd,
+                {
                   color: isSettled
-                    ? muted
+                    ? colorSemanticTokens.text.secondary
                     : isPositive
                       ? colorSemanticTokens.financial.positive
                       : colorSemanticTokens.financial.negative,
-                  fontSize: 22,
-                  lineHeight: 28,
-                  fontWeight: "600",
-                }}
-              >
-                {isSettled
-                  ? "Settled up"
-                  : isPositive
-                    ? "You are owed"
-                    : "You owe"}
-              </Text>
-              {!isSettled && (
-                <Text
-                  selectable
+                },
+              ]}
+            >
+              {isSettled
+                ? "Settled up"
+                : isPositive
+                  ? "You are owed"
+                  : "You owe"}
+              {isSettled ? "" : ` ${formatCents(Math.abs(friend.netCents))}`}
+            </Text>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacingTokens.sm }}>              {!isSettled ? (
+                <Pressable
+                  onPress={() => {
+                    router.push({
+                      pathname: "/(app)/(tabs)/(friends)/settle-up",
+                      params: { friendId: friend.userId },
+                    });
+                  }}
                   style={{
-                    color: isPositive
-                      ? colorSemanticTokens.financial.positive
-                      : colorSemanticTokens.financial.negative,
-                    fontSize: 28,
-                    lineHeight: 34,
-                    fontWeight: "600",
-                    fontVariant: ["tabular-nums"],
+                    borderRadius: radiusTokens.pill,
+                    borderCurve: "continuous",
+                    backgroundColor: colorSemanticTokens.accent.primary,
+                    paddingHorizontal: 14,
+                    paddingVertical: 8,
                   }}
                 >
-                  {formatCents(Math.abs(friend.netCents))}
-                </Text>
-              )}
-            </View>
-            <View
-              style={{
-                marginTop: 4,
-                flexDirection: "row",
-                flexWrap: "wrap",
-                gap: 8,
-              }}
-            >
+                  <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.inverse }]}>                    Settle up
+                  </Text>
+                </Pressable>
+              ) : null}
+
               <Pressable
                 onPress={handleAddExpense}
                 disabled={isEnsuring}
                 style={{
-                  borderRadius: 999,
+                  borderRadius: radiusTokens.pill,
                   borderCurve: "continuous",
-                  backgroundColor: colorSemanticTokens.state.infoSoft,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  opacity: isEnsuring ? 0.7 : 1,
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  paddingHorizontal: 14,
+                  paddingVertical: 8,
+                  opacity: isEnsuring ? 0.6 : 1,
                 }}
               >
-                <Text
-                  selectable
-                  style={{
-                    color: colorSemanticTokens.state.info,
-                    fontSize: 13,
-                    lineHeight: 16,
-                    fontWeight: "600",
-                  }}
-                >
-                  {isEnsuring ? "Starting..." : "Add expense"}
+                <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>                  {isEnsuring ? "Starting..." : "Add expense"}
                 </Text>
               </Pressable>
-              {!isSettled ? (
-                <Pressable
-                  onPress={() => {
-                    router.push({
-                      pathname: "/(app)/(tabs)/(friends)/settle-up" as never,
-                      params: { friendId: friend.userId } as never,
-                    });
-                  }}
-                  style={{
-                    borderRadius: 999,
-                    borderCurve: "continuous",
-                    backgroundColor: colorSemanticTokens.accent.soft,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                  }}
-                >
-                  <Text
-                    selectable
-                    style={{
-                      color: accent,
-                      fontSize: 13,
-                      lineHeight: 16,
-                      fontWeight: "600",
-                    }}
-                  >
-                    Settle up
-                  </Text>
-                </Pressable>
-              ) : null}
-            </View>
+            </ScrollView>
           </View>
 
-          {/* Activity list */}
-          <View
-            style={{
-              borderRadius: radiusTokens.card,
-              borderCurve: "continuous",
-              backgroundColor: colorSemanticTokens.surface.card,
-              padding: 16,
-              gap: 10,
-            }}
-          >
-            <Text
-              selectable
-              style={{
-                color: ink,
-                fontSize: 18,
-                lineHeight: 22,
-                fontWeight: "600",
-              }}
-            >
-              Recent items
-            </Text>
-
-            {activity.length === 0 ? (
-              <Text
+          {groupedActivity.map((bucket) => (
+            <View key={bucket.monthLabel} style={{ gap: spacingTokens.sm }}>              <Text
                 selectable
-                style={{
-                  color: muted,
-                  fontSize: 15,
-                  lineHeight: 20,
-                  fontWeight: "500",
-                }}
+                style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
               >
-                No shared expenses yet.
+                {bucket.monthLabel}
               </Text>
-            ) : (
-              activity.map((item) => {
-                const itemPositive = item.netCents > 0;
-                const isSettlement = item.entryType === "settlement";
-                return (
+
+              {bucket.items.map((item) => (
+                <View
+                  key={item.expenseId}
+                  style={{
+                    borderRadius: radiusTokens.card,
+                    borderCurve: "continuous",
+                    borderWidth: 1,
+                    borderColor: colorSemanticTokens.border.subtle,
+                    backgroundColor: colorSemanticTokens.surface.card,
+                    padding: spacingTokens.md,
+                    gap: 6,
+                  }}
+                >
                   <View
-                    key={item.expenseId}
                     style={{
-                      borderRadius: radiusTokens.card,
-                      borderCurve: "continuous",
-                      backgroundColor: colorSemanticTokens.background.subtle,
-                      padding: 12,
-                      gap: 6,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: spacingTokens.sm,
                     }}
                   >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "flex-start",
-                        justifyContent: "space-between",
-                        gap: 12,
-                      }}
-                    >
-                      <View style={{ flex: 1, gap: 4 }}>
-                        <Text
-                          selectable
-                          style={{
-                            color: ink,
-                            fontSize: 16,
-                            lineHeight: 20,
-                            fontWeight: "600",
-                          }}
-                        >
-                          {item.description}
-                        </Text>
-                        {isSettlement ? (
-                          <View
-                            style={{
-                              alignSelf: "flex-start",
-                              borderRadius: 999,
-                              borderCurve: "continuous",
-                              backgroundColor: colorSemanticTokens.accent.soft,
-                              paddingHorizontal: 8,
-                              paddingVertical: 3,
-                            }}
-                          >
-                            <Text
-                              selectable
-                              style={{
-                                color: accent,
-                                fontSize: 11,
-                                lineHeight: 14,
-                                fontWeight: "600",
-                              }}
-                            >
-                              Settlement
-                            </Text>
-                          </View>
-                        ) : null}
-                      </View>
+                    <View style={{ flex: 1, gap: 2 }}>                      <Text
+                        selectable
+                        style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                      >
+                        {item.description}
+                      </Text>
                       <Text
                         selectable
-                        style={{
-                          color: itemPositive ? accent : muted,
-                          fontSize: 16,
-                          lineHeight: 20,
-                          fontWeight: "600",
-                          fontVariant: ["tabular-nums"],
-                        }}
+                        style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
                       >
-                        {itemPositive ? "+" : "-"}
-                        {formatCents(Math.abs(item.netCents))}
+                        {item.groupEmoji ? `${item.groupEmoji} ` : ""}
+                        {item.groupName} · {shortDate(item.expenseDate)}
                       </Text>
                     </View>
                     <Text
                       selectable
-                      style={{
-                        color: muted,
-                        fontSize: 13,
-                        lineHeight: 16,
-                        fontWeight: "500",
-                      }}
+                      style={[
+                        typographyScale.headingMd,
+                        {
+                          color:
+                            item.netCents > 0
+                              ? colorSemanticTokens.financial.positive
+                              : colorSemanticTokens.financial.negative,
+                        },
+                      ]}
                     >
-                      {item.groupEmoji ? `${item.groupEmoji} ` : ""}
-                      {item.groupName} · {formatShortDate(item.expenseDate)}
+                      {item.netCents > 0 ? "+" : "-"}
+                      {formatCents(Math.abs(item.netCents))}
                     </Text>
                   </View>
-                );
-              })
-            )}
-          </View>
+                </View>
+              ))}
+            </View>
+          ))}
         </>
-      )}
+      ) : null}
     </ScrollView>
   );
 }

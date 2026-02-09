@@ -19,6 +19,15 @@ export type FriendBalance = {
   direction: BalanceDirection;
 };
 
+export type FriendListRowVM = {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  statusLabel: string;
+  statusAmount: string | null;
+  tone: "positive" | "negative" | "neutral";
+};
+
 /** Raw row from get_friend_activity() RPC */
 export type FriendActivityRow = {
   expense_id: string;

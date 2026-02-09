@@ -1,42 +1,65 @@
-import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Switch, Text, View } from "@/design/primitives/sora-native";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { Pressable, Text, View } from "@/design/primitives/sora-native";
+import { useState } from "react";
 
 import { Button } from "@/design/primitives/button";
-import { LiquidSurface } from "@/design/primitives/liquid-surface";
-import { PageHeading } from "@/design/primitives/page-heading";
+import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-cta";
 import { ScreenContainer } from "@/design/primitives/screen-container";
-import { TextField } from "@/design/primitives/text-field";
+import { TabTopActions } from "@/design/primitives/tab-top-actions";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
-import { getDisplayNameValidationMessage } from "@/features/auth/utils/auth-validation";
-import { useNotificationPreferences } from "@/features/notifications/hooks/use-notification-preferences";
 import { useProfile } from "@/features/profile/hooks/use-profile";
 
-function settingRow(
-  label: string,
-  value: boolean,
-  onValueChange: (nextValue: boolean) => void,
-) {
+function AccountRow({
+  label,
+  subtitle,
+  disabled = false,
+}: {
+  label: string;
+  subtitle?: string;
+  disabled?: boolean;
+}) {
   return (
     <View
       style={{
+        borderRadius: radiusTokens.card,
+        borderCurve: "continuous",
+        borderWidth: 1,
+        borderColor: colorSemanticTokens.border.subtle,
+        backgroundColor: colorSemanticTokens.surface.card,
+        paddingHorizontal: spacingTokens.md,
+        paddingVertical: spacingTokens.sm,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: spacingTokens.sm,
+        opacity: disabled ? 0.5 : 1,
       }}
     >
-      <Text selectable style={[typographyScale.bodyLg, { color: colorSemanticTokens.text.primary }]}>
-        {label}
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text
+          selectable
+          style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+        >
+          {label}
+        </Text>
+        {subtitle ? (
+          <Text
+            selectable
+            style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+          >
+            {subtitle}
+          </Text>
+        ) : null}
+      </View>
+      <Text
+        selectable
+        style={[typographyScale.headingSm, { color: colorSemanticTokens.text.tertiary }]}
+      >
+        ›
       </Text>
-      <Switch
-        value={value}
-        onValueChange={onValueChange}
-        trackColor={{ true: colorSemanticTokens.accent.primary }}
-      />
     </View>
   );
 }
@@ -44,54 +67,13 @@ function settingRow(
 export default function SettingsTabScreen() {
   const router = useRouter();
   const { signOut, user } = useAuth();
-  const { profile, isLoading, isSaving, error, saveDisplayName } = useProfile();
-  const {
-    preferences,
-    isLoading: isLoadingPrefs,
-    error: prefsError,
-    toggleFriendRequests,
-    toggleGroupInvitations,
-    toggleExpenseUpdates,
-  } = useNotificationPreferences();
-
+  const { profile } = useProfile();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
-  const [profileError, setProfileError] = useState<string | null>(null);
-  const [draftDisplayName, setDraftDisplayName] = useState("");
 
-  useEffect(() => {
-    if (profile?.displayName) {
-      setDraftDisplayName(profile.displayName);
-      return;
-    }
-
-    if (user?.email) {
-      setDraftDisplayName(user.email.split("@")[0] ?? "");
-    }
-  }, [profile?.displayName, user?.email]);
-
-  const profileEmail = profile?.email ?? user?.email ?? "-";
-  const providerLabel = useMemo(() => "Email + Password", []);
-
-  const displayNameValidationMessage = getDisplayNameValidationMessage(draftDisplayName);
-  const hasPendingDisplayNameChange =
-    draftDisplayName.trim() !== (profile?.displayName ?? "").trim();
-
-  const handleSaveProfile = () => {
-    setProfileError(null);
-
-    if (displayNameValidationMessage) {
-      setProfileError(displayNameValidationMessage);
-      return;
-    }
-
-    void (async () => {
-      const result = await saveDisplayName(draftDisplayName);
-      if (!result.ok) {
-        setProfileError(result.message);
-      }
-    })();
-  };
+  const displayName =
+    profile?.displayName ?? user?.email?.split("@")[0] ?? "Account";
+  const email = profile?.email ?? user?.email ?? "-";
 
   const handleSignOut = () => {
     setSignOutError(null);
@@ -111,101 +93,120 @@ export default function SettingsTabScreen() {
   };
 
   return (
-    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
-      <PageHeading
-        title="Settings"
-        subtitle="Profile, notifications, and account controls."
-      />
+    <View style={{ flex: 1 }}>
+      <ScreenContainer
+        contentContainerStyle={{
+          gap: spacingTokens.md,
+          paddingBottom: spacingTokens["6xl"] + 120,
+        }}
+      >
+        <TabTopActions onSearchPress={() => {}} />
 
-      <LiquidSurface kind="strong" contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
-        <Text selectable style={[typographyScale.labelMd, { color: colorSemanticTokens.text.tertiary }]}>
-          Account
-        </Text>
+        <View
+          style={{
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            borderWidth: 1,
+            borderColor: colorSemanticTokens.border.subtle,
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: spacingTokens.cardPadding,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacingTokens.md,
+          }}
+        >
+          <View
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: radiusTokens.pill,
+              borderCurve: "continuous",
+              backgroundColor: colorSemanticTokens.accent.soft,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              selectable
+              style={[typographyScale.headingLg, { color: colorSemanticTokens.accent.primary }]}
+            >
+              {displayName.trim().slice(0, 1).toUpperCase()}
+            </Text>
+          </View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text
+              selectable
+              style={[typographyScale.headingLg, { color: colorSemanticTokens.text.primary }]}
+            >
+              {displayName}
+            </Text>
+            <Text
+              selectable
+              style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+            >
+              {email}
+            </Text>
+          </View>
+          <Link href="/(app)/(tabs)/(settings)/profile" asChild>
+            <Pressable>
+              <Text
+                selectable
+                style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
+              >
+                Edit
+              </Text>
+            </Pressable>
+          </Link>
+        </View>
 
-        <TextField
-          value={draftDisplayName}
-          onChangeText={setDraftDisplayName}
-          label="Username"
-          required
-          placeholder="Choose a username"
-          autoCapitalize="words"
-          autoCorrect={false}
-          error={profileError ?? displayNameValidationMessage}
-          helperText={!profileError && !displayNameValidationMessage ? "Required" : undefined}
-        />
+        <View style={{ gap: spacingTokens.sm }}>
+          <Link href="/(app)/(tabs)/(settings)/profile" asChild>
+            <Pressable>
+              <AccountRow label="Profile" subtitle="Username and account details" />
+            </Pressable>
+          </Link>
 
-        <Text selectable style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}>
-          {profileEmail}
-        </Text>
-        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.tertiary }]}>
-          Sign-in method: {providerLabel}
-        </Text>
+          <Link href="/(app)/(tabs)/(settings)/notifications" asChild>
+            <Pressable>
+              <AccountRow label="Notifications" subtitle="Email updates and alerts" />
+            </Pressable>
+          </Link>
 
-        {error ? (
-          <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
-            {error}
+          <AccountRow
+            label="Scan code"
+            subtitle="Coming soon"
+            disabled
+          />
+
+          <AccountRow
+            label="Bank connections"
+            subtitle="Coming soon"
+            disabled
+          />
+        </View>
+
+        {signOutError ? (
+          <Text
+            selectable
+            style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+          >
+            {signOutError}
           </Text>
         ) : null}
 
         <Button
-          label={isSaving ? "Saving..." : "Save Username"}
-          loading={isSaving}
-          onPress={handleSaveProfile}
-          disabled={
-            isLoading ||
-            isSaving ||
-            !hasPendingDisplayNameChange ||
-            Boolean(displayNameValidationMessage)
-          }
+          label="Sign out"
+          loading={isSigningOut}
+          onPress={handleSignOut}
+          tone="danger"
         />
-      </LiquidSurface>
+      </ScreenContainer>
 
-      <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.md }}>
-        <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>
-          Email Notifications
-        </Text>
-        {isLoadingPrefs ? (
-          <ActivityIndicator size="small" color={colorSemanticTokens.accent.primary} />
-        ) : (
-          <>
-            {settingRow(
-              "Friend requests",
-              preferences?.friend_request_received ?? true,
-              toggleFriendRequests,
-            )}
-            {settingRow(
-              "Group invitations",
-              preferences?.added_to_group ?? true,
-              toggleGroupInvitations,
-            )}
-            {settingRow(
-              "Expense & settlement updates",
-              preferences?.new_expense ?? true,
-              toggleExpenseUpdates,
-            )}
-            {prefsError ? (
-              <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
-                {prefsError}
-              </Text>
-            ) : null}
-          </>
-        )}
-      </LiquidSurface>
-
-      {signOutError ? (
-        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger, textAlign: "center" }]}>
-          {signOutError}
-        </Text>
-      ) : null}
-
-      <Button
-        label="Sign Out"
-        loading={isSigningOut}
-        onPress={handleSignOut}
-        tone="danger"
-        variant="solid"
-        size="lg"
+      <FloatingAddExpenseCta
+        onPress={() => {
+          router.push("/(app)/add-expense-context");
+        }}
       />
-    </ScreenContainer>
+    </View>
   );
 }

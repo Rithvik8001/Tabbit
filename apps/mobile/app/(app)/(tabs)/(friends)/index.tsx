@@ -1,58 +1,67 @@
+import { useMemo, useState } from "react";
 import { Link, useRouter } from "expo-router";
-import { Pressable, Text, View } from "@/design/primitives/sora-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "@/design/primitives/sora-native";
 
+import { BalanceListRow } from "@/design/primitives/balance-list-row";
 import { Button } from "@/design/primitives/button";
-import { LiquidSurface } from "@/design/primitives/liquid-surface";
-import {
-  HeaderPillButton,
-  PageHeading,
-} from "@/design/primitives/page-heading";
+import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-cta";
+import { OverallBalanceStrip } from "@/design/primitives/overall-balance-strip";
 import { ScreenContainer } from "@/design/primitives/screen-container";
+import { TabTopActions } from "@/design/primitives/tab-top-actions";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
-import { FRIEND_REQUESTS_RPC_UNAVAILABLE_MESSAGE } from "@/features/friends/lib/friend-requests-repository";
-import { FRIENDS_RPC_UNAVAILABLE_MESSAGE } from "@/features/friends/lib/friends-repository";
 import { useFriendRequests } from "@/features/friends/hooks/use-friend-requests";
 import { useFriends } from "@/features/friends/hooks/use-friends";
+import type { FriendListRowVM } from "@/features/friends/types/friend.types";
 import { formatCents } from "@/features/groups/lib/format-currency";
+import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
 
-function RequestRowSkeleton() {
-  return (
-    <LiquidSurface
-      contentStyle={{
-        padding: spacingTokens.cardPadding,
-        gap: spacingTokens.xs,
-      }}
-    >
-      <View
-        style={{
-          width: "55%",
-          height: 14,
-          borderRadius: 999,
-          backgroundColor: colorSemanticTokens.border.subtle,
-        }}
-      />
-      <View
-        style={{
-          width: "72%",
-          height: 12,
-          borderRadius: 999,
-          backgroundColor: colorSemanticTokens.border.subtle,
-        }}
-      />
-    </LiquidSurface>
-  );
+function mapFriendRow(friend: {
+  userId: string;
+  displayName: string | null;
+  email: string | null;
+  netCents: number;
+  direction: "you_owe" | "you_are_owed" | "settled";
+}): FriendListRowVM {
+  if (friend.direction === "you_owe") {
+    return {
+      id: friend.userId,
+      title: friend.displayName ?? friend.email ?? "Unknown",
+      subtitle: friend.email,
+      statusLabel: "you owe",
+      statusAmount: formatCents(Math.abs(friend.netCents)),
+      tone: "negative",
+    };
+  }
+
+  if (friend.direction === "you_are_owed") {
+    return {
+      id: friend.userId,
+      title: friend.displayName ?? friend.email ?? "Unknown",
+      subtitle: friend.email,
+      statusLabel: "owes you",
+      statusAmount: formatCents(Math.abs(friend.netCents)),
+      tone: "positive",
+    };
+  }
+
+  return {
+    id: friend.userId,
+    title: friend.displayName ?? friend.email ?? "Unknown",
+    subtitle: friend.email,
+    statusLabel: "settled up",
+    statusAmount: null,
+    tone: "neutral",
+  };
 }
 
 export default function FriendsTabScreen() {
   const router = useRouter();
-  const {
-    friends,
-    isLoading: isFriendsLoading,
-    error: friendsError,
-    refresh: refreshFriends,
-  } = useFriends();
+  const { snapshot } = useHomeDashboard({ activityLimit: 1 });
+  const { friends, isLoading: isFriendsLoading, error: friendsError, refresh: refreshFriends } =
+    useFriends();
   const {
     incomingRequests,
     outgoingRequests,
@@ -65,372 +74,309 @@ export default function FriendsTabScreen() {
     isMutatingRequest,
   } = useFriendRequests();
 
-  const isLoading = isFriendsLoading || isRequestsLoading;
-  const hasFriendsError = Boolean(friendsError);
-  const hasRequestsError = Boolean(requestsError);
-  const hasErrors = hasFriendsError || hasRequestsError;
+  const [showSearch, setShowSearch] = useState(false);
+  const [query, setQuery] = useState("");
+  const [hideSettled, setHideSettled] = useState(false);
 
-  const showMigrationHint =
-    friendsError === FRIENDS_RPC_UNAVAILABLE_MESSAGE ||
-    requestsError === FRIEND_REQUESTS_RPC_UNAVAILABLE_MESSAGE;
+  const rows = useMemo(() => friends.map(mapFriendRow), [friends]);
+
+  const filteredRows = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+
+    return rows.filter((row) => {
+      if (hideSettled && row.statusLabel === "settled up") {
+        return false;
+      }
+
+      if (!normalized) {
+        return true;
+      }
+
+      const haystack = `${row.title} ${row.subtitle ?? ""}`.toLowerCase();
+      return haystack.includes(normalized);
+    });
+  }, [hideSettled, query, rows]);
+
+  const hasErrors = Boolean(friendsError || requestsError);
+  const isLoading = isFriendsLoading || isRequestsLoading;
 
   const refreshAll = async () => {
     await Promise.all([refreshFriends(), refreshRequests()]);
   };
 
-  const handleAccept = (requestId: string) => {
-    void (async () => {
-      const result = await acceptRequest(requestId);
-      if (!result.ok) {
-        return;
-      }
-      void refreshFriends();
-    })();
-  };
-
-  const handleDecline = (requestId: string) => {
-    void (async () => {
-      const result = await declineRequest(requestId);
-      if (!result.ok) {
-        return;
-      }
-      void refreshFriends();
-    })();
-  };
-
-  const handleCancel = (requestId: string) => {
-    void (async () => {
-      const result = await cancelRequest(requestId);
-      if (!result.ok) {
-        return;
-      }
-      void refreshFriends();
-    })();
-  };
-
   return (
-    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
-      <PageHeading
-        title="Friends"
-        subtitle="Requests, balances, and quick settle-ups."
-        trailing={
-          <HeaderPillButton
-            label="+ Friend"
-            onPress={() => {
-              router.push("/(app)/(tabs)/(friends)/add");
+    <View style={{ flex: 1 }}>
+      <ScreenContainer
+        contentContainerStyle={{
+          gap: spacingTokens.md,
+          paddingBottom: spacingTokens["6xl"] + 120,
+        }}
+      >
+        <TabTopActions
+          rightActionLabel="Add friends"
+          onRightActionPress={() => {
+            router.push("/(app)/(tabs)/(friends)/add");
+          }}
+          onSearchPress={() => setShowSearch((current) => !current)}
+        />
+
+        {showSearch ? (
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search friends"
+            placeholderTextColor={colorSemanticTokens.text.tertiary}
+            selectionColor={colorSemanticTokens.accent.primary}
+            autoCapitalize="none"
+            autoCorrect={false}
+            style={[
+              typographyScale.bodyLg,
+              {
+                borderRadius: radiusTokens.control,
+                borderCurve: "continuous",
+                borderWidth: 1,
+                borderColor: colorSemanticTokens.border.subtle,
+                backgroundColor: colorSemanticTokens.surface.card,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                color: colorSemanticTokens.text.primary,
+              },
+            ]}
+          />
+        ) : null}
+
+        <OverallBalanceStrip
+          netBalanceCents={snapshot.netBalanceCents}
+          onFilterPress={() => setHideSettled((current) => !current)}
+        />
+
+        {incomingRequests.length + outgoingRequests.length > 0 ? (
+          <View
+            style={{
+              borderRadius: radiusTokens.card,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.border.subtle,
+              backgroundColor: colorSemanticTokens.surface.card,
+              padding: spacingTokens.md,
+              gap: spacingTokens.sm,
             }}
-            tone="accent"
-          />
-        }
-      />
-
-      {isLoading ? (
-        <>
-          <RequestRowSkeleton />
-          <RequestRowSkeleton />
-          <RequestRowSkeleton />
-        </>
-      ) : null}
-
-      {hasErrors ? (
-        <LiquidSurface
-          contentStyle={{
-            padding: spacingTokens.cardPadding,
-            gap: spacingTokens.sm,
-          }}
-        >
-          <Text
-            selectable
-            style={[
-              typographyScale.headingSm,
-              { color: colorSemanticTokens.text.primary },
-            ]}
           >
-            Could not load friends right now
-          </Text>
-          {friendsError ? (
             <Text
               selectable
-              style={[
-                typographyScale.bodySm,
-                { color: colorSemanticTokens.text.secondary },
-              ]}
+              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
             >
-              {friendsError}
+              Requests
             </Text>
-          ) : null}
-          {requestsError ? (
-            <Text
-              selectable
-              style={[
-                typographyScale.bodySm,
-                { color: colorSemanticTokens.text.secondary },
-              ]}
-            >
-              {requestsError}
-            </Text>
-          ) : null}
-          {showMigrationHint ? (
-            <Text
-              selectable
-              style={[
-                typographyScale.bodySm,
-                { color: colorSemanticTokens.text.secondary },
-              ]}
-            >
-              If you are developing locally, run the latest Supabase migrations
-              and retry.
-            </Text>
-          ) : null}
-          <Button
-            label="Retry"
-            variant="soft"
-            onPress={() => void refreshAll()}
-          />
-        </LiquidSurface>
-      ) : null}
 
-      {!isLoading && !hasRequestsError && incomingRequests.length > 0 ? (
-        <LiquidSurface
-          contentStyle={{
-            padding: spacingTokens.cardPadding,
-            gap: spacingTokens.sm,
-          }}
-        >
-          <Text
-            selectable
-            style={[
-              typographyScale.headingSm,
-              { color: colorSemanticTokens.text.primary },
-            ]}
-          >
-            Incoming requests
-          </Text>
-          {incomingRequests.map((request) => (
-            <View
-              key={request.requestId}
-              style={{
-                borderRadius: 14,
-                borderCurve: "continuous",
-                backgroundColor: colorSemanticTokens.background.subtle,
-                padding: 12,
-                gap: 8,
-              }}
-            >
-              <View style={{ gap: 2 }}>
-                <Text
-                  selectable
-                  style={[
-                    typographyScale.headingSm,
-                    { color: colorSemanticTokens.text.primary },
-                  ]}
-                >
-                  {request.displayName ?? request.email ?? "Unknown"}
-                </Text>
-                {request.email ? (
-                  <Text
-                    selectable
-                    style={[
-                      typographyScale.bodySm,
-                      { color: colorSemanticTokens.text.tertiary },
-                    ]}
-                  >
-                    {request.email}
-                  </Text>
-                ) : null}
-              </View>
-              <View style={{ flexDirection: "row", gap: spacingTokens.xs }}>
-                <View style={{ flex: 1 }}>
-                  <Button
-                    label="Accept"
-                    variant="soft"
-                    tone="accent"
-                    size="sm"
-                    loading={isMutatingRequest(request.requestId)}
-                    disabled={isMutatingRequest(request.requestId)}
-                    onPress={() => {
-                      handleAccept(request.requestId);
-                    }}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Button
-                    label="Decline"
-                    variant="soft"
-                    tone="danger"
-                    size="sm"
-                    loading={isMutatingRequest(request.requestId)}
-                    disabled={isMutatingRequest(request.requestId)}
-                    onPress={() => {
-                      handleDecline(request.requestId);
-                    }}
-                  />
-                </View>
-              </View>
-            </View>
-          ))}
-        </LiquidSurface>
-      ) : null}
-
-      {!isLoading && !hasRequestsError && outgoingRequests.length > 0 ? (
-        <LiquidSurface
-          contentStyle={{
-            padding: spacingTokens.cardPadding,
-            gap: spacingTokens.sm,
-          }}
-        >
-          <Text
-            selectable
-            style={[
-              typographyScale.headingSm,
-              { color: colorSemanticTokens.text.primary },
-            ]}
-          >
-            Sent requests
-          </Text>
-          {outgoingRequests.map((request) => (
-            <View
-              key={request.requestId}
-              style={{
-                borderRadius: 14,
-                borderCurve: "continuous",
-                backgroundColor: colorSemanticTokens.background.subtle,
-                padding: 12,
-                gap: 8,
-              }}
-            >
-              <View style={{ gap: 2 }}>
-                <Text
-                  selectable
-                  style={[
-                    typographyScale.headingSm,
-                    { color: colorSemanticTokens.text.primary },
-                  ]}
-                >
-                  {request.displayName ?? request.email ?? "Unknown"}
-                </Text>
-                {request.email ? (
-                  <Text
-                    selectable
-                    style={[
-                      typographyScale.bodySm,
-                      { color: colorSemanticTokens.text.tertiary },
-                    ]}
-                  >
-                    {request.email}
-                  </Text>
-                ) : null}
-              </View>
-              <Button
-                label="Cancel Request"
-                variant="soft"
-                tone="neutral"
-                size="sm"
-                loading={isMutatingRequest(request.requestId)}
-                disabled={isMutatingRequest(request.requestId)}
-                onPress={() => {
-                  handleCancel(request.requestId);
+            {incomingRequests.map((request) => (
+              <View
+                key={request.requestId}
+                style={{
+                  borderRadius: radiusTokens.control,
+                  borderCurve: "continuous",
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  padding: spacingTokens.sm,
+                  gap: spacingTokens.sm,
                 }}
-              />
-            </View>
-          ))}
-        </LiquidSurface>
-      ) : null}
-
-      {!isLoading &&
-      !hasFriendsError &&
-      !hasRequestsError &&
-      friends.length === 0 &&
-      incomingRequests.length === 0 &&
-      outgoingRequests.length === 0 ? (
-        <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding }}>
-          <Text
-            selectable
-            style={[
-              typographyScale.bodyMd,
-              { color: colorSemanticTokens.text.secondary },
-            ]}
-          >
-            No friends yet. Add a friend or join a group to get started.
-          </Text>
-        </LiquidSurface>
-      ) : null}
-
-      {!hasFriendsError
-        ? friends.map((friend) => {
-            const isSettled = friend.direction === "settled";
-            const isPositive = friend.direction === "you_are_owed";
-
-            return (
-              <Link
-                key={friend.userId}
-                href={{
-                  pathname: "/(app)/(tabs)/(friends)/[friendId]",
-                  params: { friendId: friend.userId },
-                }}
-                asChild
               >
-                <Pressable>
-                  <LiquidSurface
-                    contentStyle={{
-                      padding: spacingTokens.cardPadding,
-                      gap: spacingTokens.xs,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: spacingTokens.sm,
+                <Text
+                  selectable
+                  style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}
+                >
+                  {request.displayName ?? request.email ?? "Unknown"}
+                </Text>
+                <View style={{ flexDirection: "row", gap: spacingTokens.sm }}>
+                  <View style={{ flex: 1 }}>
+                    <Button
+                      label="Accept"
+                      size="sm"
+                      variant="soft"
+                      onPress={() => {
+                        void (async () => {
+                          const result = await acceptRequest(request.requestId);
+                          if (result.ok) {
+                            await refreshFriends();
+                          }
+                        })();
                       }}
-                    >
-                      <Text
-                        selectable
-                        style={[
-                          typographyScale.headingMd,
-                          { color: colorSemanticTokens.text.primary },
-                        ]}
-                      >
-                        {friend.displayName ?? friend.email ?? "Unknown"}
-                      </Text>
-                      <Text
-                        selectable
-                        style={[
-                          typographyScale.headingSm,
-                          { color: colorSemanticTokens.text.tertiary },
-                        ]}
-                      >
-                        ›
-                      </Text>
-                    </View>
+                      loading={isMutatingRequest(request.requestId)}
+                      disabled={isMutatingRequest(request.requestId)}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Button
+                      label="Decline"
+                      size="sm"
+                      variant="soft"
+                      tone="danger"
+                      onPress={() => {
+                        void declineRequest(request.requestId);
+                      }}
+                      loading={isMutatingRequest(request.requestId)}
+                      disabled={isMutatingRequest(request.requestId)}
+                    />
+                  </View>
+                </View>
+              </View>
+            ))}
 
-                    <Text
-                      selectable
-                      style={[
-                        typographyScale.bodyMd,
-                        {
-                          color: isSettled
-                            ? colorSemanticTokens.text.tertiary
-                            : isPositive
-                              ? colorSemanticTokens.financial.positive
-                              : colorSemanticTokens.financial.negative,
-                          fontVariant: ["tabular-nums"],
-                        },
-                      ]}
-                    >
-                      {isSettled
-                        ? "Settled up"
-                        : isPositive
-                          ? `You are owed ${formatCents(Math.abs(friend.netCents))}`
-                          : `You owe ${formatCents(Math.abs(friend.netCents))}`}
-                    </Text>
-                  </LiquidSurface>
-                </Pressable>
-              </Link>
-            );
-          })
-        : null}
-    </ScreenContainer>
+            {outgoingRequests.map((request) => (
+              <View
+                key={request.requestId}
+                style={{
+                  borderRadius: radiusTokens.control,
+                  borderCurve: "continuous",
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  padding: spacingTokens.sm,
+                  gap: spacingTokens.sm,
+                }}
+              >
+                <Text
+                  selectable
+                  style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}
+                >
+                  {request.displayName ?? request.email ?? "Unknown"}
+                </Text>
+                <Text
+                  selectable
+                  style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                >
+                  Request sent
+                </Text>
+                <Button
+                  label="Cancel request"
+                  size="sm"
+                  variant="soft"
+                  tone="neutral"
+                  onPress={() => {
+                    void cancelRequest(request.requestId);
+                  }}
+                  loading={isMutatingRequest(request.requestId)}
+                  disabled={isMutatingRequest(request.requestId)}
+                />
+              </View>
+            ))}
+          </View>
+        ) : null}
+
+        {hasErrors ? (
+          <View
+            style={{
+              borderRadius: radiusTokens.card,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.state.danger,
+              backgroundColor: colorSemanticTokens.state.dangerSoft,
+              padding: spacingTokens.md,
+              gap: spacingTokens.sm,
+            }}
+          >
+            <Text
+              selectable
+              style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}
+            >
+              Could not load friends
+            </Text>
+            {friendsError ? (
+              <Text
+                selectable
+                style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+              >
+                {friendsError}
+              </Text>
+            ) : null}
+            {requestsError ? (
+              <Text
+                selectable
+                style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+              >
+                {requestsError}
+              </Text>
+            ) : null}
+            <Button label="Retry" variant="soft" onPress={() => void refreshAll()} />
+          </View>
+        ) : null}
+
+        {isLoading ? (
+          <View style={{ alignItems: "center", paddingVertical: spacingTokens.md }}>
+            <ActivityIndicator
+              size="small"
+              color={colorSemanticTokens.accent.primary}
+            />
+          </View>
+        ) : null}
+
+        {!isLoading && filteredRows.length === 0 && !hasErrors ? (
+          <View
+            style={{
+              borderRadius: radiusTokens.card,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.border.subtle,
+              backgroundColor: colorSemanticTokens.surface.card,
+              padding: spacingTokens.cardPadding,
+              gap: spacingTokens.sm,
+            }}
+          >
+            <Text
+              selectable
+              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+            >
+              No friends yet
+            </Text>
+            <Text
+              selectable
+              style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+            >
+              Add your first friend to start splitting.
+            </Text>
+          </View>
+        ) : null}
+
+        {filteredRows.map((row) => (
+          <Link
+            key={row.id}
+            href={{
+              pathname: "/(app)/(tabs)/(friends)/[friendId]",
+              params: { friendId: row.id },
+            }}
+            asChild
+          >
+            <Pressable
+              style={{
+                borderRadius: radiusTokens.card,
+                borderCurve: "continuous",
+                borderWidth: 1,
+                borderColor: colorSemanticTokens.border.subtle,
+                backgroundColor: colorSemanticTokens.surface.card,
+              }}
+            >
+              <BalanceListRow
+                title={row.title}
+                subtitle={row.subtitle ?? undefined}
+                statusLabel={row.statusLabel}
+                amountText={row.statusAmount ?? undefined}
+                tone={row.tone}
+              />
+            </Pressable>
+          </Link>
+        ))}
+
+        <Button
+          label="Add more friends"
+          variant="soft"
+          onPress={() => {
+            router.push("/(app)/(tabs)/(friends)/add");
+          }}
+        />
+      </ScreenContainer>
+
+      <FloatingAddExpenseCta
+        onPress={() => {
+          router.push("/(app)/add-expense-context");
+        }}
+      />
+    </View>
   );
 }

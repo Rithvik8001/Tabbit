@@ -16,6 +16,12 @@ export default function GroupsTabLayout() {
       />
       <Stack.Screen name="[id]" />
       <Stack.Screen
+        name="settings"
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
         name="edit"
         options={{
           presentation: "modal",

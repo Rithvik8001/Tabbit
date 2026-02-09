@@ -13,6 +13,12 @@ export default function AppShellLayout() {
     >
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="home-preview" />
+      <Stack.Screen
+        name="add-expense-context"
+        options={{
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

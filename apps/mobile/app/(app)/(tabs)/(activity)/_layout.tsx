@@ -1,11 +1,9 @@
 import { Stack } from "expo-router";
 
-export default function SettingsTabLayout() {
+export default function ActivityTabLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Screen name="profile" />
-      <Stack.Screen name="notifications" />
     </Stack>
   );
 }
