@@ -1,4 +1,4 @@
-import type { TextStyle } from "react-native";
+import type { TextStyle } from "@/design/primitives/sora-native";
 
 export const fontFamilyTokens = {
   bodyRegular: "Sora_400Regular",

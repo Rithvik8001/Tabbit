@@ -1,6 +1,6 @@
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text } from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import { colorSemanticTokens } from "@/design/tokens/colors";

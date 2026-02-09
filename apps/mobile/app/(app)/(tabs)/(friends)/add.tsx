@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, TextInput, View } from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import {

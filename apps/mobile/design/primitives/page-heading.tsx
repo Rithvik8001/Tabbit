@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";

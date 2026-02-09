@@ -10,7 +10,7 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
+} from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/primitives/button";

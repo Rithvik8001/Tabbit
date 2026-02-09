@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
-import type { GestureResponderEvent } from "react-native";
-import { ActivityIndicator, Pressable, Text } from "react-native";
+import type { GestureResponderEvent } from "@/design/primitives/sora-native";
+import { ActivityIndicator, Pressable, Text } from "@/design/primitives/sora-native";
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { Text, View } from "@/design/primitives/sora-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { spacingTokens } from "@/design/tokens/spacing";

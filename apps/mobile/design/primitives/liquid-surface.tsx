@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import type { StyleProp, ViewStyle } from "react-native";
-import { View } from "react-native";
+import type { StyleProp, ViewStyle } from "@/design/primitives/sora-native";
+import { View } from "@/design/primitives/sora-native";
 
 import { radiusTokens } from "@/design/tokens/radius";
 

@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View } from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import { colorSemanticTokens } from "@/design/tokens/colors";

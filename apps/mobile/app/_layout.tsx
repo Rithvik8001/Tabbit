@@ -10,41 +10,13 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { ActivityIndicator, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, View } from "@/design/primitives/sora-native";
 
 import { AppProvider } from "@/providers/app-provider";
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
 void SplashScreen.preventAutoHideAsync();
-
-let didApplyGlobalSora = false;
-
-function applyGlobalSoraDefaults() {
-  if (didApplyGlobalSora) {
-    return;
-  }
-
-  const textComponent = Text as typeof Text & { defaultProps?: Record<string, unknown> };
-  const inputComponent = TextInput as typeof TextInput & {
-    defaultProps?: Record<string, unknown>;
-  };
-
-  const existingTextStyle = textComponent.defaultProps?.style;
-  const existingInputStyle = inputComponent.defaultProps?.style;
-
-  textComponent.defaultProps = {
-    ...textComponent.defaultProps,
-    style: [{ fontFamily: "Sora_500Medium" }, existingTextStyle],
-  };
-
-  inputComponent.defaultProps = {
-    ...inputComponent.defaultProps,
-    style: [{ fontFamily: "Sora_500Medium" }, existingInputStyle],
-  };
-
-  didApplyGlobalSora = true;
-}
 
 function RootNavigator() {
   const { session, isAuthLoading } = useAuth();
@@ -58,7 +30,6 @@ function RootNavigator() {
 
   useEffect(() => {
     if (!isAuthLoading && fontsLoaded) {
-      applyGlobalSoraDefaults();
       void SplashScreen.hideAsync();
     }
   }, [isAuthLoading, fontsLoaded]);

@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
 import { Badge } from "@/design/primitives/badge";
 import { Button } from "@/design/primitives/button";

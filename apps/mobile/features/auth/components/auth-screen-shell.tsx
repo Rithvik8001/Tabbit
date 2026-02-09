@@ -5,7 +5,7 @@ import {
   ScrollView,
   Text,
   View,
-} from "react-native";
+} from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Switch, Text, View } from "react-native";
+import { ActivityIndicator, Switch, Text, View } from "@/design/primitives/sora-native";
 import { useRouter } from "expo-router";
 
 import { Button } from "@/design/primitives/button";

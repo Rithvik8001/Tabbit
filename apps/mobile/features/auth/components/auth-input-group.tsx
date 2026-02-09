@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
-import type { TextInputProps } from "react-native";
+import { Pressable, Text, TextInput, View } from "@/design/primitives/sora-native";
+import type { TextInputProps } from "@/design/primitives/sora-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";

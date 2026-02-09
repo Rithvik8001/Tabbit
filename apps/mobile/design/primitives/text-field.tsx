@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { TextInputProps } from "react-native";
-import { Text, TextInput, View } from "react-native";
+import type { TextInputProps } from "@/design/primitives/sora-native";
+import { Text, TextInput, View } from "@/design/primitives/sora-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";

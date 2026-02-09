@@ -8,7 +8,7 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
+} from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import {

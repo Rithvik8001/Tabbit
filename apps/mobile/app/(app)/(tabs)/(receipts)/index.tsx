@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View } from "@/design/primitives/sora-native";
 
 import { Badge } from "@/design/primitives/badge";
 import { LiquidSurface } from "@/design/primitives/liquid-surface";

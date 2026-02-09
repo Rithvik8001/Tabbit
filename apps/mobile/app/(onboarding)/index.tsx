@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/primitives/button";

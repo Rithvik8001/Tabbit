@@ -6,7 +6,7 @@ import {
   ScrollView,
   Text,
   View,
-} from "react-native";
+} from "@/design/primitives/sora-native";
 
 import {
   HeaderPillButton,

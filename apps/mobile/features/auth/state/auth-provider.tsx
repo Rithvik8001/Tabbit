@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { AppState, type AppStateStatus } from "react-native";
+import { AppState, type AppStateStatus } from "@/design/primitives/sora-native";
 
 import { supabase } from "@/features/auth/lib/supabase-client";
 import type { AuthActionResult } from "@/features/auth/types/auth.types";

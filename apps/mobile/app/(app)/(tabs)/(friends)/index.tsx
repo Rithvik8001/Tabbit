@@ -1,5 +1,5 @@
 import { Link, useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import { LiquidSurface } from "@/design/primitives/liquid-surface";

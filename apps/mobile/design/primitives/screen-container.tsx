@@ -1,6 +1,6 @@
 import { type ReactNode, useMemo, useState } from "react";
-import type { StyleProp, ViewStyle } from "react-native";
-import { ScrollView, View } from "react-native";
+import type { StyleProp, ViewStyle } from "@/design/primitives/sora-native";
+import { ScrollView, View } from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
