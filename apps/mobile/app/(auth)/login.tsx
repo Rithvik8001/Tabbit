@@ -1,4 +1,4 @@
-import { Link, useRouter } from "expo-router";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -7,8 +7,18 @@ import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { loginSchema, parseFormErrors } from "@/features/auth/utils/auth-schemas";
 
+function getParamValue(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+
+  return value ?? null;
+}
+
 export default function LoginScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ verified?: string }>();
+  const verifiedParam = getParamValue(params.verified);
   const { session, isAuthLoading, signInWithPassword } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -102,6 +112,19 @@ export default function LoginScreen() {
           }}
         >
           {serverError}
+        </Text>
+      ) : null}
+
+      {!serverError && verifiedParam === "1" ? (
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: "400",
+            color: "#58CC02",
+            textAlign: "center",
+          }}
+        >
+          Email verified. Log in to continue.
         </Text>
       ) : null}
 

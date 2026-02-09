@@ -18,9 +18,6 @@ export default function SignupScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
-  const [verificationMessage, setVerificationMessage] = useState<string | null>(
-    null,
-  );
 
   useEffect(() => {
     if (!isAuthLoading && session) {
@@ -39,11 +36,6 @@ export default function SignupScreen() {
   }, []);
 
   const handleSignUp = () => {
-    if (verificationMessage) {
-      router.replace("/(auth)/login");
-      return;
-    }
-
     const result = signupSchema.safeParse({
       displayName,
       email,
@@ -74,9 +66,9 @@ export default function SignupScreen() {
       }
 
       if (authResult.requiresEmailVerification) {
-        setVerificationMessage(
-          authResult.message ??
-            "Check your inbox and confirm your email to continue.",
+        const verificationEmail = authResult.email ?? result.data.email.trim();
+        router.push(
+          `/(auth)/verify-signup-otp?email=${encodeURIComponent(verificationEmail)}`,
         );
         return;
       }
@@ -84,49 +76,6 @@ export default function SignupScreen() {
       router.replace("/(app)/(tabs)/(home)");
     })();
   };
-
-  if (verificationMessage) {
-    return (
-      <AuthScreenShell title="Check your email">
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "400",
-            color: "#3C3C3C",
-            textAlign: "center",
-            lineHeight: 22,
-          }}
-        >
-          {verificationMessage}
-        </Text>
-
-        <Pressable
-          onPress={() => router.replace("/(auth)/login")}
-          style={{
-            backgroundColor: "#1CB0F6",
-            borderRadius: 16,
-            borderCurve: "continuous",
-            minHeight: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            paddingVertical: 14,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: "700",
-              color: "#FFFFFF",
-              textTransform: "uppercase",
-              letterSpacing: 0.8,
-            }}
-          >
-            GO TO LOGIN
-          </Text>
-        </Pressable>
-      </AuthScreenShell>
-    );
-  }
 
   return (
     <AuthScreenShell title="Create your account">

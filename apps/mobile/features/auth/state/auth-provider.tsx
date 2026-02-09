@@ -18,10 +18,7 @@ import {
   parseAuthSessionFromUrl,
   isSupportedAuthUrl,
 } from "@/features/auth/utils/auth-callback";
-import {
-  EMAIL_CONFIRMED_URL,
-  RESET_PASSWORD_URL,
-} from "@/features/auth/utils/auth-urls";
+import { RESET_PASSWORD_URL } from "@/features/auth/utils/auth-urls";
 
 type AuthContextValue = {
   session: Session | null;
@@ -36,6 +33,8 @@ type AuthContextValue = {
     email: string,
     password: string,
   ) => Promise<AuthActionResult>;
+  verifySignupOtp: (email: string, code: string) => Promise<AuthActionResult>;
+  resendSignupOtp: (email: string) => Promise<AuthActionResult>;
   requestPasswordReset: (email: string) => Promise<AuthActionResult>;
   updatePassword: (nextPassword: string) => Promise<AuthActionResult>;
   signOut: () => Promise<AuthActionResult>;
@@ -156,11 +155,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: string,
       password: string,
     ): Promise<AuthActionResult> => {
+      const normalizedEmail = email.trim();
+
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: EMAIL_CONFIRMED_URL,
           data: {
             display_name: displayName.trim(),
           },
@@ -175,11 +175,65 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return {
           ok: true,
           requiresEmailVerification: true,
-          message: "Check your inbox and confirm your email before logging in.",
+          email: normalizedEmail,
+          message: "Enter the 6-digit code we emailed you to verify your account.",
         };
       }
 
       return { ok: true };
+    },
+    [],
+  );
+
+  const verifySignupOtp = useCallback(
+    async (email: string, code: string): Promise<AuthActionResult> => {
+      const normalizedEmail = email.trim();
+      const normalizedCode = code.trim();
+
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: normalizedEmail,
+        token: normalizedCode,
+        type: "signup",
+      });
+
+      if (error) {
+        return mapAuthError(error);
+      }
+
+      const sessionFromResponse = data.session;
+      if (sessionFromResponse) {
+        return { ok: true };
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData.session) {
+        return { ok: true };
+      }
+
+      return {
+        ok: true,
+        requiresSignIn: true,
+        message: "Email verified. Log in to continue.",
+      };
+    },
+    [],
+  );
+
+  const resendSignupOtp = useCallback(
+    async (email: string): Promise<AuthActionResult> => {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim(),
+      });
+
+      if (error) {
+        return mapAuthError(error);
+      }
+
+      return {
+        ok: true,
+        message: "A new verification code has been sent.",
+      };
     },
     [],
   );
@@ -234,12 +288,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthLoading,
       signInWithPassword,
       signUpWithPassword,
+      verifySignupOtp,
+      resendSignupOtp,
       requestPasswordReset,
       updatePassword,
       signOut,
     };
   }, [
     isAuthLoading,
+    resendSignupOtp,
     requestPasswordReset,
     session,
     signInWithPassword,
@@ -247,6 +304,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signUpWithPassword,
     updatePassword,
     user,
+    verifySignupOtp,
   ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

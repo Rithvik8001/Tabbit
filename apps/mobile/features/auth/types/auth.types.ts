@@ -12,4 +12,6 @@ export type AuthActionResult = {
   code?: AuthErrorCode;
   message?: string;
   requiresEmailVerification?: boolean;
+  requiresSignIn?: boolean;
+  email?: string;
 };

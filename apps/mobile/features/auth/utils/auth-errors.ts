@@ -33,6 +33,18 @@ export function mapAuthError(error: unknown): AuthActionResult {
     );
   }
 
+  if (
+    normalized.includes("token has expired") ||
+    normalized.includes("token is invalid") ||
+    normalized.includes("otp") ||
+    normalized.includes("verification code")
+  ) {
+    return fromCode(
+      "validation",
+      "Verification code is invalid or expired. Request a new code and try again.",
+    );
+  }
+
   if (normalized.includes("network") || normalized.includes("failed to fetch")) {
     return fromCode(
       "network",
