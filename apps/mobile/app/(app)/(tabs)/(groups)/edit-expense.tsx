@@ -1,12 +1,19 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import {
-  getTodayString,
   SPLIT_TYPE_OPTIONS,
   MAX_DESCRIPTION_LENGTH,
   computeEqualSplits,
@@ -14,66 +21,88 @@ import {
   computePercentSplits,
   validateExpenseForm,
 } from "@/features/groups/lib/expense-form-utils";
+import {
+  getExpenseById,
+  updateExpense,
+  deleteExpense,
+} from "@/features/groups/lib/expenses-repository";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
-import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
-import type { SplitType } from "@/features/groups/types/expense.types";
+import type {
+  SplitType,
+  ExpenseWithSplits,
+} from "@/features/groups/types/expense.types";
 
 const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
 const accent = colorSemanticTokens.accent.primary;
 
-export default function AddExpenseScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function EditExpenseScreen() {
+  const { id, expenseId } = useLocalSearchParams<{
+    id: string;
+    expenseId: string;
+  }>();
   const router = useRouter();
   const { user } = useAuth();
-  const { group, members } = useGroupDetail(id);
-  const { createExpense, isCreating } = useGroupExpenses(id, members);
+  const { members } = useGroupDetail(id);
+
+  const [expense, setExpense] = useState<ExpenseWithSplits | null>(null);
+  const [isLoadingExpense, setIsLoadingExpense] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [description, setDescription] = useState("");
   const [amountText, setAmountText] = useState("");
-  const [dateText, setDateText] = useState(getTodayString());
+  const [dateText, setDateText] = useState("");
   const [splitType, setSplitType] = useState<SplitType>("equal");
   const [paidBy, setPaidBy] = useState<string | null>(null);
-  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
+  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(
+    new Set(),
+  );
   const [exactAmounts, setExactAmounts] = useState<Record<string, string>>({});
-  const [percentAmounts, setPercentAmounts] = useState<Record<string, string>>({});
+  const [percentAmounts, setPercentAmounts] = useState<Record<string, string>>(
+    {},
+  );
   const [formError, setFormError] = useState<string | null>(null);
-  const seededGroupIdRef = useRef<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  // Fetch expense on mount
   useEffect(() => {
-    seededGroupIdRef.current = null;
-    setPaidBy(null);
-    setSelectedParticipants(new Set());
-    setExactAmounts({});
-    setPercentAmounts({});
-    setFormError(null);
-  }, [id]);
+    if (!expenseId) return;
 
-  useEffect(() => {
-    if (!id || !group || group.id !== id || members.length === 0) {
-      return;
-    }
-
-    if (seededGroupIdRef.current === id) {
-      return;
-    }
-
-    const memberUserIds = members.map((member) => member.userId);
-    const fallbackPaidBy = members[0]?.userId ?? null;
-    const initialPaidBy =
-      user?.id && memberUserIds.includes(user.id) ? user.id : fallbackPaidBy;
-
-    if (!initialPaidBy) {
-      return;
-    }
-
-    setPaidBy((currentValue) => currentValue ?? initialPaidBy);
-    setSelectedParticipants((currentValue) =>
-      currentValue.size > 0 ? currentValue : new Set(memberUserIds),
-    );
-    seededGroupIdRef.current = id;
-  }, [group, id, members, user?.id]);
+    void (async () => {
+      setIsLoadingExpense(true);
+      setLoadError(null);
+      const result = await getExpenseById(expenseId);
+      if (result.ok) {
+        const e = result.data;
+        setExpense(e);
+        setDescription(e.description);
+        setAmountText((e.amountCents / 100).toFixed(2));
+        setDateText(e.expenseDate);
+        setSplitType(e.splitType);
+        setPaidBy(e.paidBy);
+        setSelectedParticipants(new Set(e.splits.map((s) => s.userId)));
+        if (e.splitType === "exact") {
+          const exact: Record<string, string> = {};
+          for (const s of e.splits) {
+            exact[s.userId] = (s.shareCents / 100).toFixed(2);
+          }
+          setExactAmounts(exact);
+        }
+        if (e.splitType === "percent") {
+          const pcts: Record<string, string> = {};
+          for (const s of e.splits) {
+            pcts[s.userId] = String(s.percentShare ?? 0);
+          }
+          setPercentAmounts(pcts);
+        }
+      } else {
+        setLoadError(result.message);
+      }
+      setIsLoadingExpense(false);
+    })();
+  }, [expenseId]);
 
   const amountCents = Math.round(parseFloat(amountText || "0") * 100);
   const participantIds = Array.from(selectedParticipants);
@@ -91,7 +120,7 @@ export default function AddExpenseScreen() {
     });
   };
 
-  const handleCreate = () => {
+  const handleSave = useCallback(() => {
     const validationError = validateExpenseForm({
       description,
       amountText,
@@ -115,13 +144,18 @@ export default function AddExpenseScreen() {
     } else if (splitType === "exact") {
       participants = computeExactSplits(participantIds, exactAmounts);
     } else {
-      participants = computePercentSplits(participantIds, percentAmounts, amountCents);
+      participants = computePercentSplits(
+        participantIds,
+        percentAmounts,
+        amountCents,
+      );
     }
 
     setFormError(null);
+    setIsSaving(true);
 
     void (async () => {
-      const result = await createExpense({
+      const result = await updateExpense(expenseId, {
         description: description.trim(),
         amountCents,
         expenseDate: dateText,
@@ -130,6 +164,8 @@ export default function AddExpenseScreen() {
         participants,
       });
 
+      setIsSaving(false);
+
       if (!result.ok) {
         Alert.alert("Error", result.message);
         return;
@@ -137,12 +173,176 @@ export default function AddExpenseScreen() {
 
       router.back();
     })();
-  };
+  }, [
+    description,
+    amountText,
+    amountCents,
+    paidBy,
+    participantIds,
+    dateText,
+    splitType,
+    exactAmounts,
+    percentAmounts,
+    expenseId,
+    router,
+  ]);
 
-  // Equal split preview
-  const equalPreview = splitType === "equal" && amountCents > 0 && participantCount >= 2
-    ? `${formatCents(Math.floor(amountCents / participantCount))} each`
-    : null;
+  const handleDelete = useCallback(() => {
+    Alert.alert(
+      "Delete Expense",
+      `Delete "${expense?.description ?? "this expense"}"? This cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            setIsDeleting(true);
+            void (async () => {
+              const result = await deleteExpense(expenseId);
+              setIsDeleting(false);
+              if (!result.ok) {
+                Alert.alert("Error", result.message);
+                return;
+              }
+              router.back();
+            })();
+          },
+        },
+      ],
+    );
+  }, [expense?.description, expenseId, router]);
+
+  // Loading state
+  if (isLoadingExpense) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#FFFFFF",
+        }}
+      >
+        <ActivityIndicator size="large" color={accent} />
+      </View>
+    );
+  }
+
+  // Error state
+  if (loadError) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#FFFFFF",
+          padding: 20,
+        }}
+      >
+        <Text
+          selectable
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+            textAlign: "center",
+          }}
+        >
+          Could not load expense
+        </Text>
+        <Text
+          selectable
+          style={{
+            color: muted,
+            fontSize: 15,
+            lineHeight: 20,
+            fontWeight: "500",
+            textAlign: "center",
+            marginTop: 8,
+          }}
+        >
+          {loadError}
+        </Text>
+      </View>
+    );
+  }
+
+  // Guard: settlement
+  if (expense?.entryType === "settlement") {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#FFFFFF",
+          padding: 20,
+        }}
+      >
+        <Text
+          selectable
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+            textAlign: "center",
+          }}
+        >
+          Settlements cannot be edited
+        </Text>
+        <Text
+          selectable
+          style={{
+            color: muted,
+            fontSize: 15,
+            lineHeight: 20,
+            fontWeight: "500",
+            textAlign: "center",
+            marginTop: 8,
+          }}
+        >
+          Delete and re-create the settlement if needed.
+        </Text>
+      </View>
+    );
+  }
+
+  // Guard: not creator
+  if (expense && user && expense.createdBy !== user.id) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#FFFFFF",
+          padding: 20,
+        }}
+      >
+        <Text
+          selectable
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+            textAlign: "center",
+          }}
+        >
+          Only the creator can edit this expense
+        </Text>
+      </View>
+    );
+  }
+
+  const equalPreview =
+    splitType === "equal" && amountCents > 0 && participantCount >= 2
+      ? `${formatCents(Math.floor(amountCents / participantCount))} each`
+      : null;
 
   return (
     <ScrollView
@@ -179,13 +379,23 @@ export default function AddExpenseScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "700",
+            }}
           >
             Description
           </Text>
           <Text
             selectable
-            style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+            style={{
+              color: muted,
+              fontSize: 13,
+              lineHeight: 16,
+              fontWeight: "600",
+            }}
           >
             {description.trim().length}/{MAX_DESCRIPTION_LENGTH}
           </Text>
@@ -198,7 +408,6 @@ export default function AddExpenseScreen() {
           placeholder="e.g. Dinner at Nobu"
           placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
-          autoFocus
           style={{
             borderRadius: 16,
             borderCurve: "continuous",
@@ -230,7 +439,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+          }}
         >
           Amount
         </Text>
@@ -249,7 +463,12 @@ export default function AddExpenseScreen() {
         >
           <Text
             selectable
-            style={{ color: muted, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
+            style={{
+              color: muted,
+              fontSize: 20,
+              lineHeight: 24,
+              fontWeight: "700",
+            }}
           >
             $
           </Text>
@@ -288,7 +507,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+          }}
         >
           Date
         </Text>
@@ -330,7 +554,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+          }}
         >
           Who paid?
         </Text>
@@ -349,8 +578,12 @@ export default function AddExpenseScreen() {
                   borderRadius: 16,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                 }}
@@ -364,7 +597,8 @@ export default function AddExpenseScreen() {
                     fontWeight: "600",
                   }}
                 >
-                  {label}{isSelf ? " (you)" : ""}
+                  {label}
+                  {isSelf ? " (you)" : ""}
                 </Text>
               </Pressable>
             );
@@ -387,7 +621,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+          }}
         >
           Split type
         </Text>
@@ -404,8 +643,12 @@ export default function AddExpenseScreen() {
                   borderRadius: 16,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -454,7 +697,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "700",
+          }}
         >
           Participants ({participantCount})
         </Text>
@@ -475,8 +723,12 @@ export default function AddExpenseScreen() {
                     borderRadius: 16,
                     borderCurve: "continuous",
                     borderWidth: 1,
-                    borderColor: isChecked ? colorSemanticTokens.accent.primary : stroke,
-                    backgroundColor: isChecked ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                    borderColor: isChecked
+                      ? colorSemanticTokens.accent.primary
+                      : stroke,
+                    backgroundColor: isChecked
+                      ? colorSemanticTokens.accent.soft
+                      : colorSemanticTokens.surface.cardStrong,
                     paddingHorizontal: 12,
                     paddingVertical: 10,
                     gap: 10,
@@ -489,7 +741,9 @@ export default function AddExpenseScreen() {
                       borderRadius: 6,
                       borderCurve: "continuous",
                       borderWidth: 2,
-                      borderColor: isChecked ? accent : colorSemanticTokens.border.muted,
+                      borderColor: isChecked
+                        ? accent
+                        : colorSemanticTokens.border.muted,
                       backgroundColor: isChecked ? accent : "transparent",
                       alignItems: "center",
                       justifyContent: "center",
@@ -519,7 +773,8 @@ export default function AddExpenseScreen() {
                       fontWeight: "600",
                     }}
                   >
-                    {label}{isSelf ? " (you)" : ""}
+                    {label}
+                    {isSelf ? " (you)" : ""}
                   </Text>
 
                   {splitType === "equal" && isChecked && equalPreview ? (
@@ -555,14 +810,22 @@ export default function AddExpenseScreen() {
                   >
                     <Text
                       selectable
-                      style={{ color: muted, fontSize: 16, lineHeight: 20, fontWeight: "600" }}
+                      style={{
+                        color: muted,
+                        fontSize: 16,
+                        lineHeight: 20,
+                        fontWeight: "600",
+                      }}
                     >
                       $
                     </Text>
                     <TextInput
                       value={exactAmounts[member.userId] ?? ""}
                       onChangeText={(text) =>
-                        setExactAmounts((prev) => ({ ...prev, [member.userId]: text }))
+                        setExactAmounts((prev) => ({
+                          ...prev,
+                          [member.userId]: text,
+                        }))
                       }
                       keyboardType="decimal-pad"
                       placeholder="0.00"
@@ -599,7 +862,10 @@ export default function AddExpenseScreen() {
                     <TextInput
                       value={percentAmounts[member.userId] ?? ""}
                       onChangeText={(text) =>
-                        setPercentAmounts((prev) => ({ ...prev, [member.userId]: text }))
+                        setPercentAmounts((prev) => ({
+                          ...prev,
+                          [member.userId]: text,
+                        }))
                       }
                       keyboardType="decimal-pad"
                       placeholder="0"
@@ -617,7 +883,12 @@ export default function AddExpenseScreen() {
                     />
                     <Text
                       selectable
-                      style={{ color: muted, fontSize: 16, lineHeight: 20, fontWeight: "600" }}
+                      style={{
+                        color: muted,
+                        fontSize: 16,
+                        lineHeight: 20,
+                        fontWeight: "600",
+                      }}
                     >
                       %
                     </Text>
@@ -659,26 +930,33 @@ export default function AddExpenseScreen() {
         >
           <Text
             selectable
-            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{
+              color: colorSemanticTokens.state.danger,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
           >
             {formError}
           </Text>
         </View>
       ) : null}
 
-      {/* Submit */}
+      {/* Save button */}
       <Pressable
         accessibilityRole="button"
-        disabled={isCreating}
-        onPress={handleCreate}
+        disabled={isSaving}
+        onPress={handleSave}
         style={{
           borderRadius: 16,
           borderCurve: "continuous",
-          backgroundColor: isCreating ? colorSemanticTokens.accent.softStrong : accent,
+          backgroundColor: isSaving
+            ? colorSemanticTokens.accent.softStrong
+            : accent,
           paddingVertical: 14,
           alignItems: "center",
           justifyContent: "center",
-          opacity: isCreating ? 0.8 : 1,
+          opacity: isSaving ? 0.8 : 1,
         }}
       >
         <Text
@@ -690,7 +968,37 @@ export default function AddExpenseScreen() {
             fontWeight: "700",
           }}
         >
-          {isCreating ? "Adding..." : "Add Expense"}
+          {isSaving ? "Saving..." : "Save Changes"}
+        </Text>
+      </Pressable>
+
+      {/* Delete button */}
+      <Pressable
+        accessibilityRole="button"
+        disabled={isDeleting}
+        onPress={handleDelete}
+        style={{
+          borderRadius: 16,
+          borderCurve: "continuous",
+          borderWidth: 1,
+          borderColor: colorSemanticTokens.state.danger,
+          backgroundColor: colorSemanticTokens.state.dangerSoft,
+          paddingVertical: 14,
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: isDeleting ? 0.6 : 1,
+        }}
+      >
+        <Text
+          selectable
+          style={{
+            color: colorSemanticTokens.state.danger,
+            fontSize: 16,
+            lineHeight: 20,
+            fontWeight: "700",
+          }}
+        >
+          {isDeleting ? "Deleting..." : "Delete Expense"}
         </Text>
       </Pressable>
     </ScrollView>

@@ -208,6 +208,96 @@ export async function createSettlement(
   );
 }
 
+export async function getExpenseById(
+  expenseId: string,
+): Promise<ExpensesResult<ExpenseWithSplits>> {
+  const { data, error } = await supabase
+    .from("expenses")
+    .select(expenseWithSplitsColumns)
+    .eq("id", expenseId)
+    .single();
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to load expense.", error),
+    };
+  }
+
+  return {
+    ok: true,
+    data: mapExpenseWithSplitsRow(data as ExpenseWithSplitsRow),
+  };
+}
+
+export async function updateExpense(
+  expenseId: string,
+  input: CreateExpenseInput,
+): Promise<ExpensesResult<Expense>> {
+  // Step 1: Update the expense row
+  const { data: expenseData, error: expenseError } = await supabase
+    .from("expenses")
+    .update({
+      description: input.description.trim(),
+      amount_cents: input.amountCents,
+      currency: input.currency ?? "USD",
+      expense_date: input.expenseDate,
+      split_type: input.splitType,
+      paid_by: input.paidBy,
+    })
+    .eq("id", expenseId)
+    .select(
+      "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at",
+    )
+    .single();
+
+  if (expenseError) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to update expense.", expenseError),
+    };
+  }
+
+  const expense = mapExpenseRow(expenseData as ExpenseRow);
+
+  // Step 2: Delete old splits
+  const { error: deleteError } = await supabase
+    .from("expense_splits")
+    .delete()
+    .eq("expense_id", expenseId);
+
+  if (deleteError) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to update expense splits.", deleteError),
+    };
+  }
+
+  // Step 3: Insert new splits
+  const splitRows = input.participants.map((p) => ({
+    expense_id: expenseId,
+    user_id: p.userId,
+    share_cents: p.shareCents,
+    percent_share: p.percentShare ?? null,
+  }));
+
+  const { error: splitsError } = await supabase
+    .from("expense_splits")
+    .insert(splitRows);
+
+  if (splitsError) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to save expense splits.", splitsError),
+    };
+  }
+
+  return {
+    ok: true,
+    data: expense,
+  };
+}
+
 export async function deleteExpense(
   expenseId: string,
 ): Promise<ExpensesResult<void>> {

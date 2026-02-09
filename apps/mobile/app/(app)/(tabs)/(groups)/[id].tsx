@@ -635,6 +635,8 @@ export default function GroupDetailScreen() {
               expenses.map((expense) => {
                 const canDelete =
                   expense.createdBy === user?.id || isAdmin;
+                const canEdit =
+                  expense.createdBy === user?.id && expense.entryType !== "settlement";
                 const splitLabel =
                   expense.splitType === "equal"
                     ? "equal"
@@ -726,36 +728,76 @@ export default function GroupDetailScreen() {
                       Paid by {expense.paidByName ?? "unknown"} · {expense.expenseDate} · {isSettlement ? "settlement" : splitLabel}
                     </Text>
 
-                    {canDelete ? (
-                      <Pressable
-                        onPress={() =>
-                          handleDeleteExpense(expense.id, expense.description)
-                        }
-                        hitSlop={8}
+                    {(canEdit || canDelete) ? (
+                      <View
                         style={{
-                          alignSelf: "flex-start",
-                          borderRadius: 999,
-                          borderCurve: "continuous",
-                          borderWidth: 1,
-                          borderColor: colorSemanticTokens.state.danger,
-                          backgroundColor: colorSemanticTokens.state.dangerSoft,
-                          paddingHorizontal: 10,
-                          paddingVertical: 4,
+                          flexDirection: "row",
+                          gap: 8,
                           marginTop: 2,
                         }}
                       >
-                        <Text
-                          selectable
-                          style={{
-                            color: colorSemanticTokens.state.danger,
-                            fontSize: 12,
-                            lineHeight: 16,
-                            fontWeight: "700",
-                          }}
-                        >
-                          Delete
-                        </Text>
-                      </Pressable>
+                        {canEdit ? (
+                          <Pressable
+                            onPress={() => {
+                              router.push({
+                                pathname: "/(app)/(tabs)/(groups)/edit-expense",
+                                params: { id: group.id, expenseId: expense.id },
+                              });
+                            }}
+                            hitSlop={8}
+                            style={{
+                              borderRadius: 999,
+                              borderCurve: "continuous",
+                              borderWidth: 1,
+                              borderColor: colorSemanticTokens.state.info,
+                              backgroundColor: colorSemanticTokens.state.infoSoft,
+                              paddingHorizontal: 10,
+                              paddingVertical: 4,
+                            }}
+                          >
+                            <Text
+                              selectable
+                              style={{
+                                color: colorSemanticTokens.state.info,
+                                fontSize: 12,
+                                lineHeight: 16,
+                                fontWeight: "700",
+                              }}
+                            >
+                              Edit
+                            </Text>
+                          </Pressable>
+                        ) : null}
+                        {canDelete ? (
+                          <Pressable
+                            onPress={() =>
+                              handleDeleteExpense(expense.id, expense.description)
+                            }
+                            hitSlop={8}
+                            style={{
+                              borderRadius: 999,
+                              borderCurve: "continuous",
+                              borderWidth: 1,
+                              borderColor: colorSemanticTokens.state.danger,
+                              backgroundColor: colorSemanticTokens.state.dangerSoft,
+                              paddingHorizontal: 10,
+                              paddingVertical: 4,
+                            }}
+                          >
+                            <Text
+                              selectable
+                              style={{
+                                color: colorSemanticTokens.state.danger,
+                                fontSize: 12,
+                                lineHeight: 16,
+                                fontWeight: "700",
+                              }}
+                            >
+                              Delete
+                            </Text>
+                          </Pressable>
+                        ) : null}
+                      </View>
                     ) : null}
                   </View>
                 );

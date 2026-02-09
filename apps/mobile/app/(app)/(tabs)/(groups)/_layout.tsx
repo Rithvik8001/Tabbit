@@ -47,6 +47,14 @@ export default function GroupsTabLayout() {
         }}
       />
       <Stack.Screen
+        name="edit-expense"
+        options={{
+          title: "Edit Expense",
+          headerLargeTitle: false,
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
         name="settle-up"
         options={{
           title: "Settle Up",

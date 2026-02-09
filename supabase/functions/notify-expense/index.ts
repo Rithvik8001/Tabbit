@@ -30,12 +30,19 @@ serve(async (req) => {
     // Look up the parent expense
     const { data: expense, error: expenseError } = await supabaseAdmin
       .from("expenses")
-      .select("description, paid_by, group_id, entry_type")
+      .select("description, paid_by, group_id, entry_type, created_at, updated_at")
       .eq("id", expenseId)
       .maybeSingle();
 
     if (expenseError || !expense) {
       return new Response("Skipped: expense not found", { status: 200 });
+    }
+
+    // Skip notifications for edited expenses (splits were re-inserted after update)
+    const createdAt = new Date(expense.created_at).getTime();
+    const updatedAt = new Date(expense.updated_at).getTime();
+    if (updatedAt - createdAt > 5000) {
+      return new Response("Skipped: expense edit, not new", { status: 200 });
     }
 
     const payerId: string = expense.paid_by;
