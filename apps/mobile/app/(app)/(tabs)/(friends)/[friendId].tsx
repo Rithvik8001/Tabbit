@@ -1,6 +1,12 @@
 import { useMemo } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "@/design/primitives/sora-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";
@@ -51,7 +57,8 @@ export default function FriendDetailScreen() {
   const { friendId } = useLocalSearchParams<{ friendId: string }>();
   const router = useRouter();
 
-  const { friend, activity, isLoading, error, refresh } = useFriendDetail(friendId);
+  const { friend, activity, isLoading, error, refresh } =
+    useFriendDetail(friendId);
   const { ensureDirectGroup, isEnsuring } = useDirectFriendGroup(friendId);
 
   const friendName = friend?.displayName ?? friend?.email ?? "Friend";
@@ -117,9 +124,14 @@ export default function FriendDetailScreen() {
           minHeight: 40,
         }}
       >
-        <Pressable onPress={() => router.back()}>          <Text
+        <Pressable onPress={() => router.back()}>
+          {" "}
+          <Text
             selectable
-            style={[typographyScale.headingSm, { color: colorSemanticTokens.text.secondary }]}
+            style={[
+              typographyScale.headingSm,
+              { color: colorSemanticTokens.text.secondary },
+            ]}
           >
             Back
           </Text>
@@ -127,7 +139,12 @@ export default function FriendDetailScreen() {
       </View>
 
       {isLoading ? (
-        <View style={{ paddingTop: spacingTokens.xl, alignItems: "center" }}>          <ActivityIndicator size="large" color={colorSemanticTokens.accent.primary} />
+        <View style={{ paddingTop: spacingTokens.xl, alignItems: "center" }}>
+          {" "}
+          <ActivityIndicator
+            size="large"
+            color={colorSemanticTokens.accent.primary}
+          />
         </View>
       ) : null}
 
@@ -143,9 +160,27 @@ export default function FriendDetailScreen() {
             gap: spacingTokens.sm,
           }}
         >
-          <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}>            {error}
+          <Text
+            selectable
+            style={[
+              typographyScale.headingSm,
+              { color: colorSemanticTokens.state.danger },
+            ]}
+          >
+            {" "}
+            {error}
           </Text>
-          <Pressable onPress={() => void refresh()}>            <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}>              Retry
+          <Pressable onPress={() => void refresh()}>
+            {" "}
+            <Text
+              selectable
+              style={[
+                typographyScale.headingSm,
+                { color: colorSemanticTokens.accent.primary },
+              ]}
+            >
+              {" "}
+              Retry
             </Text>
           </Pressable>
         </View>
@@ -166,7 +201,10 @@ export default function FriendDetailScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.displayMd, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.displayMd,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               {friendName}
             </Text>
@@ -192,7 +230,13 @@ export default function FriendDetailScreen() {
               {isSettled ? "" : ` ${formatCents(Math.abs(friend.netCents))}`}
             </Text>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacingTokens.sm }}>              {!isSettled ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: spacingTokens.sm }}
+            >
+              {" "}
+              {!isSettled ? (
                 <Pressable
                   onPress={() => {
                     router.push({
@@ -208,11 +252,18 @@ export default function FriendDetailScreen() {
                     paddingVertical: 8,
                   }}
                 >
-                  <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.inverse }]}>                    Settle up
+                  <Text
+                    selectable
+                    style={[
+                      typographyScale.headingSm,
+                      { color: colorSemanticTokens.text.inverse },
+                    ]}
+                  >
+                    {" "}
+                    Settle up
                   </Text>
                 </Pressable>
               ) : null}
-
               <Pressable
                 onPress={handleAddExpense}
                 disabled={isEnsuring}
@@ -225,20 +276,32 @@ export default function FriendDetailScreen() {
                   opacity: isEnsuring ? 0.6 : 1,
                 }}
               >
-                <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>                  {isEnsuring ? "Starting..." : "Add expense"}
+                <Text
+                  selectable
+                  style={[
+                    typographyScale.headingSm,
+                    { color: colorSemanticTokens.text.primary },
+                  ]}
+                >
+                  {" "}
+                  {isEnsuring ? "Starting..." : "Add expense"}
                 </Text>
               </Pressable>
             </ScrollView>
           </View>
 
           {groupedActivity.map((bucket) => (
-            <View key={bucket.monthLabel} style={{ gap: spacingTokens.sm }}>              <Text
+            <View key={bucket.monthLabel} style={{ gap: spacingTokens.sm }}>
+              {" "}
+              <Text
                 selectable
-                style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                style={[
+                  typographyScale.headingMd,
+                  { color: colorSemanticTokens.text.primary },
+                ]}
               >
                 {bucket.monthLabel}
               </Text>
-
               {bucket.items.map((item) => (
                 <View
                   key={item.expenseId}
@@ -260,15 +323,23 @@ export default function FriendDetailScreen() {
                       gap: spacingTokens.sm,
                     }}
                   >
-                    <View style={{ flex: 1, gap: 2 }}>                      <Text
+                    <View style={{ flex: 1, gap: 2 }}>
+                      {" "}
+                      <Text
                         selectable
-                        style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                        style={[
+                          typographyScale.headingMd,
+                          { color: colorSemanticTokens.text.primary },
+                        ]}
                       >
                         {item.description}
                       </Text>
                       <Text
                         selectable
-                        style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                        style={[
+                          typographyScale.bodySm,
+                          { color: colorSemanticTokens.text.secondary },
+                        ]}
                       >
                         {item.groupEmoji ? `${item.groupEmoji} ` : ""}
                         {item.groupName} · {shortDate(item.expenseDate)}

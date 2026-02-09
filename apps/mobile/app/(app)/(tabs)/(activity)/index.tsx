@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
-import { ActivityIndicator, TextInput, View } from "@/design/primitives/sora-native";
+import {
+  ActivityIndicator,
+  TextInput,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { BalanceListRow } from "@/design/primitives/balance-list-row";
 import { Button } from "@/design/primitives/button";
@@ -75,7 +79,9 @@ export default function ActivityTabScreen() {
         ) : null}
 
         {isLoading ? (
-          <View style={{ alignItems: "center", paddingVertical: spacingTokens.md }}>
+          <View
+            style={{ alignItems: "center", paddingVertical: spacingTokens.md }}
+          >
             <ActivityIndicator
               size="small"
               color={colorSemanticTokens.accent.primary}

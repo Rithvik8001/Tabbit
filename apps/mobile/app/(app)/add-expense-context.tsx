@@ -41,6 +41,8 @@ function SelectionDot({ isSelected }: { isSelected: boolean }) {
   );
 }
 
+type ReturnTab = "friends" | "groups";
+
 export default function AddExpenseContextScreen() {
   const router = useRouter();
   const { groups, isLoading: isGroupsLoading } = useGroups();
@@ -75,6 +77,24 @@ export default function AddExpenseContextScreen() {
     });
   }, [friends, normalizedQuery]);
 
+  const openExpenseForm = (groupId: string, returnTab: ReturnTab) => {
+    const tabRoute =
+      returnTab === "groups"
+        ? "/(app)/(tabs)/(groups)"
+        : "/(app)/(tabs)/(friends)";
+
+    // Ensure the underlying tab route is the back target before opening add-expense.
+    router.dismissTo(tabRoute);
+
+    // Queue the modal push for the next frame after tab transition settles.
+    requestAnimationFrame(() => {
+      router.push({
+        pathname: "/(app)/(tabs)/(groups)/add-expense",
+        params: { id: groupId, returnTab },
+      });
+    });
+  };
+
   const handleSave = () => {
     if (isSubmitting) {
       return;
@@ -91,10 +111,7 @@ export default function AddExpenseContextScreen() {
 
     void (async () => {
       if (selectedGroupId) {
-        router.replace({
-          pathname: "/(app)/(tabs)/(groups)/add-expense",
-          params: { id: selectedGroupId },
-        });
+        openExpenseForm(selectedGroupId, "groups");
         return;
       }
 
@@ -111,10 +128,7 @@ export default function AddExpenseContextScreen() {
         return;
       }
 
-      router.replace({
-        pathname: "/(app)/(tabs)/(groups)/add-expense",
-        params: { id: directGroupResult.data },
-      });
+      openExpenseForm(directGroupResult.data, "friends");
     })();
   };
 

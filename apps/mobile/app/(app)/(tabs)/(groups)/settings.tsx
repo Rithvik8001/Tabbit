@@ -1,5 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Alert, Pressable, ScrollView, Text, View } from "@/design/primitives/sora-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import { colorSemanticTokens } from "@/design/tokens/colors";
@@ -90,9 +96,14 @@ export default function GroupSettingsScreen() {
           justifyContent: "space-between",
         }}
       >
-        <Pressable onPress={() => router.back()}>          <Text
+        <Pressable onPress={() => router.back()}>
+          {" "}
+          <Text
             selectable
-            style={[typographyScale.headingSm, { color: colorSemanticTokens.text.secondary }]}
+            style={[
+              typographyScale.headingSm,
+              { color: colorSemanticTokens.text.secondary },
+            ]}
           >
             Back
           </Text>
@@ -100,7 +111,10 @@ export default function GroupSettingsScreen() {
 
         <Text
           selectable
-          style={[typographyScale.headingLg, { color: colorSemanticTokens.text.primary }]}
+          style={[
+            typographyScale.headingLg,
+            { color: colorSemanticTokens.text.primary },
+          ]}
         >
           Group settings
         </Text>
@@ -111,7 +125,10 @@ export default function GroupSettingsScreen() {
       {isLoading ? (
         <Text
           selectable
-          style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+          style={[
+            typographyScale.bodyMd,
+            { color: colorSemanticTokens.text.secondary },
+          ]}
         >
           Loading settings...
         </Text>
@@ -129,9 +146,27 @@ export default function GroupSettingsScreen() {
             gap: spacingTokens.sm,
           }}
         >
-          <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}>            {error}
+          <Text
+            selectable
+            style={[
+              typographyScale.headingSm,
+              { color: colorSemanticTokens.state.danger },
+            ]}
+          >
+            {" "}
+            {error}
           </Text>
-          <Pressable onPress={() => void refresh()}>            <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}>              Retry
+          <Pressable onPress={() => void refresh()}>
+            {" "}
+            <Text
+              selectable
+              style={[
+                typographyScale.headingSm,
+                { color: colorSemanticTokens.accent.primary },
+              ]}
+            >
+              {" "}
+              Retry
             </Text>
           </Pressable>
         </View>
@@ -150,17 +185,35 @@ export default function GroupSettingsScreen() {
               gap: spacingTokens.sm,
             }}
           >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm }}>              <Text selectable style={{ fontSize: 30, lineHeight: 36 }}>                {group.emoji}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacingTokens.sm,
+              }}
+            >
+              {" "}
+              <Text selectable style={{ fontSize: 30, lineHeight: 36 }}>
+                {" "}
+                {group.emoji}
               </Text>
-              <View style={{ flex: 1, gap: 2 }}>                <Text
+              <View style={{ flex: 1, gap: 2 }}>
+                {" "}
+                <Text
                   selectable
-                  style={[typographyScale.headingLg, { color: colorSemanticTokens.text.primary }]}
+                  style={[
+                    typographyScale.headingLg,
+                    { color: colorSemanticTokens.text.primary },
+                  ]}
                 >
                   {group.name}
                 </Text>
                 <Text
                   selectable
-                  style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                  style={[
+                    typographyScale.bodySm,
+                    { color: colorSemanticTokens.text.secondary },
+                  ]}
                 >
                   {members.length} {members.length === 1 ? "member" : "members"}
                 </Text>
@@ -176,7 +229,10 @@ export default function GroupSettingsScreen() {
                 >
                   <Text
                     selectable
-                    style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
+                    style={[
+                      typographyScale.headingSm,
+                      { color: colorSemanticTokens.accent.primary },
+                    ]}
                   >
                     Edit
                   </Text>
@@ -185,13 +241,17 @@ export default function GroupSettingsScreen() {
             </View>
           </View>
 
-          <View style={{ gap: spacingTokens.sm }}>            <Text
+          <View style={{ gap: spacingTokens.sm }}>
+            {" "}
+            <Text
               selectable
-              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.headingMd,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               Group members
             </Text>
-
             {isAdmin ? (
               <Button
                 label="Add people to group"
@@ -204,7 +264,6 @@ export default function GroupSettingsScreen() {
                 }}
               />
             ) : null}
-
             {members.map((member) => {
               const label = member.displayName || member.email || "Unknown";
               const isSelf = member.userId === user?.id;
@@ -225,9 +284,14 @@ export default function GroupSettingsScreen() {
                     gap: spacingTokens.sm,
                   }}
                 >
-                  <View style={{ flex: 1, gap: 2 }}>                    <Text
+                  <View style={{ flex: 1, gap: 2 }}>
+                    {" "}
+                    <Text
                       selectable
-                      style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                      style={[
+                        typographyScale.headingMd,
+                        { color: colorSemanticTokens.text.primary },
+                      ]}
                     >
                       {label}
                       {isSelf ? " (you)" : ""}
@@ -235,7 +299,10 @@ export default function GroupSettingsScreen() {
                     {member.email ? (
                       <Text
                         selectable
-                        style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                        style={[
+                          typographyScale.bodySm,
+                          { color: colorSemanticTokens.text.secondary },
+                        ]}
                       >
                         {member.email}
                       </Text>
@@ -248,7 +315,10 @@ export default function GroupSettingsScreen() {
                     >
                       <Text
                         selectable
-                        style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}
+                        style={[
+                          typographyScale.headingSm,
+                          { color: colorSemanticTokens.state.danger },
+                        ]}
                       >
                         Remove
                       </Text>

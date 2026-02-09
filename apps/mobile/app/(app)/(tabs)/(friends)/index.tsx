@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link, useRouter } from "expo-router";
-import { ActivityIndicator, Pressable, Text, TextInput, View } from "@/design/primitives/sora-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { BalanceListRow } from "@/design/primitives/balance-list-row";
 import { Button } from "@/design/primitives/button";
@@ -60,8 +66,12 @@ function mapFriendRow(friend: {
 export default function FriendsTabScreen() {
   const router = useRouter();
   const { snapshot } = useHomeDashboard({ activityLimit: 1 });
-  const { friends, isLoading: isFriendsLoading, error: friendsError, refresh: refreshFriends } =
-    useFriends();
+  const {
+    friends,
+    isLoading: isFriendsLoading,
+    error: friendsError,
+    refresh: refreshFriends,
+  } = useFriends();
   const {
     incomingRequests,
     outgoingRequests,
@@ -164,7 +174,10 @@ export default function FriendsTabScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.headingMd,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               Requests
             </Text>
@@ -182,7 +195,10 @@ export default function FriendsTabScreen() {
               >
                 <Text
                   selectable
-                  style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}
+                  style={[
+                    typographyScale.headingSm,
+                    { color: colorSemanticTokens.text.primary },
+                  ]}
                 >
                   {request.displayName ?? request.email ?? "Unknown"}
                 </Text>
@@ -234,13 +250,19 @@ export default function FriendsTabScreen() {
               >
                 <Text
                   selectable
-                  style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}
+                  style={[
+                    typographyScale.headingSm,
+                    { color: colorSemanticTokens.text.primary },
+                  ]}
                 >
                   {request.displayName ?? request.email ?? "Unknown"}
                 </Text>
                 <Text
                   selectable
-                  style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                  style={[
+                    typographyScale.bodySm,
+                    { color: colorSemanticTokens.text.secondary },
+                  ]}
                 >
                   Request sent
                 </Text>
@@ -274,14 +296,20 @@ export default function FriendsTabScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}
+              style={[
+                typographyScale.headingSm,
+                { color: colorSemanticTokens.state.danger },
+              ]}
             >
               Could not load friends
             </Text>
             {friendsError ? (
               <Text
                 selectable
-                style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+                style={[
+                  typographyScale.bodySm,
+                  { color: colorSemanticTokens.state.danger },
+                ]}
               >
                 {friendsError}
               </Text>
@@ -289,17 +317,26 @@ export default function FriendsTabScreen() {
             {requestsError ? (
               <Text
                 selectable
-                style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+                style={[
+                  typographyScale.bodySm,
+                  { color: colorSemanticTokens.state.danger },
+                ]}
               >
                 {requestsError}
               </Text>
             ) : null}
-            <Button label="Retry" variant="soft" onPress={() => void refreshAll()} />
+            <Button
+              label="Retry"
+              variant="soft"
+              onPress={() => void refreshAll()}
+            />
           </View>
         ) : null}
 
         {isLoading ? (
-          <View style={{ alignItems: "center", paddingVertical: spacingTokens.md }}>
+          <View
+            style={{ alignItems: "center", paddingVertical: spacingTokens.md }}
+          >
             <ActivityIndicator
               size="small"
               color={colorSemanticTokens.accent.primary}
@@ -321,13 +358,19 @@ export default function FriendsTabScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.headingMd,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               No friends yet
             </Text>
             <Text
               selectable
-              style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+              style={[
+                typographyScale.bodyMd,
+                { color: colorSemanticTokens.text.secondary },
+              ]}
             >
               Add your first friend to start splitting.
             </Text>

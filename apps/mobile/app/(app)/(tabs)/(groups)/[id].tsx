@@ -1,6 +1,12 @@
 import { useMemo } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Alert, Pressable, ScrollView, Text, View } from "@/design/primitives/sora-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";
@@ -41,10 +47,8 @@ export default function GroupDetailScreen() {
   const { user } = useAuth();
 
   const { group, members, isLoading, error, refresh } = useGroupDetail(id);
-  const { expenses, userBalance, simplifiedDebts, deleteExpense } = useGroupExpenses(
-    id,
-    members,
-  );
+  const { expenses, userBalance, simplifiedDebts, deleteExpense } =
+    useGroupExpenses(id, members);
 
   const groupedExpenses = useMemo(() => {
     const map = new Map<string, typeof expenses>();
@@ -108,9 +112,14 @@ export default function GroupDetailScreen() {
           justifyContent: "space-between",
         }}
       >
-        <Pressable onPress={() => router.back()}>          <Text
+        <Pressable onPress={() => router.back()}>
+          {" "}
+          <Text
             selectable
-            style={[typographyScale.headingSm, { color: colorSemanticTokens.text.secondary }]}
+            style={[
+              typographyScale.headingSm,
+              { color: colorSemanticTokens.text.secondary },
+            ]}
           >
             Back
           </Text>
@@ -127,7 +136,10 @@ export default function GroupDetailScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
+              style={[
+                typographyScale.headingSm,
+                { color: colorSemanticTokens.accent.primary },
+              ]}
             >
               Settings
             </Text>
@@ -138,7 +150,10 @@ export default function GroupDetailScreen() {
       {isLoading ? (
         <Text
           selectable
-          style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+          style={[
+            typographyScale.bodyMd,
+            { color: colorSemanticTokens.text.secondary },
+          ]}
         >
           Loading group...
         </Text>
@@ -156,9 +171,27 @@ export default function GroupDetailScreen() {
             gap: spacingTokens.sm,
           }}
         >
-          <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}>            {error}
+          <Text
+            selectable
+            style={[
+              typographyScale.headingSm,
+              { color: colorSemanticTokens.state.danger },
+            ]}
+          >
+            {" "}
+            {error}
           </Text>
-          <Pressable onPress={() => void refresh()}>            <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}>              Retry
+          <Pressable onPress={() => void refresh()}>
+            {" "}
+            <Text
+              selectable
+              style={[
+                typographyScale.headingSm,
+                { color: colorSemanticTokens.accent.primary },
+              ]}
+            >
+              {" "}
+              Retry
             </Text>
           </Pressable>
         </View>
@@ -177,22 +210,38 @@ export default function GroupDetailScreen() {
               gap: spacingTokens.sm,
             }}
           >
-            <Text selectable style={{ fontSize: 48, lineHeight: 54 }}>              {group.emoji}
+            <Text selectable style={{ fontSize: 48, lineHeight: 54 }}>
+              {" "}
+              {group.emoji}
             </Text>
             <Text
               selectable
-              style={[typographyScale.displayMd, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.displayMd,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               {group.name}
             </Text>
             <Text
               selectable
-              style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+              style={[
+                typographyScale.bodyMd,
+                { color: colorSemanticTokens.text.secondary },
+              ]}
             >
               {members.length} {members.length === 1 ? "member" : "members"}
             </Text>
 
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacingTokens.sm }}>              <Pressable
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: spacingTokens.sm,
+              }}
+            >
+              {" "}
+              <Pressable
                 onPress={() => {
                   router.push({
                     pathname: "/(app)/(tabs)/(groups)/add-expense",
@@ -207,10 +256,17 @@ export default function GroupDetailScreen() {
                   paddingVertical: 8,
                 }}
               >
-                <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.inverse }]}>                  Add expense
+                <Text
+                  selectable
+                  style={[
+                    typographyScale.headingSm,
+                    { color: colorSemanticTokens.text.inverse },
+                  ]}
+                >
+                  {" "}
+                  Add expense
                 </Text>
               </Pressable>
-
               <Pressable
                 onPress={() => {
                   router.push({
@@ -226,7 +282,15 @@ export default function GroupDetailScreen() {
                   paddingVertical: 8,
                 }}
               >
-                <Text selectable style={[typographyScale.headingSm, { color: colorSemanticTokens.text.primary }]}>                  Group settings
+                <Text
+                  selectable
+                  style={[
+                    typographyScale.headingSm,
+                    { color: colorSemanticTokens.text.primary },
+                  ]}
+                >
+                  {" "}
+                  Group settings
                 </Text>
               </Pressable>
             </View>
@@ -245,7 +309,10 @@ export default function GroupDetailScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.headingMd,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               {userBalance.direction === "you_are_owed"
                 ? "You are owed"
@@ -292,11 +359,15 @@ export default function GroupDetailScreen() {
                 >
                   <Text
                     selectable
-                    style={[typographyScale.bodySm, { color: colorSemanticTokens.text.primary, flex: 1 }]}
+                    style={[
+                      typographyScale.bodySm,
+                      { color: colorSemanticTokens.text.primary, flex: 1 },
+                    ]}
                   >
                     {isPayer
                       ? `You owe ${debt.toName ?? "member"}`
-                      : `${debt.fromName ?? "member"} owes you`} {formatCents(debt.amountCents)}
+                      : `${debt.fromName ?? "member"} owes you`}{" "}
+                    {formatCents(debt.amountCents)}
                   </Text>
                   <Pressable
                     onPress={() => {
@@ -313,7 +384,10 @@ export default function GroupDetailScreen() {
                   >
                     <Text
                       selectable
-                      style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
+                      style={[
+                        typographyScale.headingSm,
+                        { color: colorSemanticTokens.accent.primary },
+                      ]}
                     >
                       Settle
                     </Text>
@@ -324,16 +398,24 @@ export default function GroupDetailScreen() {
           </View>
 
           {groupedExpenses.map((bucket) => (
-            <View key={bucket.label} style={{ gap: spacingTokens.sm }}>              <Text
+            <View key={bucket.label} style={{ gap: spacingTokens.sm }}>
+              {" "}
+              <Text
                 selectable
-                style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                style={[
+                  typographyScale.headingMd,
+                  { color: colorSemanticTokens.text.primary },
+                ]}
               >
                 {bucket.label}
               </Text>
-
               {bucket.items.map((expense) => {
-                const canDelete = expense.createdBy === user?.id || group.createdBy === user?.id;
-                const canEdit = expense.createdBy === user?.id && expense.entryType !== "settlement";
+                const canDelete =
+                  expense.createdBy === user?.id ||
+                  group.createdBy === user?.id;
+                const canEdit =
+                  expense.createdBy === user?.id &&
+                  expense.entryType !== "settlement";
 
                 return (
                   <View
@@ -356,29 +438,45 @@ export default function GroupDetailScreen() {
                         gap: spacingTokens.sm,
                       }}
                     >
-                      <View style={{ flex: 1, gap: 2 }}>                        <Text
+                      <View style={{ flex: 1, gap: 2 }}>
+                        {" "}
+                        <Text
                           selectable
-                          style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                          style={[
+                            typographyScale.headingMd,
+                            { color: colorSemanticTokens.text.primary },
+                          ]}
                         >
                           {expense.description}
                         </Text>
                         <Text
                           selectable
-                          style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                          style={[
+                            typographyScale.bodySm,
+                            { color: colorSemanticTokens.text.secondary },
+                          ]}
                         >
-                          Paid by {expense.paidByName ?? "Unknown"} · {shortDate(expense.expenseDate)}
+                          Paid by {expense.paidByName ?? "Unknown"} ·{" "}
+                          {shortDate(expense.expenseDate)}
                         </Text>
                       </View>
                       <Text
                         selectable
-                        style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                        style={[
+                          typographyScale.headingMd,
+                          { color: colorSemanticTokens.text.primary },
+                        ]}
                       >
                         {formatCents(expense.amountCents)}
                       </Text>
                     </View>
 
                     {canEdit || canDelete ? (
-                      <View style={{ flexDirection: "row", gap: spacingTokens.sm }}>                        {canEdit ? (
+                      <View
+                        style={{ flexDirection: "row", gap: spacingTokens.sm }}
+                      >
+                        {" "}
+                        {canEdit ? (
                           <Pressable
                             onPress={() => {
                               router.push({
@@ -389,7 +487,10 @@ export default function GroupDetailScreen() {
                           >
                             <Text
                               selectable
-                              style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
+                              style={[
+                                typographyScale.headingSm,
+                                { color: colorSemanticTokens.accent.primary },
+                              ]}
                             >
                               Edit
                             </Text>
@@ -397,11 +498,19 @@ export default function GroupDetailScreen() {
                         ) : null}
                         {canDelete ? (
                           <Pressable
-                            onPress={() => handleDeleteExpense(expense.id, expense.description)}
+                            onPress={() =>
+                              handleDeleteExpense(
+                                expense.id,
+                                expense.description,
+                              )
+                            }
                           >
                             <Text
                               selectable
-                              style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}
+                              style={[
+                                typographyScale.headingSm,
+                                { color: colorSemanticTokens.state.danger },
+                              ]}
                             >
                               Delete
                             </Text>

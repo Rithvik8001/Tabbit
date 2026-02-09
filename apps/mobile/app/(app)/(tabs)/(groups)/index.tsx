@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useRouter } from "expo-router";
-import { ActivityIndicator, Pressable, Text, TextInput, View } from "@/design/primitives/sora-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { BalanceListRow } from "@/design/primitives/balance-list-row";
 import { Button } from "@/design/primitives/button";
@@ -44,7 +50,9 @@ function computeNetForUser(
       continue;
     }
 
-    const currentUserSplit = expense.splits.find((split) => split.userId === userId);
+    const currentUserSplit = expense.splits.find(
+      (split) => split.userId === userId,
+    );
     if (currentUserSplit) {
       net -= currentUserSplit.shareCents;
     }
@@ -62,7 +70,9 @@ export default function GroupsTabScreen() {
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [hideSettled, setHideSettled] = useState(false);
-  const [statusByGroupId, setStatusByGroupId] = useState<Record<string, GroupStatus>>({});
+  const [statusByGroupId, setStatusByGroupId] = useState<
+    Record<string, GroupStatus>
+  >({});
 
   useEffect(() => {
     if (!user?.id || groups.length === 0) {
@@ -231,22 +241,34 @@ export default function GroupsTabScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingSm, { color: colorSemanticTokens.state.danger }]}
+              style={[
+                typographyScale.headingSm,
+                { color: colorSemanticTokens.state.danger },
+              ]}
             >
               Could not load groups
             </Text>
             <Text
               selectable
-              style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+              style={[
+                typographyScale.bodySm,
+                { color: colorSemanticTokens.state.danger },
+              ]}
             >
               {error}
             </Text>
-            <Button label="Retry" variant="soft" onPress={() => void refresh()} />
+            <Button
+              label="Retry"
+              variant="soft"
+              onPress={() => void refresh()}
+            />
           </View>
         ) : null}
 
         {isLoading ? (
-          <View style={{ alignItems: "center", paddingVertical: spacingTokens.md }}>
+          <View
+            style={{ alignItems: "center", paddingVertical: spacingTokens.md }}
+          >
             <ActivityIndicator
               size="small"
               color={colorSemanticTokens.accent.primary}
@@ -268,13 +290,19 @@ export default function GroupsTabScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.headingMd,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               No groups yet
             </Text>
             <Text
               selectable
-              style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+              style={[
+                typographyScale.bodyMd,
+                { color: colorSemanticTokens.text.secondary },
+              ]}
             >
               Start your first group to split shared costs.
             </Text>

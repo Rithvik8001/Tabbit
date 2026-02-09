@@ -1,6 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "@/design/primitives/sora-native";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import {
@@ -28,8 +34,12 @@ function getCandidateInputValue(candidate: GroupMemberCandidate) {
 export default function AddMemberScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { addMember, addMemberByUserId, isAddingMember, searchMemberCandidates } =
-    useGroupDetail(id);
+  const {
+    addMember,
+    addMemberByUserId,
+    isAddingMember,
+    searchMemberCandidates,
+  } = useGroupDetail(id);
 
   const [query, setQuery] = useState("");
   const [selectedCandidate, setSelectedCandidate] =
@@ -56,7 +66,8 @@ export default function AddMemberScreen() {
 
     if (
       selectedCandidate &&
-      normalized !== getCandidateInputValue(selectedCandidate).trim().toLowerCase()
+      normalized !==
+        getCandidateInputValue(selectedCandidate).trim().toLowerCase()
     ) {
       setSelectedCandidate(null);
     }
@@ -90,7 +101,10 @@ export default function AddMemberScreen() {
       requestIdRef.current = requestId;
 
       void (async () => {
-        const result = await searchMemberCandidates(normalized, SUGGESTION_LIMIT);
+        const result = await searchMemberCandidates(
+          normalized,
+          SUGGESTION_LIMIT,
+        );
 
         if (requestIdRef.current !== requestId) {
           return;
@@ -116,7 +130,9 @@ export default function AddMemberScreen() {
     setFormError(null);
 
     if (!selectedCandidate && !isValidEmail(trimmed)) {
-      setFormError("Select a user from suggestions or enter a valid email address.");
+      setFormError(
+        "Select a user from suggestions or enter a valid email address.",
+      );
       return;
     }
 
@@ -166,14 +182,24 @@ export default function AddMemberScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Add member
         </Text>
 
         <Text
           selectable
-          style={{ color: muted, fontSize: 14, lineHeight: 18, fontWeight: "500" }}
+          style={{
+            color: muted,
+            fontSize: 14,
+            lineHeight: 18,
+            fontWeight: "500",
+          }}
         >
           Search by username or email. You can also paste an exact email.
         </Text>
@@ -206,7 +232,12 @@ export default function AddMemberScreen() {
         {isSearching ? (
           <Text
             selectable
-            style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+            style={{
+              color: muted,
+              fontSize: 13,
+              lineHeight: 16,
+              fontWeight: "600",
+            }}
           >
             Looking up users...
           </Text>
@@ -215,7 +246,12 @@ export default function AddMemberScreen() {
         {searchError ? (
           <Text
             selectable
-            style={{ color: colorSemanticTokens.state.danger, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+            style={{
+              color: colorSemanticTokens.state.danger,
+              fontSize: 13,
+              lineHeight: 16,
+              fontWeight: "600",
+            }}
           >
             {searchError}
           </Text>
@@ -261,7 +297,9 @@ export default function AddMemberScreen() {
                     paddingVertical: 11,
                     borderTopWidth: suggestions[0]?.id === candidate.id ? 0 : 1,
                     borderTopColor: stroke,
-                    backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                    backgroundColor: isSelected
+                      ? colorSemanticTokens.accent.soft
+                      : colorSemanticTokens.surface.cardStrong,
                     gap: 2,
                   }}
                 >
@@ -309,7 +347,12 @@ export default function AddMemberScreen() {
         >
           <Text
             selectable
-            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{
+              color: colorSemanticTokens.state.danger,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
           >
             {formError}
           </Text>

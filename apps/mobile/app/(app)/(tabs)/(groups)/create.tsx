@@ -1,6 +1,12 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "@/design/primitives/sora-native";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import {
@@ -29,7 +35,8 @@ export default function CreateGroupScreen() {
   const [name, setName] = useState("");
   const [groupType, setGroupType] = useState<GroupType>("other");
   const [emoji, setEmoji] = useState(GROUP_DEFAULT_EMOJI_BY_TYPE.other);
-  const [hasManuallySelectedEmoji, setHasManuallySelectedEmoji] = useState(false);
+  const [hasManuallySelectedEmoji, setHasManuallySelectedEmoji] =
+    useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   const handleSelectType = (nextType: GroupType) => {
@@ -121,13 +128,23 @@ export default function CreateGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
           >
             Group name
           </Text>
           <Text
             selectable
-            style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+            style={{
+              color: muted,
+              fontSize: 13,
+              lineHeight: 16,
+              fontWeight: "600",
+            }}
           >
             {name.trim().length}/{maxGroupNameLength}
           </Text>
@@ -168,7 +185,12 @@ export default function CreateGroupScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Group type
         </Text>
@@ -185,8 +207,12 @@ export default function CreateGroupScreen() {
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -239,7 +265,12 @@ export default function CreateGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
           >
             Group emoji
           </Text>
@@ -274,8 +305,12 @@ export default function CreateGroupScreen() {
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -302,7 +337,12 @@ export default function CreateGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{
+              color: colorSemanticTokens.state.danger,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
           >
             {formError}
           </Text>

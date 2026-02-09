@@ -1,6 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from "@/design/primitives/sora-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import {
@@ -30,7 +37,10 @@ const muted = colorSemanticTokens.text.secondary;
 const accent = colorSemanticTokens.accent.primary;
 
 export default function AddExpenseScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, returnTab } = useLocalSearchParams<{
+    id: string;
+    returnTab?: "friends" | "groups" | string;
+  }>();
   const router = useRouter();
   const { user } = useAuth();
   const { group, members } = useGroupDetail(id);
@@ -41,9 +51,13 @@ export default function AddExpenseScreen() {
   const [dateText, setDateText] = useState(getTodayString());
   const [splitType, setSplitType] = useState<SplitType>("equal");
   const [paidBy, setPaidBy] = useState<string | null>(null);
-  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
+  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(
+    new Set(),
+  );
   const [exactAmounts, setExactAmounts] = useState<Record<string, string>>({});
-  const [percentAmounts, setPercentAmounts] = useState<Record<string, string>>({});
+  const [percentAmounts, setPercentAmounts] = useState<Record<string, string>>(
+    {},
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const seededGroupIdRef = useRef<string | null>(null);
 
@@ -85,6 +99,23 @@ export default function AddExpenseScreen() {
   const participantIds = Array.from(selectedParticipants);
   const participantCount = participantIds.length;
 
+  const normalizedReturnTab =
+    returnTab === "friends" || returnTab === "groups" ? returnTab : null;
+
+  const handleClose = () => {
+    if (normalizedReturnTab === "groups") {
+      router.dismissTo("/(app)/(tabs)/(groups)");
+      return;
+    }
+
+    if (normalizedReturnTab === "friends") {
+      router.dismissTo("/(app)/(tabs)/(friends)");
+      return;
+    }
+
+    router.back();
+  };
+
   const toggleParticipant = (userId: string) => {
     setSelectedParticipants((prev) => {
       const next = new Set(prev);
@@ -121,7 +152,11 @@ export default function AddExpenseScreen() {
     } else if (splitType === "exact") {
       participants = computeExactSplits(participantIds, exactAmounts);
     } else {
-      participants = computePercentSplits(participantIds, percentAmounts, amountCents);
+      participants = computePercentSplits(
+        participantIds,
+        percentAmounts,
+        amountCents,
+      );
     }
 
     setFormError(null);
@@ -141,14 +176,15 @@ export default function AddExpenseScreen() {
         return;
       }
 
-      router.back();
+      handleClose();
     })();
   };
 
   // Equal split preview
-  const equalPreview = splitType === "equal" && amountCents > 0 && participantCount >= 2
-    ? `${formatCents(Math.floor(amountCents / participantCount))} each`
-    : null;
+  const equalPreview =
+    splitType === "equal" && amountCents > 0 && participantCount >= 2
+      ? `${formatCents(Math.floor(amountCents / participantCount))} each`
+      : null;
 
   return (
     <ScrollView
@@ -166,9 +202,7 @@ export default function AddExpenseScreen() {
         size="section"
         title="Add Expense"
         subtitle="Capture it once. Split it right."
-        leading={
-          <HeaderPillButton label="Back" onPress={() => router.back()} />
-        }
+        leading={<HeaderPillButton label="Back" onPress={handleClose} />}
       />
 
       {/* Description */}
@@ -191,13 +225,23 @@ export default function AddExpenseScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
           >
             Description
           </Text>
           <Text
             selectable
-            style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+            style={{
+              color: muted,
+              fontSize: 13,
+              lineHeight: 16,
+              fontWeight: "600",
+            }}
           >
             {description.trim().length}/{MAX_DESCRIPTION_LENGTH}
           </Text>
@@ -239,7 +283,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Amount
         </Text>
@@ -258,7 +307,12 @@ export default function AddExpenseScreen() {
         >
           <Text
             selectable
-            style={{ color: muted, fontSize: 20, lineHeight: 24, fontWeight: "600" }}
+            style={{
+              color: muted,
+              fontSize: 20,
+              lineHeight: 24,
+              fontWeight: "600",
+            }}
           >
             $
           </Text>
@@ -294,7 +348,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Date
         </Text>
@@ -333,7 +392,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Who paid?
         </Text>
@@ -352,8 +416,12 @@ export default function AddExpenseScreen() {
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                 }}
@@ -367,7 +435,8 @@ export default function AddExpenseScreen() {
                     fontWeight: "600",
                   }}
                 >
-                  {label}{isSelf ? " (you)" : ""}
+                  {label}
+                  {isSelf ? " (you)" : ""}
                 </Text>
               </Pressable>
             );
@@ -387,7 +456,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Split type
         </Text>
@@ -404,8 +478,12 @@ export default function AddExpenseScreen() {
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -451,7 +529,12 @@ export default function AddExpenseScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Participants ({participantCount})
         </Text>
@@ -472,8 +555,12 @@ export default function AddExpenseScreen() {
                     borderRadius: radiusTokens.control,
                     borderCurve: "continuous",
                     borderWidth: 1,
-                    borderColor: isChecked ? colorSemanticTokens.accent.primary : stroke,
-                    backgroundColor: isChecked ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                    borderColor: isChecked
+                      ? colorSemanticTokens.accent.primary
+                      : stroke,
+                    backgroundColor: isChecked
+                      ? colorSemanticTokens.accent.soft
+                      : colorSemanticTokens.surface.cardStrong,
                     paddingHorizontal: 12,
                     paddingVertical: 10,
                     gap: 10,
@@ -486,7 +573,9 @@ export default function AddExpenseScreen() {
                       borderRadius: 6,
                       borderCurve: "continuous",
                       borderWidth: 2,
-                      borderColor: isChecked ? accent : colorSemanticTokens.border.muted,
+                      borderColor: isChecked
+                        ? accent
+                        : colorSemanticTokens.border.muted,
                       backgroundColor: isChecked ? accent : "transparent",
                       alignItems: "center",
                       justifyContent: "center",
@@ -516,7 +605,8 @@ export default function AddExpenseScreen() {
                       fontWeight: "600",
                     }}
                   >
-                    {label}{isSelf ? " (you)" : ""}
+                    {label}
+                    {isSelf ? " (you)" : ""}
                   </Text>
 
                   {splitType === "equal" && isChecked && equalPreview ? (
@@ -552,14 +642,22 @@ export default function AddExpenseScreen() {
                   >
                     <Text
                       selectable
-                      style={{ color: muted, fontSize: 16, lineHeight: 20, fontWeight: "600" }}
+                      style={{
+                        color: muted,
+                        fontSize: 16,
+                        lineHeight: 20,
+                        fontWeight: "600",
+                      }}
                     >
                       $
                     </Text>
                     <TextInput
                       value={exactAmounts[member.userId] ?? ""}
                       onChangeText={(text) =>
-                        setExactAmounts((prev) => ({ ...prev, [member.userId]: text }))
+                        setExactAmounts((prev) => ({
+                          ...prev,
+                          [member.userId]: text,
+                        }))
                       }
                       keyboardType="decimal-pad"
                       placeholder="0.00"
@@ -596,7 +694,10 @@ export default function AddExpenseScreen() {
                     <TextInput
                       value={percentAmounts[member.userId] ?? ""}
                       onChangeText={(text) =>
-                        setPercentAmounts((prev) => ({ ...prev, [member.userId]: text }))
+                        setPercentAmounts((prev) => ({
+                          ...prev,
+                          [member.userId]: text,
+                        }))
                       }
                       keyboardType="decimal-pad"
                       placeholder="0"
@@ -614,7 +715,12 @@ export default function AddExpenseScreen() {
                     />
                     <Text
                       selectable
-                      style={{ color: muted, fontSize: 16, lineHeight: 20, fontWeight: "600" }}
+                      style={{
+                        color: muted,
+                        fontSize: 16,
+                        lineHeight: 20,
+                        fontWeight: "600",
+                      }}
                     >
                       %
                     </Text>
@@ -656,7 +762,12 @@ export default function AddExpenseScreen() {
         >
           <Text
             selectable
-            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{
+              color: colorSemanticTokens.state.danger,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
           >
             {formError}
           </Text>

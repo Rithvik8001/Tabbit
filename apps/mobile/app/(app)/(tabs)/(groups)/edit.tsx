@@ -1,6 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from "@/design/primitives/sora-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
 import {
@@ -26,12 +33,18 @@ const maxGroupNameLength = 40;
 export default function EditGroupScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { group, updateGroup, deleteGroup, isUpdating, isDeleting } = useGroupDetail(id);
+  const { group, updateGroup, deleteGroup, isUpdating, isDeleting } =
+    useGroupDetail(id);
 
   const [name, setName] = useState(group?.name ?? "");
-  const [groupType, setGroupType] = useState<GroupType>(group?.groupType ?? "other");
-  const [emoji, setEmoji] = useState(group?.emoji ?? GROUP_DEFAULT_EMOJI_BY_TYPE.other);
-  const [hasManuallySelectedEmoji, setHasManuallySelectedEmoji] = useState(true);
+  const [groupType, setGroupType] = useState<GroupType>(
+    group?.groupType ?? "other",
+  );
+  const [emoji, setEmoji] = useState(
+    group?.emoji ?? GROUP_DEFAULT_EMOJI_BY_TYPE.other,
+  );
+  const [hasManuallySelectedEmoji, setHasManuallySelectedEmoji] =
+    useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const hydratedGroupIdRef = useRef<string | null>(null);
 
@@ -168,13 +181,23 @@ export default function EditGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
           >
             Group name
           </Text>
           <Text
             selectable
-            style={{ color: muted, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
+            style={{
+              color: muted,
+              fontSize: 13,
+              lineHeight: 16,
+              fontWeight: "600",
+            }}
           >
             {name.trim().length}/{maxGroupNameLength}
           </Text>
@@ -215,7 +238,12 @@ export default function EditGroupScreen() {
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+          style={{
+            color: ink,
+            fontSize: 18,
+            lineHeight: 22,
+            fontWeight: "600",
+          }}
         >
           Group type
         </Text>
@@ -232,8 +260,12 @@ export default function EditGroupScreen() {
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -287,7 +319,12 @@ export default function EditGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
           >
             Group emoji
           </Text>
@@ -322,8 +359,12 @@ export default function EditGroupScreen() {
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
-                  backgroundColor: isSelected ? colorSemanticTokens.accent.soft : colorSemanticTokens.surface.cardStrong,
+                  borderColor: isSelected
+                    ? colorSemanticTokens.accent.primary
+                    : stroke,
+                  backgroundColor: isSelected
+                    ? colorSemanticTokens.accent.soft
+                    : colorSemanticTokens.surface.cardStrong,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -351,7 +392,12 @@ export default function EditGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: colorSemanticTokens.state.danger, fontSize: 14, lineHeight: 18, fontWeight: "600" }}
+            style={{
+              color: colorSemanticTokens.state.danger,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "600",
+            }}
           >
             {formError}
           </Text>
