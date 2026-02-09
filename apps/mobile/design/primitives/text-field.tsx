@@ -42,7 +42,7 @@ export function TextField({
         selectable
         style={[
           typographyScale.labelSm,
-          { color: colorSemanticTokens.text.secondary },
+          { color: colorSemanticTokens.text.primary, fontWeight: "500" },
         ]}
       >
         {resolvedLabel}
@@ -58,13 +58,13 @@ export function TextField({
             minHeight: 48,
             borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
+            borderWidth: 1.5,
             borderColor: error
               ? colorSemanticTokens.state.danger
               : isFocused
-                ? "#58CC02"
-                : "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+                ? colorSemanticTokens.accent.primary
+                : "transparent",
+            backgroundColor: colorSemanticTokens.background.subtle,
             color: colorSemanticTokens.text.primary,
             paddingHorizontal: spacingTokens.md,
             paddingVertical: 12,

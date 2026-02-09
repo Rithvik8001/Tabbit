@@ -2,6 +2,7 @@ import { Text, View } from "react-native";
 
 import { Button } from "@/design/primitives/button";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -14,13 +15,10 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
   return (
     <View
       style={{
-        borderRadius: 16,
+        borderRadius: radiusTokens.card,
         borderCurve: "continuous",
-        borderWidth: 2,
-        borderColor: "#E5E5E5",
-        backgroundColor: "#FFFFFF",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        padding: 20,
+        backgroundColor: colorSemanticTokens.surface.card,
+        padding: 24,
         gap: 12,
         alignItems: "center",
       }}
@@ -48,7 +46,7 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
             color: ink,
             fontSize: 22,
             lineHeight: 26,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           No groups yet
@@ -59,7 +57,7 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
             color: muted,
             fontSize: 15,
             lineHeight: 20,
-            fontWeight: "500",
+            fontWeight: "400",
             textAlign: "center",
           }}
         >

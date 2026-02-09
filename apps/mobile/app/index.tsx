@@ -1,7 +1,7 @@
 import { Redirect } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 
-import { colorTokens } from "@/design/tokens/color";
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
 export default function Index() {
@@ -10,7 +10,7 @@ export default function Index() {
   if (isAuthLoading) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator color={colorTokens.brand.primary} />
+        <ActivityIndicator color={colorSemanticTokens.accent.primary} />
       </View>
     );
   }

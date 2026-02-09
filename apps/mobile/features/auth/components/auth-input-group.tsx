@@ -3,6 +3,9 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import type { TextInputProps } from "react-native";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
+
 export type FieldConfig = TextInputProps & {
   placeholder: string;
   secureTextEntry?: boolean;
@@ -13,49 +16,71 @@ type AuthInputGroupProps = {
   fields: FieldConfig[];
 };
 
-function AuthInputField({
-  field,
-  isLast,
-}: {
-  field: FieldConfig;
-  isLast: boolean;
-}) {
+function AuthInputField({ field }: { field: FieldConfig }) {
   const [isSecure, setIsSecure] = useState(field.secureTextEntry ?? false);
+  const [isFocused, setIsFocused] = useState(false);
   const hasEyeToggle = field.secureTextEntry;
   const hasError = !!field.error;
 
   return (
-    <View>
+    <View style={{ gap: 6 }}>
+      <Text
+        style={{
+          fontSize: 13,
+          fontWeight: "500",
+          color: colorSemanticTokens.text.primary,
+        }}
+      >
+        {field.placeholder}
+      </Text>
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: hasError ? "#FFF5F5" : undefined,
+          backgroundColor: hasError
+            ? "rgba(239, 68, 68, 0.06)"
+            : colorSemanticTokens.background.subtle,
+          borderRadius: radiusTokens.control,
+          borderCurve: "continuous",
+          borderWidth: 1.5,
+          borderColor: hasError
+            ? colorSemanticTokens.state.danger
+            : isFocused
+              ? colorSemanticTokens.accent.primary
+              : "transparent",
         }}
       >
         <TextInput
           {...field}
           secureTextEntry={isSecure}
-          placeholderTextColor="#AFAFAF"
+          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          onFocus={(e) => {
+            setIsFocused(true);
+            field.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            field.onBlur?.(e);
+          }}
           style={{
             flex: 1,
-            paddingHorizontal: 16,
+            paddingHorizontal: 14,
             paddingVertical: 14,
             fontSize: 16,
             fontWeight: "400",
-            color: "#3C3C3C",
+            color: colorSemanticTokens.text.primary,
           }}
         />
         {hasEyeToggle ? (
           <Pressable
             onPress={() => setIsSecure((prev) => !prev)}
             hitSlop={8}
-            style={{ paddingRight: 16 }}
+            style={{ paddingRight: 14 }}
           >
             <Ionicons
               name={isSecure ? "eye-off-outline" : "eye-outline"}
               size={22}
-              color="#AFAFAF"
+              color={colorSemanticTokens.text.tertiary}
             />
           </Pressable>
         ) : null}
@@ -65,48 +90,21 @@ function AuthInputField({
           style={{
             fontSize: 12,
             fontWeight: "400",
-            color: "#FF4B4B",
-            paddingHorizontal: 16,
-            paddingBottom: 8,
-            backgroundColor: "#FFF5F5",
+            color: colorSemanticTokens.state.danger,
           }}
         >
           {field.error}
         </Text>
-      ) : null}
-      {!isLast ? (
-        <View
-          style={{
-            height: 1,
-            backgroundColor: "#E5E5E5",
-            marginHorizontal: 0,
-          }}
-        />
       ) : null}
     </View>
   );
 }
 
 export function AuthInputGroup({ fields }: AuthInputGroupProps) {
-  const hasAnyError = fields.some((f) => !!f.error);
-
   return (
-    <View
-      style={{
-        borderRadius: 16,
-        borderCurve: "continuous",
-        backgroundColor: "#F7F7F7",
-        borderWidth: 2,
-        borderColor: hasAnyError ? "#FF4B4B" : "#E5E5E5",
-        overflow: "hidden",
-      }}
-    >
+    <View style={{ gap: 16 }}>
       {fields.map((field, index) => (
-        <AuthInputField
-          key={index}
-          field={field}
-          isLast={index === fields.length - 1}
-        />
+        <AuthInputField key={index} field={field} />
       ))}
     </View>
   );

@@ -1,14 +1,28 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
-import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
+import { Button } from "@/design/primitives/button";
+import { HeaderPillButton } from "@/design/primitives/page-heading";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { signupSchema, parseFormErrors } from "@/features/auth/utils/auth-schemas";
 
 export default function SignupScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { session, isAuthLoading, signUpWithPassword } = useAuth();
 
   const [displayName, setDisplayName] = useState("");
@@ -18,6 +32,8 @@ export default function SignupScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+  const [isConfirmHidden, setIsConfirmHidden] = useState(true);
 
   useEffect(() => {
     if (!isAuthLoading && session) {
@@ -78,143 +94,424 @@ export default function SignupScreen() {
   };
 
   return (
-    <AuthScreenShell title="Create your account">
-      <AuthInputGroup
-        fields={[
-          {
-            placeholder: "Username",
-            value: displayName,
-            onChangeText: (text: string) => {
-              setDisplayName(text);
-              clearFieldError("displayName");
-            },
-            autoCapitalize: "words",
-            autoCorrect: false,
-            textContentType: "username",
-            autoComplete: "name",
-            error: fieldErrors.displayName,
-          },
-          {
-            placeholder: "Email",
-            value: email,
-            onChangeText: (text: string) => {
-              setEmail(text);
-              clearFieldError("email");
-            },
-            autoCapitalize: "none",
-            autoCorrect: false,
-            keyboardType: "email-address",
-            textContentType: "emailAddress",
-            autoComplete: "email",
-            error: fieldErrors.email,
-          },
-          {
-            placeholder: "Password",
-            value: password,
-            onChangeText: (text: string) => {
-              setPassword(text);
-              clearFieldError("password");
-            },
-            secureTextEntry: true,
-            autoCapitalize: "none",
-            autoCorrect: false,
-            textContentType: "newPassword",
-            autoComplete: "password-new",
-            error: fieldErrors.password,
-          },
-          {
-            placeholder: "Confirm password",
-            value: confirmPassword,
-            onChangeText: (text: string) => {
-              setConfirmPassword(text);
-              clearFieldError("confirmPassword");
-            },
-            secureTextEntry: true,
-            autoCapitalize: "none",
-            autoCorrect: false,
-            textContentType: "newPassword",
-            autoComplete: "password-new",
-            error: fieldErrors.confirmPassword,
-          },
-        ]}
-      />
-
-      {serverError ? (
-        <Text
-          style={{
-            fontSize: 13,
-            fontWeight: "400",
-            color: "#FF4B4B",
-            textAlign: "center",
-          }}
-        >
-          {serverError}
-        </Text>
-      ) : null}
-
-      {/* Create Account button */}
-      <Pressable
-        disabled={isSubmitting}
-        onPress={handleSignUp}
-        style={{
-          backgroundColor: "#1CB0F6",
-          borderRadius: 16,
-          borderCurve: "continuous",
-          minHeight: 50,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 14,
-          opacity: isSubmitting ? 0.5 : 1,
-        }}
+    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "700",
-            color: "#FFFFFF",
-            textTransform: "uppercase",
-            letterSpacing: 0.8,
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: insets.top + 16,
+            paddingBottom: insets.bottom + 20,
+            paddingHorizontal: 24,
+            gap: 18,
           }}
         >
-          CREATE ACCOUNT
-        </Text>
-      </Pressable>
+          <HeaderPillButton
+            label="Back"
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+                return;
+              }
 
-      {/* Bottom row */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          paddingTop: 8,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 13,
-            fontWeight: "400",
-            color: "#AFAFAF",
-          }}
-        >
-          Already have an account?
-        </Text>
-        <Link href="/(auth)/login" asChild>
-          <Pressable>
-            <Text
+              router.replace("/(onboarding)");
+            }}
+          />
+
+          <View
+            style={{
+              borderRadius: 28,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.border.subtle,
+              backgroundColor: colorSemanticTokens.surface.card,
+              paddingHorizontal: 18,
+              paddingVertical: 18,
+              gap: 12,
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("@/assets/images/icon.png")}
+              contentFit="cover"
               style={{
-                fontSize: 13,
-                fontWeight: "700",
-                color: "#1CB0F6",
-                textTransform: "uppercase",
-                letterSpacing: 0.2,
+                width: 98,
+                height: 98,
+                borderRadius: 24,
+              }}
+            />
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.primary,
+                fontSize: 32,
+                lineHeight: 40,
+                fontWeight: "800",
+                letterSpacing: -0.5,
               }}
             >
-              LOG IN
+              Join Tabbit
             </Text>
-          </Pressable>
-        </Link>
-      </View>
-    </AuthScreenShell>
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.secondary,
+                fontSize: 16,
+                lineHeight: 24,
+                fontWeight: "500",
+                textAlign: "center",
+              }}
+            >
+              Create your account and start splitting cleanly.
+            </Text>
+          </View>
+
+          <View
+            style={{
+              borderRadius: 28,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.border.subtle,
+              backgroundColor: colorSemanticTokens.surface.card,
+              paddingHorizontal: 16,
+              paddingVertical: 16,
+              gap: 12,
+            }}
+          >
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.primary,
+                fontSize: 20,
+                lineHeight: 26,
+                fontWeight: "700",
+              }}
+            >
+              Create account with Email
+            </Text>
+
+            <View style={{ gap: 8 }}>
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.text.secondary,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  fontWeight: "600",
+                }}
+              >
+                Username
+              </Text>
+              <TextInput
+                value={displayName}
+                onChangeText={(text) => {
+                  setDisplayName(text);
+                  clearFieldError("displayName");
+                }}
+                placeholder="Your name"
+                placeholderTextColor={colorSemanticTokens.text.tertiary}
+                autoCapitalize="words"
+                autoCorrect={false}
+                textContentType="username"
+                autoComplete="name"
+                selectionColor={colorSemanticTokens.accent.primary}
+                style={{
+                  borderRadius: radiusTokens.xl,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: fieldErrors.displayName
+                    ? colorSemanticTokens.state.danger
+                    : colorSemanticTokens.border.subtle,
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  paddingHorizontal: 20,
+                  paddingVertical: 16,
+                  color: colorSemanticTokens.text.primary,
+                  fontSize: 16,
+                  lineHeight: 22,
+                  fontWeight: "500",
+                }}
+              />
+              {fieldErrors.displayName ? (
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.state.danger,
+                    fontSize: 12,
+                    lineHeight: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  {fieldErrors.displayName}
+                </Text>
+              ) : null}
+            </View>
+
+            <View style={{ gap: 8 }}>
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.text.secondary,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  fontWeight: "600",
+                }}
+              >
+                Email
+              </Text>
+              <TextInput
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  clearFieldError("email");
+                }}
+                placeholder="Your email"
+                placeholderTextColor={colorSemanticTokens.text.tertiary}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                autoComplete="email"
+                selectionColor={colorSemanticTokens.accent.primary}
+                style={{
+                  borderRadius: radiusTokens.xl,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: fieldErrors.email
+                    ? colorSemanticTokens.state.danger
+                    : colorSemanticTokens.border.subtle,
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  paddingHorizontal: 20,
+                  paddingVertical: 16,
+                  color: colorSemanticTokens.text.primary,
+                  fontSize: 16,
+                  lineHeight: 22,
+                  fontWeight: "500",
+                }}
+              />
+              {fieldErrors.email ? (
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.state.danger,
+                    fontSize: 12,
+                    lineHeight: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  {fieldErrors.email}
+                </Text>
+              ) : null}
+            </View>
+
+            <View style={{ gap: 8 }}>
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.text.secondary,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  fontWeight: "600",
+                }}
+              >
+                Password
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderRadius: radiusTokens.xl,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: fieldErrors.password
+                    ? colorSemanticTokens.state.danger
+                    : colorSemanticTokens.border.subtle,
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TextInput
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    clearFieldError("password");
+                  }}
+                  placeholder="At least 8 characters"
+                  placeholderTextColor={colorSemanticTokens.text.tertiary}
+                  secureTextEntry={isPasswordHidden}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  textContentType="newPassword"
+                  autoComplete="password-new"
+                  selectionColor={colorSemanticTokens.accent.primary}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 16,
+                    color: colorSemanticTokens.text.primary,
+                    fontSize: 16,
+                    lineHeight: 22,
+                    fontWeight: "500",
+                  }}
+                />
+                <Pressable onPress={() => setIsPasswordHidden((prev) => !prev)}>
+                  <Ionicons
+                    name={isPasswordHidden ? "eye-off-outline" : "eye-outline"}
+                    size={24}
+                    color={colorSemanticTokens.text.tertiary}
+                  />
+                </Pressable>
+              </View>
+              {fieldErrors.password ? (
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.state.danger,
+                    fontSize: 12,
+                    lineHeight: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  {fieldErrors.password}
+                </Text>
+              ) : null}
+            </View>
+
+            <View style={{ gap: 8 }}>
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.text.secondary,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  fontWeight: "600",
+                }}
+              >
+                Confirm password
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderRadius: radiusTokens.xl,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: fieldErrors.confirmPassword
+                    ? colorSemanticTokens.state.danger
+                    : colorSemanticTokens.border.subtle,
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TextInput
+                  value={confirmPassword}
+                  onChangeText={(text) => {
+                    setConfirmPassword(text);
+                    clearFieldError("confirmPassword");
+                  }}
+                  placeholder="Confirm password"
+                  placeholderTextColor={colorSemanticTokens.text.tertiary}
+                  secureTextEntry={isConfirmHidden}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  textContentType="newPassword"
+                  autoComplete="password-new"
+                  selectionColor={colorSemanticTokens.accent.primary}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 16,
+                    color: colorSemanticTokens.text.primary,
+                    fontSize: 16,
+                    lineHeight: 22,
+                    fontWeight: "500",
+                  }}
+                />
+                <Pressable onPress={() => setIsConfirmHidden((prev) => !prev)}>
+                  <Ionicons
+                    name={isConfirmHidden ? "eye-off-outline" : "eye-outline"}
+                    size={24}
+                    color={colorSemanticTokens.text.tertiary}
+                  />
+                </Pressable>
+              </View>
+              {fieldErrors.confirmPassword ? (
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.state.danger,
+                    fontSize: 12,
+                    lineHeight: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  {fieldErrors.confirmPassword}
+                </Text>
+              ) : null}
+            </View>
+
+            {serverError ? (
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.state.danger,
+                  fontSize: 12,
+                  lineHeight: 17,
+                  fontWeight: "500",
+                  textAlign: "center",
+                }}
+              >
+                {serverError}
+              </Text>
+            ) : null}
+
+            <Button
+              label="Create Account"
+              onPress={handleSignUp}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              size="lg"
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              paddingBottom: 4,
+            }}
+          >
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.tertiary,
+                fontSize: 14,
+                lineHeight: 20,
+                fontWeight: "500",
+              }}
+            >
+              Already have an account?
+            </Text>
+            <Link href="/(auth)/login" asChild>
+              <Pressable>
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.accent.primary,
+                    fontSize: 14,
+                    lineHeight: 20,
+                    fontWeight: "700",
+                  }}
+                >
+                  Log in
+                </Text>
+              </Pressable>
+            </Link>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }

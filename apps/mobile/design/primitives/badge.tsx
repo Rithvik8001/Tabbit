@@ -33,7 +33,7 @@ function getBadgeColors(tone: NonNullable<BadgeProps["tone"]>) {
   }
 
   return {
-    backgroundColor: "#F7F7F7",
+    backgroundColor: colorSemanticTokens.background.subtle,
     color: colorSemanticTokens.text.secondary,
   };
 }
@@ -58,9 +58,7 @@ export function Badge({ label, tone = "neutral" }: BadgeProps) {
           typographyScale.caption,
           {
             color: palette.color,
-            fontWeight: "700",
-            textTransform: "uppercase",
-            letterSpacing: 0.8,
+            fontWeight: "600",
           },
         ]}
       >

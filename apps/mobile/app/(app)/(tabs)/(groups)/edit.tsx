@@ -2,7 +2,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import {
   GROUP_DEFAULT_EMOJI_BY_TYPE,
   GROUP_EMOJI_OPTIONS,
@@ -133,15 +139,21 @@ export default function EditGroupScreen() {
         gap: 12,
       }}
     >
+      <PageHeading
+        size="section"
+        title="Edit Group"
+        subtitle="Update the group details and vibe."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
+      />
+
       {/* Group name */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -156,7 +168,7 @@ export default function EditGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
           >
             Group name
           </Text>
@@ -176,11 +188,11 @@ export default function EditGroupScreen() {
           placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -194,19 +206,16 @@ export default function EditGroupScreen() {
       {/* Group type */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
         >
           Group type
         </Text>
@@ -220,7 +229,7 @@ export default function EditGroupScreen() {
                 key={preset.type}
                 onPress={() => handleSelectType(preset.type)}
                 style={{
-                  borderRadius: 16,
+                  borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
@@ -236,7 +245,7 @@ export default function EditGroupScreen() {
                     color: isSelected ? accent : ink,
                     fontSize: 16,
                     lineHeight: 20,
-                    fontWeight: "700",
+                    fontWeight: "600",
                   }}
                 >
                   {preset.label}
@@ -261,12 +270,9 @@ export default function EditGroupScreen() {
       {/* Group emoji */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 12,
         }}
@@ -281,7 +287,7 @@ export default function EditGroupScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
           >
             Group emoji
           </Text>
@@ -313,7 +319,7 @@ export default function EditGroupScreen() {
                 style={{
                   width: 46,
                   height: 46,
-                  borderRadius: 12,
+                  borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
@@ -335,7 +341,7 @@ export default function EditGroupScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: colorSemanticTokens.state.danger,
@@ -353,62 +359,24 @@ export default function EditGroupScreen() {
       ) : null}
 
       {/* Save button */}
-      <Pressable
-        accessibilityRole="button"
-        disabled={isUpdating}
+      <Button
+        label={isUpdating ? "Saving..." : "Save changes"}
         onPress={handleSave}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          backgroundColor: isUpdating ? colorSemanticTokens.accent.softStrong : accent,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: isUpdating ? 0.8 : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.text.inverse,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isUpdating ? "Saving..." : "Save Changes"}
-        </Text>
-      </Pressable>
+        disabled={isUpdating}
+        loading={isUpdating}
+        size="lg"
+      />
 
       {/* Delete button */}
-      <Pressable
-        accessibilityRole="button"
-        disabled={isDeleting}
+      <Button
+        label={isDeleting ? "Deleting..." : "Delete group"}
         onPress={handleDelete}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          borderWidth: 1,
-          borderColor: colorSemanticTokens.state.danger,
-          backgroundColor: colorSemanticTokens.state.dangerSoft,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: isDeleting ? 0.6 : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.state.danger,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isDeleting ? "Deleting..." : "Delete Group"}
-        </Text>
-      </Pressable>
+        disabled={isDeleting}
+        loading={isDeleting}
+        variant="soft"
+        tone="danger"
+        size="lg"
+      />
     </ScrollView>
   );
 }

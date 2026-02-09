@@ -4,9 +4,9 @@ export const radiusTokens = {
   md: 16,
   lg: 16,
   xl: 24,
-  card: 16,
-  button: 16,
-  control: 16,
+  card: 20,
+  button: 14,
+  control: 12,
   pill: 999,
 } as const;
 

@@ -4,61 +4,44 @@ export default function GroupsTabLayout() {
   return (
     <Stack
       screenOptions={{
-        headerLargeTitle: false,
-        headerShadowVisible: false,
-        headerBackButtonDisplayMode: "minimal",
+        headerShown: false,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Groups" }} />
+      <Stack.Screen name="index" />
       <Stack.Screen
         name="create"
         options={{
-          title: "New Group",
-          headerLargeTitle: false,
           presentation: "modal",
         }}
       />
-      <Stack.Screen
-        name="[id]"
-        options={{ title: "Group", headerLargeTitle: false }}
-      />
+      <Stack.Screen name="[id]" />
       <Stack.Screen
         name="edit"
         options={{
-          title: "Edit Group",
-          headerLargeTitle: false,
           presentation: "modal",
         }}
       />
       <Stack.Screen
         name="add-member"
         options={{
-          title: "Add Member",
-          headerLargeTitle: false,
           presentation: "modal",
         }}
       />
       <Stack.Screen
         name="add-expense"
         options={{
-          title: "Add Expense",
-          headerLargeTitle: false,
           presentation: "modal",
         }}
       />
       <Stack.Screen
         name="edit-expense"
         options={{
-          title: "Edit Expense",
-          headerLargeTitle: false,
           presentation: "modal",
         }}
       />
       <Stack.Screen
         name="settle-up"
         options={{
-          title: "Settle Up",
-          headerLargeTitle: false,
           presentation: "modal",
         }}
       />

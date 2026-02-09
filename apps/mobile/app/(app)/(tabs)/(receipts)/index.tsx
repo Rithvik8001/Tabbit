@@ -2,6 +2,7 @@ import { Text, View } from "react-native";
 
 import { Badge } from "@/design/primitives/badge";
 import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import { PageHeading } from "@/design/primitives/page-heading";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { spacingTokens } from "@/design/tokens/spacing";
@@ -36,6 +37,11 @@ function statusTone(status: ReceiptStatus): "success" | "accent" | "neutral" {
 export default function ReceiptsTabScreen() {
   return (
     <ScreenContainer contentContainerStyle={{ gap: spacingTokens.sm }}>
+      <PageHeading
+        title="Receipts"
+        subtitle="Scan history and pending review items."
+      />
+
       {receiptItems.map((receipt) => (
         <LiquidSurface
           key={receipt.id}

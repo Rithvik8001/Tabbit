@@ -16,7 +16,7 @@ export const motionTokens = {
   offset: {
     screen: 10,
     listStagger: 26,
-    buttonPress: 4,
+    buttonPress: 0,
   },
 } as const;
 

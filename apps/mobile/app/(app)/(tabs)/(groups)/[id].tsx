@@ -1,7 +1,13 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { getGroupTypeLabel } from "@/features/groups/constants/group-presets";
 import { formatCents } from "@/features/groups/lib/format-currency";
@@ -9,7 +15,6 @@ import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
 
 const surface = colorSemanticTokens.surface.cardStrong;
-const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
 const accent = colorSemanticTokens.accent.primary;
@@ -18,12 +23,9 @@ function LoadingCard() {
   return (
     <View
       style={{
-        borderRadius: 16,
+        borderRadius: radiusTokens.card,
         borderCurve: "continuous",
-        borderWidth: 2,
-        borderColor: "#E5E5E5",
-        backgroundColor: "#FFFFFF",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        backgroundColor: colorSemanticTokens.surface.card,
         padding: 16,
         gap: 10,
       }}
@@ -151,11 +153,17 @@ export default function GroupDetailScreen() {
         gap: 12,
       }}
     >
-      <Stack.Screen
-        options={{
-          title: group?.name ?? "Group",
-          headerLargeTitle: false,
-        }}
+      <PageHeading
+        size="section"
+        title={group?.name ?? "Group"}
+        subtitle={
+          group
+            ? `${members.length} ${members.length === 1 ? "member" : "members"}`
+            : "Review members, balances, and expenses."
+        }
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
       />
 
       {isLoading ? (
@@ -168,10 +176,8 @@ export default function GroupDetailScreen() {
       {!isLoading && error ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: stroke,
             backgroundColor: surface,
             padding: 16,
             gap: 10,
@@ -179,7 +185,7 @@ export default function GroupDetailScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
+            style={{ color: ink, fontSize: 20, lineHeight: 24, fontWeight: "600" }}
           >
             Could not load group
           </Text>
@@ -197,8 +203,6 @@ export default function GroupDetailScreen() {
               alignSelf: "flex-start",
               borderRadius: 999,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: colorSemanticTokens.border.muted,
               paddingHorizontal: 12,
               paddingVertical: 8,
               backgroundColor: colorSemanticTokens.background.subtle,
@@ -206,7 +210,7 @@ export default function GroupDetailScreen() {
           >
             <Text
               selectable
-              style={{ color: ink, fontSize: 13, lineHeight: 16, fontWeight: "700" }}
+              style={{ color: ink, fontSize: 13, lineHeight: 16, fontWeight: "600" }}
             >
               Try again
             </Text>
@@ -219,10 +223,8 @@ export default function GroupDetailScreen() {
           {/* Group info card */}
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
               backgroundColor: surface,
               padding: 16,
               gap: 12,
@@ -246,7 +248,7 @@ export default function GroupDetailScreen() {
             </View>
             <Text
               selectable
-              style={{ color: ink, fontSize: 24, lineHeight: 30, fontWeight: "700" }}
+              style={{ color: ink, fontSize: 24, lineHeight: 30, fontWeight: "600" }}
             >
               {group.name}
             </Text>
@@ -261,10 +263,8 @@ export default function GroupDetailScreen() {
           {/* Members card */}
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
               backgroundColor: surface,
               padding: 16,
               gap: 12,
@@ -279,7 +279,7 @@ export default function GroupDetailScreen() {
             >
               <Text
                 selectable
-                style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+                style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
               >
                 Members ({members.length})
               </Text>
@@ -294,8 +294,6 @@ export default function GroupDetailScreen() {
                   style={{
                     borderRadius: 999,
                     borderCurve: "continuous",
-                    borderWidth: 1,
-                    borderColor: colorSemanticTokens.accent.primary,
                     backgroundColor: colorSemanticTokens.accent.soft,
                     paddingHorizontal: 12,
                     paddingVertical: 6,
@@ -307,7 +305,7 @@ export default function GroupDetailScreen() {
                       color: accent,
                       fontSize: 13,
                       lineHeight: 16,
-                      fontWeight: "700",
+                      fontWeight: "600",
                     }}
                   >
                     Add
@@ -335,10 +333,9 @@ export default function GroupDetailScreen() {
                       flexDirection: "row",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      borderRadius: 16,
+                      borderRadius: radiusTokens.card,
                       borderCurve: "continuous",
-                      borderWidth: 2,
-                      borderColor: "#E5E5E5",
+                      backgroundColor: colorSemanticTokens.background.subtle,
                       padding: 12,
                       gap: 8,
                     }}
@@ -372,7 +369,7 @@ export default function GroupDetailScreen() {
                                 color: accent,
                                 fontSize: 11,
                                 lineHeight: 14,
-                                fontWeight: "700",
+                                fontWeight: "600",
                               }}
                             >
                               Admin
@@ -402,8 +399,6 @@ export default function GroupDetailScreen() {
                         style={{
                           borderRadius: 999,
                           borderCurve: "continuous",
-                          borderWidth: 1,
-                          borderColor: colorSemanticTokens.state.danger,
                           backgroundColor: colorSemanticTokens.state.dangerSoft,
                           paddingHorizontal: 10,
                           paddingVertical: 4,
@@ -415,7 +410,7 @@ export default function GroupDetailScreen() {
                             color: colorSemanticTokens.state.danger,
                             fontSize: 12,
                             lineHeight: 16,
-                            fontWeight: "700",
+                            fontWeight: "600",
                           }}
                         >
                           Remove
@@ -432,10 +427,8 @@ export default function GroupDetailScreen() {
           {expenses.length > 0 ? (
             <View
               style={{
-                borderRadius: 16,
+                borderRadius: radiusTokens.card,
                 borderCurve: "continuous",
-                borderWidth: 1,
-                borderColor: stroke,
                 backgroundColor: surface,
                 padding: 16,
                 gap: 12,
@@ -443,7 +436,7 @@ export default function GroupDetailScreen() {
             >
               <Text
                 selectable
-                style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+                style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
               >
                 Your Balance
               </Text>
@@ -458,7 +451,7 @@ export default function GroupDetailScreen() {
                         : muted,
                   fontSize: 28,
                   lineHeight: 34,
-                  fontWeight: "800",
+                  fontWeight: "600",
                   fontVariant: ["tabular-nums"],
                 }}
               >
@@ -539,8 +532,6 @@ export default function GroupDetailScreen() {
                               style={{
                                 borderRadius: 999,
                                 borderCurve: "continuous",
-                                borderWidth: 1,
-                                borderColor: colorSemanticTokens.accent.primary,
                                 backgroundColor: colorSemanticTokens.accent.soft,
                                 paddingHorizontal: 10,
                                 paddingVertical: 4,
@@ -552,7 +543,7 @@ export default function GroupDetailScreen() {
                                   color: accent,
                                   fontSize: 12,
                                   lineHeight: 16,
-                                  fontWeight: "700",
+                                  fontWeight: "600",
                                 }}
                               >
                                 {settleActionLabel}
@@ -571,10 +562,8 @@ export default function GroupDetailScreen() {
           {/* Expenses card */}
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: stroke,
               backgroundColor: surface,
               padding: 16,
               gap: 12,
@@ -589,7 +578,7 @@ export default function GroupDetailScreen() {
             >
               <Text
                 selectable
-                style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+                style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
               >
                 Expenses{expenses.length > 0 ? ` (${expenses.length})` : ""}
               </Text>
@@ -603,8 +592,6 @@ export default function GroupDetailScreen() {
                 style={{
                   borderRadius: 999,
                   borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: colorSemanticTokens.accent.primary,
                   backgroundColor: colorSemanticTokens.accent.soft,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
@@ -616,7 +603,7 @@ export default function GroupDetailScreen() {
                     color: accent,
                     fontSize: 13,
                     lineHeight: 16,
-                    fontWeight: "700",
+                    fontWeight: "600",
                   }}
                 >
                   + Add
@@ -649,10 +636,9 @@ export default function GroupDetailScreen() {
                   <View
                     key={expense.id}
                     style={{
-                      borderRadius: 16,
+                      borderRadius: radiusTokens.card,
                       borderCurve: "continuous",
-                      borderWidth: 2,
-                      borderColor: "#E5E5E5",
+                      backgroundColor: colorSemanticTokens.background.subtle,
                       padding: 12,
                       gap: 6,
                     }}
@@ -694,7 +680,7 @@ export default function GroupDetailScreen() {
                                 color: accent,
                                 fontSize: 11,
                                 lineHeight: 14,
-                                fontWeight: "700",
+                                fontWeight: "600",
                               }}
                             >
                               Settlement
@@ -708,7 +694,7 @@ export default function GroupDetailScreen() {
                           color: ink,
                           fontSize: 16,
                           lineHeight: 20,
-                          fontWeight: "700",
+                          fontWeight: "600",
                           fontVariant: ["tabular-nums"],
                         }}
                       >
@@ -748,8 +734,6 @@ export default function GroupDetailScreen() {
                             style={{
                               borderRadius: 999,
                               borderCurve: "continuous",
-                              borderWidth: 1,
-                              borderColor: colorSemanticTokens.state.info,
                               backgroundColor: colorSemanticTokens.state.infoSoft,
                               paddingHorizontal: 10,
                               paddingVertical: 4,
@@ -761,7 +745,7 @@ export default function GroupDetailScreen() {
                                 color: colorSemanticTokens.state.info,
                                 fontSize: 12,
                                 lineHeight: 16,
-                                fontWeight: "700",
+                                fontWeight: "600",
                               }}
                             >
                               Edit
@@ -777,8 +761,6 @@ export default function GroupDetailScreen() {
                             style={{
                               borderRadius: 999,
                               borderCurve: "continuous",
-                              borderWidth: 1,
-                              borderColor: colorSemanticTokens.state.danger,
                               backgroundColor: colorSemanticTokens.state.dangerSoft,
                               paddingHorizontal: 10,
                               paddingVertical: 4,
@@ -790,7 +772,7 @@ export default function GroupDetailScreen() {
                                 color: colorSemanticTokens.state.danger,
                                 fontSize: 12,
                                 lineHeight: 16,
-                                fontWeight: "700",
+                                fontWeight: "600",
                               }}
                             >
                               Delete
@@ -808,62 +790,26 @@ export default function GroupDetailScreen() {
           {/* Admin actions */}
           {isAdmin ? (
             <View style={{ gap: 10 }}>
-              <Pressable
+              <Button
+                label="Edit group"
                 onPress={() => {
                   router.push({
                     pathname: "/(app)/(tabs)/(groups)/edit",
                     params: { id: group.id },
                   });
                 }}
-                style={{
-                  borderRadius: 16,
-                  borderCurve: "continuous",
-                  backgroundColor: accent,
-                  paddingVertical: 14,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  selectable
-                  style={{
-                    color: colorSemanticTokens.text.inverse,
-                    fontSize: 16,
-                    lineHeight: 20,
-                    fontWeight: "700",
-                  }}
-                >
-                  Edit Group
-                </Text>
-              </Pressable>
+                size="lg"
+              />
 
-              <Pressable
-                disabled={isDeleting}
+              <Button
+                label={isDeleting ? "Deleting..." : "Delete group"}
                 onPress={handleDeleteGroup}
-                style={{
-                  borderRadius: 16,
-                  borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: colorSemanticTokens.state.danger,
-                  backgroundColor: colorSemanticTokens.state.dangerSoft,
-                  paddingVertical: 14,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  opacity: isDeleting ? 0.6 : 1,
-                }}
-              >
-                <Text
-                  selectable
-                  style={{
-                    color: colorSemanticTokens.state.danger,
-                    fontSize: 16,
-                    lineHeight: 20,
-                    fontWeight: "700",
-                  }}
-                >
-                  {isDeleting ? "Deleting..." : "Delete Group"}
-                </Text>
-              </Pressable>
+                disabled={isDeleting}
+                loading={isDeleting}
+                tone="danger"
+                variant="soft"
+                size="lg"
+              />
             </View>
           ) : null}
         </>

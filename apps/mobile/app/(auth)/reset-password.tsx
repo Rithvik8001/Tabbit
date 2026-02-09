@@ -2,6 +2,8 @@ import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { useAuth } from "@/features/auth/state/auth-provider";
@@ -57,7 +59,7 @@ export default function ResetPasswordScreen() {
           style={{
             fontSize: 15,
             fontWeight: "400",
-            color: "#3C3C3C",
+            color: colorSemanticTokens.text.primary,
             textAlign: "center",
             lineHeight: 22,
           }}
@@ -65,28 +67,8 @@ export default function ResetPasswordScreen() {
           Recovery link missing or expired. Request a new link and try again.
         </Text>
         <Link href="/(auth)/forgot-password" asChild>
-          <Pressable
-            style={{
-              backgroundColor: "#1CB0F6",
-              borderRadius: 16,
-              borderCurve: "continuous",
-              minHeight: 50,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingVertical: 14,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: "700",
-                color: "#FFFFFF",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              REQUEST NEW LINK
-            </Text>
+          <Pressable>
+            <Button label="Request new link" size="lg" />
           </Pressable>
         </Link>
       </AuthScreenShell>
@@ -125,7 +107,7 @@ export default function ResetPasswordScreen() {
           style={{
             fontSize: 13,
             fontWeight: "400",
-            color: "#FF4B4B",
+            color: colorSemanticTokens.state.danger,
             textAlign: "center",
           }}
         >
@@ -133,47 +115,24 @@ export default function ResetPasswordScreen() {
         </Text>
       ) : null}
 
-      {/* Update Password button */}
-      <Pressable
-        disabled={disableSubmit}
+      <Button
+        label="Update password"
         onPress={handleUpdatePassword}
-        style={{
-          backgroundColor: "#1CB0F6",
-          borderRadius: 16,
-          borderCurve: "continuous",
-          minHeight: 50,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 14,
-          opacity: disableSubmit ? 0.5 : 1,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "700",
-            color: "#FFFFFF",
-            textTransform: "uppercase",
-            letterSpacing: 0.8,
-          }}
-        >
-          UPDATE PASSWORD
-        </Text>
-      </Pressable>
+        loading={isSubmitting}
+        disabled={disableSubmit}
+        size="lg"
+      />
 
-      {/* Back to login */}
       <Link href="/(auth)/login" asChild>
         <Pressable style={{ alignSelf: "center", paddingTop: 8 }}>
           <Text
             style={{
               fontSize: 13,
-              fontWeight: "700",
-              color: "#1CB0F6",
-              textTransform: "uppercase",
-              letterSpacing: 0.2,
+              fontWeight: "600",
+              color: colorSemanticTokens.accent.primary,
             }}
           >
-            BACK TO LOGIN
+            Back to login
           </Text>
         </Pressable>
       </Link>

@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { colorSemanticTokens } from "@/design/tokens/colors";
+
 type AuthScreenShellProps = {
   title: string;
   children: ReactNode;
@@ -22,7 +24,7 @@ export function AuthScreenShell({
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -38,23 +40,20 @@ export function AuthScreenShell({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Title */}
           <Text
             style={{
-              fontSize: 17,
-              fontWeight: "700",
-              color: "#AFAFAF",
+              fontSize: 26,
+              fontWeight: "600",
+              color: colorSemanticTokens.text.primary,
               textAlign: "center",
-              marginBottom: 32,
+              marginBottom: 40,
             }}
           >
             {title}
           </Text>
 
-          {/* Content */}
           <View style={{ gap: 20 }}>{children}</View>
 
-          {/* Footer */}
           {footer ? (
             <View style={{ marginTop: 24 }}>{footer}</View>
           ) : null}

@@ -1,9 +1,22 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
-import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
+import { Button } from "@/design/primitives/button";
+import { HeaderPillButton } from "@/design/primitives/page-heading";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { loginSchema, parseFormErrors } from "@/features/auth/utils/auth-schemas";
 
@@ -17,6 +30,7 @@ function getParamValue(value: string | string[] | undefined): string | null {
 
 export default function LoginScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ verified?: string }>();
   const verifiedParam = getParamValue(params.verified);
   const { session, isAuthLoading, signInWithPassword } = useAuth();
@@ -26,6 +40,7 @@ export default function LoginScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
 
   useEffect(() => {
     if (!isAuthLoading && session) {
@@ -68,146 +83,336 @@ export default function LoginScreen() {
   };
 
   return (
-    <AuthScreenShell title="Enter your details">
-      <AuthInputGroup
-        fields={[
-          {
-            placeholder: "Email",
-            value: email,
-            onChangeText: (text: string) => {
-              setEmail(text);
-              clearFieldError("email");
-            },
-            autoCapitalize: "none",
-            autoCorrect: false,
-            keyboardType: "email-address",
-            textContentType: "emailAddress",
-            autoComplete: "email",
-            error: fieldErrors.email,
-          },
-          {
-            placeholder: "Password",
-            value: password,
-            onChangeText: (text: string) => {
-              setPassword(text);
-              clearFieldError("password");
-            },
-            secureTextEntry: true,
-            autoCapitalize: "none",
-            autoCorrect: false,
-            textContentType: "password",
-            autoComplete: "password",
-            error: fieldErrors.password,
-          },
-        ]}
-      />
-
-      {serverError ? (
-        <Text
-          style={{
-            fontSize: 13,
-            fontWeight: "400",
-            color: "#FF4B4B",
-            textAlign: "center",
-          }}
-        >
-          {serverError}
-        </Text>
-      ) : null}
-
-      {!serverError && verifiedParam === "1" ? (
-        <Text
-          style={{
-            fontSize: 13,
-            fontWeight: "400",
-            color: "#58CC02",
-            textAlign: "center",
-          }}
-        >
-          Email verified. Log in to continue.
-        </Text>
-      ) : null}
-
-      {/* Log In button */}
-      <Pressable
-        disabled={isSubmitting}
-        onPress={handleLogin}
-        style={{
-          backgroundColor: "#1CB0F6",
-          borderRadius: 16,
-          borderCurve: "continuous",
-          minHeight: 50,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 14,
-          opacity: isSubmitting ? 0.5 : 1,
-        }}
+    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "700",
-            color: "#FFFFFF",
-            textTransform: "uppercase",
-            letterSpacing: 0.8,
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: insets.top + 16,
+            paddingBottom: insets.bottom + 20,
+            paddingHorizontal: 24,
+            gap: 18,
           }}
         >
-          LOG IN
-        </Text>
-      </Pressable>
+          <HeaderPillButton
+            label="Back"
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+                return;
+              }
 
-      {/* Forgot password */}
-      <Link href="/(auth)/forgot-password" asChild>
-        <Pressable style={{ alignSelf: "center" }}>
-          <Text
+              router.replace("/(onboarding)");
+            }}
+          />
+
+          <View
             style={{
-              fontSize: 13,
-              fontWeight: "700",
-              color: "#1CB0F6",
-              textTransform: "uppercase",
-              letterSpacing: 0.4,
+              borderRadius: 28,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.border.subtle,
+              backgroundColor: colorSemanticTokens.surface.card,
+              paddingHorizontal: 18,
+              paddingVertical: 18,
+              gap: 12,
+              alignItems: "center",
             }}
           >
-            FORGOT PASSWORD
-          </Text>
-        </Pressable>
-      </Link>
-
-      {/* Bottom row */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          paddingTop: 8,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 13,
-            fontWeight: "400",
-            color: "#AFAFAF",
-          }}
-        >
-          New to Tabbit?
-        </Text>
-        <Link href="/(auth)/signup" asChild>
-          <Pressable>
-            <Text
+            <Image
+              source={require("@/assets/images/icon.png")}
+              contentFit="cover"
               style={{
-                fontSize: 13,
-                fontWeight: "700",
-                color: "#1CB0F6",
-                textTransform: "uppercase",
-                letterSpacing: 0.2,
+                width: 98,
+                height: 98,
+                borderRadius: 24,
+              }}
+            />
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.primary,
+                fontSize: 32,
+                lineHeight: 40,
+                fontWeight: "800",
+                letterSpacing: -0.5,
               }}
             >
-              CREATE ACCOUNT
+              Welcome back
             </Text>
-          </Pressable>
-        </Link>
-      </View>
-    </AuthScreenShell>
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.secondary,
+                fontSize: 16,
+                lineHeight: 24,
+                fontWeight: "500",
+                textAlign: "center",
+              }}
+            >
+              Sign in to continue splitting and settling.
+            </Text>
+          </View>
+
+          <View
+            style={{
+              borderRadius: 28,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.border.subtle,
+              backgroundColor: colorSemanticTokens.surface.card,
+              paddingHorizontal: 16,
+              paddingVertical: 16,
+              gap: 12,
+            }}
+          >
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.primary,
+                fontSize: 20,
+                lineHeight: 26,
+                fontWeight: "700",
+              }}
+            >
+              Sign in with Email
+            </Text>
+
+            <View style={{ gap: 8 }}>
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.text.secondary,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  fontWeight: "600",
+                }}
+              >
+                Email
+              </Text>
+              <TextInput
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  clearFieldError("email");
+                }}
+                placeholder="Your email"
+                placeholderTextColor={colorSemanticTokens.text.tertiary}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                autoComplete="email"
+                selectionColor={colorSemanticTokens.accent.primary}
+                style={{
+                  borderRadius: radiusTokens.xl,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: fieldErrors.email
+                    ? colorSemanticTokens.state.danger
+                    : colorSemanticTokens.border.subtle,
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  paddingHorizontal: 20,
+                  paddingVertical: 16,
+                  color: colorSemanticTokens.text.primary,
+                  fontSize: 16,
+                  lineHeight: 22,
+                  fontWeight: "500",
+                }}
+              />
+              {fieldErrors.email ? (
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.state.danger,
+                    fontSize: 12,
+                    lineHeight: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  {fieldErrors.email}
+                </Text>
+              ) : null}
+            </View>
+
+            <View style={{ gap: 8 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.text.secondary,
+                    fontSize: 15,
+                    lineHeight: 20,
+                    fontWeight: "600",
+                  }}
+                >
+                  Password
+                </Text>
+
+                <Link href="/(auth)/forgot-password" asChild>
+                  <Pressable>
+                    <Text
+                      selectable
+                      style={{
+                        color: colorSemanticTokens.accent.primary,
+                        fontSize: 15,
+                        lineHeight: 20,
+                        fontWeight: "700",
+                      }}
+                    >
+                      Forgot?
+                    </Text>
+                  </Pressable>
+                </Link>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderRadius: radiusTokens.xl,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: fieldErrors.password
+                    ? colorSemanticTokens.state.danger
+                    : colorSemanticTokens.border.subtle,
+                  backgroundColor: colorSemanticTokens.background.subtle,
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TextInput
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    clearFieldError("password");
+                  }}
+                  placeholder="Enter your password"
+                  placeholderTextColor={colorSemanticTokens.text.tertiary}
+                  secureTextEntry={isPasswordHidden}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  textContentType="password"
+                  autoComplete="password"
+                  selectionColor={colorSemanticTokens.accent.primary}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 16,
+                    color: colorSemanticTokens.text.primary,
+                    fontSize: 16,
+                    lineHeight: 22,
+                    fontWeight: "500",
+                  }}
+                />
+                <Pressable onPress={() => setIsPasswordHidden((prev) => !prev)}>
+                  <Ionicons
+                    name={isPasswordHidden ? "eye-off-outline" : "eye-outline"}
+                    size={24}
+                    color={colorSemanticTokens.text.tertiary}
+                  />
+                </Pressable>
+              </View>
+              {fieldErrors.password ? (
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.state.danger,
+                    fontSize: 12,
+                    lineHeight: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  {fieldErrors.password}
+                </Text>
+              ) : null}
+            </View>
+
+            {serverError ? (
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.state.danger,
+                  fontSize: 12,
+                  lineHeight: 17,
+                  fontWeight: "500",
+                  textAlign: "center",
+                }}
+              >
+                {serverError}
+              </Text>
+            ) : null}
+
+            {!serverError && verifiedParam === "1" ? (
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.state.success,
+                  fontSize: 12,
+                  lineHeight: 17,
+                  fontWeight: "500",
+                  textAlign: "center",
+                }}
+              >
+                Email verified. Log in to continue.
+              </Text>
+            ) : null}
+
+            <Button
+              label="Log in"
+              onPress={handleLogin}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              size="lg"
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              paddingBottom: 4,
+            }}
+          >
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.tertiary,
+                fontSize: 14,
+                lineHeight: 20,
+                fontWeight: "500",
+              }}
+            >
+              New to Tabbit?
+            </Text>
+            <Link href="/(auth)/signup" asChild>
+              <Pressable>
+                <Text
+                  selectable
+                  style={{
+                    color: colorSemanticTokens.accent.primary,
+                    fontSize: 14,
+                    lineHeight: 20,
+                    fontWeight: "700",
+                  }}
+                >
+                  Create account
+                </Text>
+              </Pressable>
+            </Link>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }

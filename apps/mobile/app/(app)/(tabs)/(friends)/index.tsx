@@ -1,12 +1,14 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
 import { Button } from "@/design/primitives/button";
 import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { colorSemanticTokens } from "@/design/tokens/colors";
-import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 import { FRIEND_REQUESTS_RPC_UNAVAILABLE_MESSAGE } from "@/features/friends/lib/friend-requests-repository";
@@ -28,7 +30,7 @@ function RequestRowSkeleton() {
           width: "55%",
           height: 14,
           borderRadius: 999,
-          backgroundColor: "#E5E5E5",
+          backgroundColor: colorSemanticTokens.border.subtle,
         }}
       />
       <View
@@ -36,7 +38,7 @@ function RequestRowSkeleton() {
           width: "72%",
           height: 12,
           borderRadius: 999,
-          backgroundColor: "#E5E5E5",
+          backgroundColor: colorSemanticTokens.border.subtle,
         }}
       />
     </LiquidSurface>
@@ -107,37 +109,19 @@ export default function FriendsTabScreen() {
   };
 
   return (
-    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.sm }}>
-      <Stack.Screen
-        options={{
-          headerRight: () => (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Add friend"
-              onPress={() => {
-                router.push("/(app)/(tabs)/(friends)/add");
-              }}
-              hitSlop={8}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: radiusTokens.pill,
-                borderCurve: "continuous",
-                backgroundColor: colorSemanticTokens.accent.soft,
-                borderWidth: 1,
-                borderColor: colorSemanticTokens.border.accent,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <FontAwesome
-                name="plus"
-                size={14}
-                color={colorSemanticTokens.accent.primary}
-              />
-            </Pressable>
-          ),
-        }}
+    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
+      <PageHeading
+        title="Friends"
+        subtitle="Requests, balances, and quick settle-ups."
+        trailing={
+          <HeaderPillButton
+            label="+ Friend"
+            onPress={() => {
+              router.push("/(app)/(tabs)/(friends)/add");
+            }}
+            tone="accent"
+          />
+        }
       />
 
       {isLoading ? (
@@ -228,9 +212,7 @@ export default function FriendsTabScreen() {
               style={{
                 borderRadius: 14,
                 borderCurve: "continuous",
-                borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.cardStrong,
+                backgroundColor: colorSemanticTokens.background.subtle,
                 padding: 12,
                 gap: 8,
               }}
@@ -312,9 +294,7 @@ export default function FriendsTabScreen() {
               style={{
                 borderRadius: 14,
                 borderCurve: "continuous",
-                borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.cardStrong,
+                backgroundColor: colorSemanticTokens.background.subtle,
                 padding: 12,
                 gap: 8,
               }}

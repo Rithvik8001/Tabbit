@@ -14,8 +14,8 @@ export const spacingTokens = {
   screenHorizontal: 24,
   screenHorizontalTight: 16,
   screenHorizontalWide: 28,
-  sectionGap: 20,
-  cardPadding: 20,
+  sectionGap: 28,
+  cardPadding: 24,
 } as const;
 
 export type SpacingScale = typeof spacingTokens;

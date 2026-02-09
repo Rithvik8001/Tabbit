@@ -4,10 +4,12 @@ import { Pressable, Text, View } from "react-native";
 import { Badge } from "@/design/primitives/badge";
 import { Button } from "@/design/primitives/button";
 import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import { PageHeading } from "@/design/primitives/page-heading";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { SectionHeader } from "@/design/primitives/section-header";
 import { StatTile } from "@/design/primitives/stat-tile";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
@@ -38,7 +40,7 @@ function LoadingShell() {
             width: "38%",
             height: 12,
             borderRadius: 999,
-            backgroundColor: "#E5E5E5",
+            backgroundColor: colorSemanticTokens.border.subtle,
           }}
         />
         <View
@@ -46,7 +48,7 @@ function LoadingShell() {
             width: "62%",
             height: 34,
             borderRadius: 999,
-            backgroundColor: "#E5E5E5",
+            backgroundColor: colorSemanticTokens.border.subtle,
           }}
         />
       </LiquidSurface>
@@ -59,7 +61,7 @@ function LoadingShell() {
                   width: "60%",
                   height: 11,
                   borderRadius: 999,
-                  backgroundColor: "#E5E5E5",
+                  backgroundColor: colorSemanticTokens.border.subtle,
                 }}
               />
               <View
@@ -67,7 +69,7 @@ function LoadingShell() {
                   width: "70%",
                   height: 23,
                   borderRadius: 999,
-                  backgroundColor: "#E5E5E5",
+                  backgroundColor: colorSemanticTokens.border.subtle,
                 }}
               />
             </LiquidSurface>
@@ -92,6 +94,11 @@ export default function HomeTabScreen() {
 
   return (
     <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
+      <PageHeading
+        title="Home"
+        subtitle="Your money snapshot at a glance."
+      />
+
       {isLoading ? <LoadingShell /> : null}
 
       {!isLoading ? (
@@ -190,11 +197,9 @@ export default function HomeTabScreen() {
                   >
                     <Pressable
                       style={{
-                        borderRadius: 16,
+                        borderRadius: radiusTokens.card,
                         borderCurve: "continuous",
-                        borderWidth: 2,
-                        borderColor: "#E5E5E5",
-                        backgroundColor: "#FFFFFF",
+                        backgroundColor: colorSemanticTokens.background.subtle,
                         padding: spacingTokens.md,
                         gap: spacingTokens.xs,
                       }}

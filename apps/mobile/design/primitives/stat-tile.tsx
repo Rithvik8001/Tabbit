@@ -31,10 +31,8 @@ export function StatTile({ label, value, tone = "neutral" }: StatTileProps) {
         style={[
           typographyScale.labelSm,
           {
-            color: colorSemanticTokens.text.tertiary,
-            fontWeight: "700",
-            textTransform: "uppercase",
-            letterSpacing: 0.8,
+            color: colorSemanticTokens.text.secondary,
+            fontWeight: "500",
           },
         ]}
       >

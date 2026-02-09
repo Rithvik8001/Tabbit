@@ -1,33 +1,29 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/primitives/button";
+import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
-const FEATURES = [
+const HIGHLIGHTS = [
   {
-    emoji: "👥",
-    title: "Groups",
-    text: "Create groups for any occasion",
-    bg: "#E8F5E9",
-    accent: "#58CC02",
+    emoji: "⚡",
+    title: "Instant splits",
+    text: "Add an expense and split in seconds.",
   },
   {
-    emoji: "💰",
-    title: "Balances",
-    text: "Track who owes what in real time",
-    bg: "#E3F2FD",
-    accent: "#1CB0F6",
+    emoji: "🤝",
+    title: "Clear balances",
+    text: "Know exactly who owes what at any moment.",
   },
   {
     emoji: "✅",
-    title: "Settle up",
-    text: "Pay back friends with one tap",
-    bg: "#FFF3E0",
-    accent: "#FF9800",
+    title: "One-tap settle",
+    text: "Record payments and close the loop fast.",
   },
 ];
 
@@ -43,121 +39,165 @@ export default function OnboardingScreen() {
   }, [isAuthLoading, router, session]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
+      <View
+        style={{
+          position: "absolute",
+          width: 260,
+          height: 260,
+          borderRadius: radiusTokens.pill,
+          backgroundColor: colorSemanticTokens.accent.soft,
+          top: -70,
+          right: -80,
+        }}
+      />
+      <View
+        style={{
+          position: "absolute",
+          width: 220,
+          height: 220,
+          borderRadius: radiusTokens.pill,
+          backgroundColor: colorSemanticTokens.state.infoSoft,
+          bottom: 120,
+          left: -90,
+        }}
+      />
+
       <View
         style={{
           flex: 1,
-          paddingTop: insets.top + 48,
+          paddingTop: insets.top + 20,
           paddingBottom: insets.bottom + 16,
           paddingHorizontal: 24,
+          gap: 22,
         }}
       >
-        {/* Top: Logo + Title + Tagline */}
-        <View style={{ alignItems: "center" }}>
-          <Image
-            source={require("@/assets/images/icon.png")}
-            contentFit="cover"
-            style={{
-              width: 120,
-              height: 120,
-              borderRadius: 32,
-              marginBottom: 20,
-            }}
-          />
-
-          <Text
-            style={{
-              fontFamily: "Pacifico_400Regular",
-              fontSize: 42,
-              color: "#3C3C3C",
-              textAlign: "center",
-              marginBottom: 12,
-            }}
-          >
-            Tabbit
-          </Text>
-
-          <Text
-            style={{
-              fontSize: 17,
-              fontWeight: "500",
-              color: "#6B6B6B",
-              textAlign: "center",
-              lineHeight: 24,
-              maxWidth: 300,
-            }}
-          >
-            Split expenses with friends{"\n"}and settle up effortlessly.
-          </Text>
-        </View>
-
-        {/* Middle: Feature highlight cards */}
         <View
           style={{
-            flex: 1,
-            justifyContent: "center",
-            gap: 12,
-            paddingVertical: 24,
+            borderRadius: 30,
+            borderCurve: "continuous",
+            borderWidth: 1,
+            borderColor: colorSemanticTokens.border.subtle,
+            backgroundColor: colorSemanticTokens.surface.card,
+            paddingHorizontal: 20,
+            paddingVertical: 18,
+            gap: 18,
           }}
         >
-          {FEATURES.map((feature) => (
-            <View
-              key={feature.title}
+          <View style={{ alignItems: "center" }}>
+            <Image
+              source={require("@/assets/images/icon.png")}
+              contentFit="cover"
               style={{
+                width: 126,
+                height: 126,
+                borderRadius: 30,
+              }}
+            />
+          </View>
+          <View style={{ gap: 8 }}>
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.primary,
+                fontSize: 34,
+                lineHeight: 42,
+                fontWeight: "800",
+                letterSpacing: -0.7,
+              }}
+            >
+              Split smarter.
+            </Text>
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.primary,
+                fontSize: 34,
+                lineHeight: 42,
+                fontWeight: "800",
+                letterSpacing: -0.7,
+              }}
+            >
+              Settle faster.
+            </Text>
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.secondary,
+                fontSize: 16,
+                lineHeight: 24,
+                fontWeight: "500",
+                marginTop: 4,
+              }}
+            >
+              Tabbit keeps every shared expense clean, quick, and stress-free.
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ gap: 10 }}>
+          {HIGHLIGHTS.map((item) => (
+            <View
+              key={item.title}
+              style={{
+                borderRadius: 20,
+                borderCurve: "continuous",
+                borderWidth: 1,
+                borderColor: colorSemanticTokens.border.subtle,
+                backgroundColor: colorSemanticTokens.surface.card,
+                paddingHorizontal: 16,
+                paddingVertical: 13,
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: feature.bg,
-                borderRadius: 16,
-                borderCurve: "continuous",
-                padding: 16,
-                gap: 14,
+                gap: 12,
               }}
             >
               <View
                 style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 14,
-                  borderCurve: "continuous",
-                  backgroundColor: "#FFFFFF",
+                  width: 40,
+                  height: 40,
+                  borderRadius: radiusTokens.pill,
                   alignItems: "center",
                   justifyContent: "center",
+                  backgroundColor: colorSemanticTokens.background.subtle,
                 }}
               >
-                <Text style={{ fontSize: 24 }}>{feature.emoji}</Text>
+                <Text selectable style={{ fontSize: 20 }}>
+                  {item.emoji}
+                </Text>
               </View>
-              <View style={{ flex: 1 }}>
+
+              <View style={{ flex: 1, gap: 2 }}>
                 <Text
+                  selectable
                   style={{
+                    color: colorSemanticTokens.text.primary,
                     fontSize: 15,
-                    fontWeight: "800",
-                    color: feature.accent,
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                    marginBottom: 2,
+                    lineHeight: 20,
+                    fontWeight: "700",
                   }}
                 >
-                  {feature.title}
+                  {item.title}
                 </Text>
                 <Text
+                  selectable
                   style={{
-                    fontSize: 15,
-                    fontWeight: "500",
-                    color: "#3C3C3C",
+                    color: colorSemanticTokens.text.secondary,
+                    fontSize: 14,
                     lineHeight: 20,
+                    fontWeight: "500",
                   }}
                 >
-                  {feature.text}
+                  {item.text}
                 </Text>
               </View>
             </View>
           ))}
         </View>
 
-        {/* Bottom: Buttons */}
-        <View style={{ gap: 12 }}>
+        <View style={{ marginTop: "auto", gap: 14 }}>
           <Button
-            label="GET STARTED"
+            label="Create account"
             size="lg"
             tone="accent"
             variant="solid"
@@ -165,15 +205,35 @@ export default function OnboardingScreen() {
               router.push("/(auth)/signup");
             }}
           />
-          <Button
-            label="I ALREADY HAVE AN ACCOUNT"
-            size="lg"
-            tone="blue"
-            variant="solid"
+
+          <Pressable
             onPress={() => {
               router.push("/(auth)/login");
             }}
-          />
+            style={{ paddingVertical: 8 }}
+          >
+            <Text
+              selectable
+              style={{
+                color: colorSemanticTokens.text.primary,
+                fontSize: 18,
+                lineHeight: 26,
+                fontWeight: "500",
+                textAlign: "center",
+              }}
+            >
+              Already have an account?{" "}
+              <Text
+                selectable
+                style={{
+                  color: colorSemanticTokens.accent.primary,
+                  fontWeight: "700",
+                }}
+              >
+                Sign in
+              </Text>
+            </Text>
+          </Pressable>
         </View>
       </View>
     </View>

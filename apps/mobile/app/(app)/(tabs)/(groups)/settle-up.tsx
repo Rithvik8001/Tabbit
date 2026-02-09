@@ -2,7 +2,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
@@ -147,6 +153,14 @@ export default function GroupSettleUpScreen() {
     })();
   };
 
+  const isDisabled =
+    isSubmitting ||
+    !user ||
+    !groupId ||
+    !fromUserId ||
+    !toUserId ||
+    !Number.isFinite(maxAmountCents);
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -159,15 +173,21 @@ export default function GroupSettleUpScreen() {
         gap: 12,
       }}
     >
+      <PageHeading
+        size="section"
+        title="Settle Up"
+        subtitle="Record a payment and close the loop."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
+      />
+
       {isLoading ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             padding: 16,
           }}
         >
@@ -177,7 +197,7 @@ export default function GroupSettleUpScreen() {
               color: ink,
               fontSize: 18,
               lineHeight: 22,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             Loading settlement details...
@@ -188,12 +208,9 @@ export default function GroupSettleUpScreen() {
       {error ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             padding: 16,
             gap: 10,
           }}
@@ -204,7 +221,7 @@ export default function GroupSettleUpScreen() {
               color: ink,
               fontSize: 18,
               lineHeight: 22,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             Could not load group details
@@ -215,7 +232,7 @@ export default function GroupSettleUpScreen() {
               color: muted,
               fontSize: 14,
               lineHeight: 18,
-              fontWeight: "500",
+              fontWeight: "400",
             }}
           >
             {error}
@@ -228,8 +245,6 @@ export default function GroupSettleUpScreen() {
               alignSelf: "flex-start",
               borderRadius: 999,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: colorSemanticTokens.border.muted,
               paddingHorizontal: 12,
               paddingVertical: 8,
               backgroundColor: colorSemanticTokens.background.subtle,
@@ -241,7 +256,7 @@ export default function GroupSettleUpScreen() {
                 color: ink,
                 fontSize: 13,
                 lineHeight: 16,
-                fontWeight: "700",
+                fontWeight: "600",
               }}
             >
               Try again
@@ -252,12 +267,9 @@ export default function GroupSettleUpScreen() {
 
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 8,
         }}
@@ -268,7 +280,7 @@ export default function GroupSettleUpScreen() {
             color: muted,
             fontSize: 14,
             lineHeight: 18,
-            fontWeight: "600",
+            fontWeight: "500",
           }}
         >
           Group
@@ -279,7 +291,7 @@ export default function GroupSettleUpScreen() {
             color: ink,
             fontSize: 22,
             lineHeight: 28,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           {group?.emoji ? `${group.emoji} ` : ""}
@@ -289,12 +301,9 @@ export default function GroupSettleUpScreen() {
 
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 8,
         }}
@@ -305,7 +314,7 @@ export default function GroupSettleUpScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Direction
@@ -316,7 +325,7 @@ export default function GroupSettleUpScreen() {
             color: muted,
             fontSize: 14,
             lineHeight: 18,
-            fontWeight: "500",
+            fontWeight: "400",
           }}
         >
           Payer: {payerLabel}
@@ -327,7 +336,7 @@ export default function GroupSettleUpScreen() {
             color: muted,
             fontSize: 14,
             lineHeight: 18,
-            fontWeight: "500",
+            fontWeight: "400",
           }}
         >
           Payee: {payeeLabel}
@@ -336,12 +345,9 @@ export default function GroupSettleUpScreen() {
 
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -352,7 +358,7 @@ export default function GroupSettleUpScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Amount
@@ -362,11 +368,9 @@ export default function GroupSettleUpScreen() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
           }}
         >
@@ -376,7 +380,7 @@ export default function GroupSettleUpScreen() {
               color: muted,
               fontSize: 20,
               lineHeight: 24,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             $
@@ -395,7 +399,7 @@ export default function GroupSettleUpScreen() {
               color: ink,
               fontSize: 20,
               lineHeight: 24,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           />
         </View>
@@ -406,7 +410,7 @@ export default function GroupSettleUpScreen() {
             color: muted,
             fontSize: 13,
             lineHeight: 16,
-            fontWeight: "500",
+            fontWeight: "400",
           }}
         >
           Maximum allowed:{" "}
@@ -421,7 +425,7 @@ export default function GroupSettleUpScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
             marginTop: 6,
           }}
         >
@@ -434,17 +438,15 @@ export default function GroupSettleUpScreen() {
           placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
             fontSize: 16,
             lineHeight: 20,
-            fontWeight: "600",
+            fontWeight: "500",
           }}
         />
       </View>
@@ -452,10 +454,8 @@ export default function GroupSettleUpScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
             backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}
@@ -466,7 +466,7 @@ export default function GroupSettleUpScreen() {
               color: colorSemanticTokens.state.danger,
               fontSize: 14,
               lineHeight: 18,
-              fontWeight: "600",
+              fontWeight: "500",
             }}
           >
             {formError}
@@ -474,55 +474,13 @@ export default function GroupSettleUpScreen() {
         </View>
       ) : null}
 
-      <Pressable
-        accessibilityRole="button"
-        disabled={
-          isSubmitting ||
-          !user ||
-          !groupId ||
-          !fromUserId ||
-          !toUserId ||
-          !Number.isFinite(maxAmountCents)
-        }
+      <Button
+        label={isSubmitting ? "Recording..." : "Record settlement"}
         onPress={handleSubmit}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          backgroundColor:
-            isSubmitting ||
-            !user ||
-            !groupId ||
-            !fromUserId ||
-            !toUserId ||
-            !Number.isFinite(maxAmountCents)
-              ? colorSemanticTokens.accent.softStrong
-              : accent,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity:
-            isSubmitting ||
-            !user ||
-            !groupId ||
-            !fromUserId ||
-            !toUserId ||
-            !Number.isFinite(maxAmountCents)
-              ? 0.8
-              : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.text.inverse,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isSubmitting ? "Recording..." : "Record Settlement"}
-        </Text>
-      </Pressable>
+        loading={isSubmitting}
+        disabled={isDisabled}
+        size="lg"
+      />
     </ScrollView>
   );
 }

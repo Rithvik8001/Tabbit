@@ -2,7 +2,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { isValidEmail } from "@/features/auth/utils/auth-validation";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import type { GroupMemberCandidate } from "@/features/groups/types/group-member.types";
@@ -140,21 +146,27 @@ export default function AddMemberScreen() {
         gap: 12,
       }}
     >
+      <PageHeading
+        size="section"
+        title="Add Member"
+        subtitle="Invite someone by name or email."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
+      />
+
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
         >
           Add member
         </Text>
@@ -177,11 +189,11 @@ export default function AddMemberScreen() {
           autoCorrect={false}
           autoFocus
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -213,12 +225,9 @@ export default function AddMemberScreen() {
       {query.trim().length >= 2 && !isSearching ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             overflow: "hidden",
           }}
         >
@@ -262,7 +271,7 @@ export default function AddMemberScreen() {
                       color: ink,
                       fontSize: 15,
                       lineHeight: 19,
-                      fontWeight: "700",
+                      fontWeight: "600",
                     }}
                   >
                     {candidate.displayName}
@@ -290,7 +299,7 @@ export default function AddMemberScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: colorSemanticTokens.state.danger,
@@ -307,32 +316,13 @@ export default function AddMemberScreen() {
         </View>
       ) : null}
 
-      <Pressable
-        accessibilityRole="button"
-        disabled={isAddingMember}
+      <Button
+        label={isAddingMember ? "Adding..." : "Add member"}
         onPress={handleAdd}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          backgroundColor: isAddingMember ? colorSemanticTokens.accent.softStrong : accent,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: isAddingMember ? 0.8 : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.text.inverse,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isAddingMember ? "Adding..." : "Add Member"}
-        </Text>
-      </Pressable>
+        disabled={isAddingMember}
+        loading={isAddingMember}
+        size="lg"
+      />
     </ScrollView>
   );
 }

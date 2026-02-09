@@ -2,14 +2,19 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { useDirectFriendGroup } from "@/features/friends/hooks/use-direct-friend-group";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
 
-const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
 const accent = colorSemanticTokens.accent.primary;
@@ -76,7 +81,7 @@ export default function FriendSettleUpScreen() {
       : {
           id: directGroupId,
           name: `Direct with ${friendLabel}`,
-          emoji: "🤝",
+          emoji: "\uD83E\uDD1D",
           isDirect: true,
         };
 
@@ -202,15 +207,21 @@ export default function FriendSettleUpScreen() {
         gap: 12,
       }}
     >
+      <PageHeading
+        size="section"
+        title="Settle Up"
+        subtitle="Close your balance in one record."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
+      />
+
       {isLoading ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             padding: 16,
             gap: 8,
           }}
@@ -221,7 +232,7 @@ export default function FriendSettleUpScreen() {
               color: ink,
               fontSize: 18,
               lineHeight: 22,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             Loading settlement details...
@@ -232,12 +243,9 @@ export default function FriendSettleUpScreen() {
       {error ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             padding: 16,
             gap: 10,
           }}
@@ -248,7 +256,7 @@ export default function FriendSettleUpScreen() {
               color: ink,
               fontSize: 18,
               lineHeight: 22,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             Could not load friend details
@@ -272,8 +280,6 @@ export default function FriendSettleUpScreen() {
               alignSelf: "flex-start",
               borderRadius: 999,
               borderCurve: "continuous",
-              borderWidth: 1,
-              borderColor: colorSemanticTokens.border.muted,
               paddingHorizontal: 12,
               paddingVertical: 8,
               backgroundColor: colorSemanticTokens.background.subtle,
@@ -285,7 +291,7 @@ export default function FriendSettleUpScreen() {
                 color: ink,
                 fontSize: 13,
                 lineHeight: 16,
-                fontWeight: "700",
+                fontWeight: "600",
               }}
             >
               Try again
@@ -298,12 +304,9 @@ export default function FriendSettleUpScreen() {
         <>
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 2,
-              borderColor: "#E5E5E5",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backgroundColor: colorSemanticTokens.surface.card,
               padding: 16,
               gap: 8,
             }}
@@ -325,7 +328,7 @@ export default function FriendSettleUpScreen() {
                 color: friend.direction === "you_are_owed" ? accent : ink,
                 fontSize: 24,
                 lineHeight: 30,
-                fontWeight: "700",
+                fontWeight: "600",
                 fontVariant: ["tabular-nums"],
               }}
             >
@@ -346,12 +349,9 @@ export default function FriendSettleUpScreen() {
 
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 2,
-              borderColor: "#E5E5E5",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backgroundColor: colorSemanticTokens.surface.card,
               padding: 16,
               gap: 10,
             }}
@@ -362,7 +362,7 @@ export default function FriendSettleUpScreen() {
                 color: ink,
                 fontSize: 18,
                 lineHeight: 22,
-                fontWeight: "700",
+                fontWeight: "600",
               }}
             >
               Settlement group
@@ -417,15 +417,15 @@ export default function FriendSettleUpScreen() {
                         setSelectedGroupId(group.id);
                       }}
                       style={{
-                        borderRadius: 16,
+                        borderRadius: radiusTokens.card,
                         borderCurve: "continuous",
-                        borderWidth: 1,
+                        borderWidth: 1.5,
                         borderColor: isSelected
                           ? colorSemanticTokens.accent.primary
-                          : stroke,
+                          : "transparent",
                         backgroundColor: isSelected
                           ? colorSemanticTokens.accent.soft
-                          : colorSemanticTokens.surface.cardStrong,
+                          : colorSemanticTokens.background.subtle,
                         paddingHorizontal: 12,
                         paddingVertical: 10,
                       }}
@@ -441,7 +441,7 @@ export default function FriendSettleUpScreen() {
                       >
                         {group.emoji ? `${group.emoji} ` : ""}
                         {group.name}
-                        {group.isDirect ? " · Direct" : ""}
+                        {group.isDirect ? " \u00B7 Direct" : ""}
                       </Text>
                     </Pressable>
                   );
@@ -452,12 +452,9 @@ export default function FriendSettleUpScreen() {
 
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 2,
-              borderColor: "#E5E5E5",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backgroundColor: colorSemanticTokens.surface.card,
               padding: 16,
               gap: 8,
             }}
@@ -468,7 +465,7 @@ export default function FriendSettleUpScreen() {
                 color: ink,
                 fontSize: 18,
                 lineHeight: 22,
-                fontWeight: "700",
+                fontWeight: "600",
               }}
             >
               Direction
@@ -499,12 +496,9 @@ export default function FriendSettleUpScreen() {
 
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 2,
-              borderColor: "#E5E5E5",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backgroundColor: colorSemanticTokens.surface.card,
               padding: 16,
               gap: 10,
             }}
@@ -515,7 +509,7 @@ export default function FriendSettleUpScreen() {
                 color: ink,
                 fontSize: 18,
                 lineHeight: 22,
-                fontWeight: "700",
+                fontWeight: "600",
               }}
             >
               Amount
@@ -525,11 +519,11 @@ export default function FriendSettleUpScreen() {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                borderRadius: 16,
+                borderRadius: radiusTokens.control,
                 borderCurve: "continuous",
-                borderWidth: 2,
-                borderColor: "#E5E5E5",
-                backgroundColor: "#FFFFFF",
+                borderWidth: 1.5,
+                borderColor: "transparent",
+                backgroundColor: colorSemanticTokens.background.subtle,
                 paddingHorizontal: 14,
               }}
             >
@@ -539,7 +533,7 @@ export default function FriendSettleUpScreen() {
                   color: muted,
                   fontSize: 20,
                   lineHeight: 24,
-                  fontWeight: "700",
+                  fontWeight: "600",
                 }}
               >
                 $
@@ -558,7 +552,7 @@ export default function FriendSettleUpScreen() {
                   color: ink,
                   fontSize: 20,
                   lineHeight: 24,
-                  fontWeight: "700",
+                  fontWeight: "600",
                 }}
               />
             </View>
@@ -581,7 +575,7 @@ export default function FriendSettleUpScreen() {
                 color: ink,
                 fontSize: 18,
                 lineHeight: 22,
-                fontWeight: "700",
+                fontWeight: "600",
                 marginTop: 6,
               }}
             >
@@ -594,11 +588,11 @@ export default function FriendSettleUpScreen() {
               placeholderTextColor={colorSemanticTokens.text.tertiary}
               selectionColor={accent}
               style={{
-                borderRadius: 16,
+                borderRadius: radiusTokens.control,
                 borderCurve: "continuous",
-                borderWidth: 2,
-                borderColor: "#E5E5E5",
-                backgroundColor: "#FFFFFF",
+                borderWidth: 1.5,
+                borderColor: "transparent",
+                backgroundColor: colorSemanticTokens.background.subtle,
                 paddingHorizontal: 14,
                 paddingVertical: 12,
                 color: ink,
@@ -614,10 +608,8 @@ export default function FriendSettleUpScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
             backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}
@@ -636,8 +628,10 @@ export default function FriendSettleUpScreen() {
         </View>
       ) : null}
 
-      <Pressable
-        accessibilityRole="button"
+      <Button
+        label={isSubmitting ? "Recording..." : "Record settlement"}
+        onPress={handleSubmit}
+        loading={isSubmitting}
         disabled={
           isSubmitting ||
           !friend ||
@@ -645,43 +639,7 @@ export default function FriendSettleUpScreen() {
           !selectedGroupId ||
           isDirectGroupLoading
         }
-        onPress={handleSubmit}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          backgroundColor:
-            isSubmitting ||
-            !friend ||
-            !user ||
-            !selectedGroupId ||
-            isDirectGroupLoading
-              ? colorSemanticTokens.accent.softStrong
-              : accent,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity:
-            isSubmitting ||
-            !friend ||
-            !user ||
-            !selectedGroupId ||
-            isDirectGroupLoading
-              ? 0.8
-              : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.text.inverse,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isSubmitting ? "Recording..." : "Record Settlement"}
-        </Text>
-      </Pressable>
+      />
     </ScrollView>
   );
 }

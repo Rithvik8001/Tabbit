@@ -1,8 +1,14 @@
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 
 import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useFriendRequests } from "@/features/friends/hooks/use-friend-requests";
 import { searchFriendCandidates } from "@/features/friends/lib/friend-requests-repository";
 import type {
@@ -10,7 +16,6 @@ import type {
   FriendSearchCandidate,
 } from "@/features/friends/types/friend-request.types";
 
-const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
 const accent = colorSemanticTokens.accent.primary;
@@ -22,14 +27,12 @@ function getRelationshipBadge(status: FriendRelationshipStatus): {
   label: string;
   textColor: string;
   backgroundColor: string;
-  borderColor: string;
 } {
   if (status === "already_friend") {
     return {
       label: "Friends",
       textColor: colorSemanticTokens.financial.positive,
-      backgroundColor: "#F2FCE9",
-      borderColor: "#B9E59A",
+      backgroundColor: colorSemanticTokens.state.successSoft,
     };
   }
 
@@ -38,7 +41,6 @@ function getRelationshipBadge(status: FriendRelationshipStatus): {
       label: "Sent",
       textColor: colorSemanticTokens.accent.primary,
       backgroundColor: colorSemanticTokens.accent.soft,
-      borderColor: colorSemanticTokens.border.accent,
     };
   }
 
@@ -47,7 +49,6 @@ function getRelationshipBadge(status: FriendRelationshipStatus): {
       label: "Incoming",
       textColor: colorSemanticTokens.state.info,
       backgroundColor: colorSemanticTokens.state.infoSoft,
-      borderColor: colorSemanticTokens.state.info,
     };
   }
 
@@ -55,11 +56,11 @@ function getRelationshipBadge(status: FriendRelationshipStatus): {
     label: "Can request",
     textColor: colorSemanticTokens.text.tertiary,
     backgroundColor: colorSemanticTokens.background.subtle,
-    borderColor: colorSemanticTokens.border.subtle,
   };
 }
 
 export default function AddFriendScreen() {
+  const router = useRouter();
   const { sendRequest, isSendingToUser } = useFriendRequests();
 
   const [query, setQuery] = useState("");
@@ -192,14 +193,20 @@ export default function AddFriendScreen() {
         gap: 12,
       }}
     >
+      <PageHeading
+        size="section"
+        title="Add Friend"
+        subtitle="Search by username or email."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
+      />
+
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -210,7 +217,7 @@ export default function AddFriendScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Find friends
@@ -239,11 +246,11 @@ export default function AddFriendScreen() {
           autoCorrect={false}
           autoFocus
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1.5,
+            borderColor: "transparent",
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -271,12 +278,9 @@ export default function AddFriendScreen() {
       {query.trim().length >= 2 && !isSearching ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             overflow: "hidden",
           }}
         >
@@ -306,7 +310,7 @@ export default function AddFriendScreen() {
                     paddingVertical: 11,
                     borderTopWidth:
                       suggestions[0]?.userId === candidate.userId ? 0 : 1,
-                    borderTopColor: stroke,
+                    borderTopColor: colorSemanticTokens.border.subtle,
                     backgroundColor: colorSemanticTokens.surface.cardStrong,
                     gap: 10,
                   }}
@@ -326,7 +330,7 @@ export default function AddFriendScreen() {
                           color: ink,
                           fontSize: 15,
                           lineHeight: 19,
-                          fontWeight: "700",
+                          fontWeight: "600",
                         }}
                       >
                         {candidate.displayName ?? candidate.email ?? "Unknown"}
@@ -350,8 +354,6 @@ export default function AddFriendScreen() {
                       style={{
                         borderRadius: 999,
                         borderCurve: "continuous",
-                        borderWidth: 1,
-                        borderColor: badge.borderColor,
                         backgroundColor: badge.backgroundColor,
                         paddingHorizontal: 10,
                         paddingVertical: 4,
@@ -363,9 +365,7 @@ export default function AddFriendScreen() {
                           color: badge.textColor,
                           fontSize: 11,
                           lineHeight: 14,
-                          fontWeight: "700",
-                          textTransform: "uppercase",
-                          letterSpacing: 0.6,
+                          fontWeight: "600",
                         }}
                       >
                         {badge.label}
@@ -375,7 +375,7 @@ export default function AddFriendScreen() {
 
                   {canRequest ? (
                     <Button
-                      label="Send Request"
+                      label="Send request"
                       size="sm"
                       tone="blue"
                       loading={isSendingToUser(candidate.userId)}
@@ -411,10 +411,8 @@ export default function AddFriendScreen() {
       {searchError ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
             backgroundColor: colorSemanticTokens.state.dangerSoft,
             padding: 12,
           }}
@@ -436,10 +434,8 @@ export default function AddFriendScreen() {
       {statusMessage ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: colorSemanticTokens.accent.primary,
             backgroundColor: colorSemanticTokens.accent.soft,
             padding: 12,
           }}

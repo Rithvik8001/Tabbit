@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -8,13 +8,17 @@ import {
   View,
 } from "react-native";
 
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useDirectFriendGroup } from "@/features/friends/hooks/use-direct-friend-group";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { formatShortDate } from "@/features/app-shell/mock/tab-mock-data";
 
-const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
 const accent = colorSemanticTokens.accent.primary;
@@ -61,11 +65,13 @@ export default function FriendDetailScreen() {
         gap: 12,
       }}
     >
-      <Stack.Screen
-        options={{
-          title: friendName,
-          headerLargeTitle: false,
-        }}
+      <PageHeading
+        size="section"
+        title={friendName}
+        subtitle="Track your shared activity and settle fast."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
       />
 
       {isLoading ? (
@@ -75,12 +81,9 @@ export default function FriendDetailScreen() {
       ) : error ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             padding: 16,
             gap: 12,
             alignItems: "center",
@@ -106,12 +109,9 @@ export default function FriendDetailScreen() {
       ) : !friend ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            backgroundColor: colorSemanticTokens.surface.card,
             padding: 16,
             gap: 6,
           }}
@@ -122,7 +122,7 @@ export default function FriendDetailScreen() {
               color: ink,
               fontSize: 20,
               lineHeight: 24,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             Friend not found
@@ -144,12 +144,9 @@ export default function FriendDetailScreen() {
           {/* Balance card */}
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 2,
-              borderColor: "#E5E5E5",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backgroundColor: colorSemanticTokens.surface.card,
               padding: 16,
               gap: 8,
             }}
@@ -185,7 +182,7 @@ export default function FriendDetailScreen() {
                       : colorSemanticTokens.financial.negative,
                   fontSize: 22,
                   lineHeight: 28,
-                  fontWeight: "700",
+                  fontWeight: "600",
                 }}
               >
                 {isSettled
@@ -203,7 +200,7 @@ export default function FriendDetailScreen() {
                       : colorSemanticTokens.financial.negative,
                     fontSize: 28,
                     lineHeight: 34,
-                    fontWeight: "700",
+                    fontWeight: "600",
                     fontVariant: ["tabular-nums"],
                   }}
                 >
@@ -225,8 +222,6 @@ export default function FriendDetailScreen() {
                 style={{
                   borderRadius: 999,
                   borderCurve: "continuous",
-                  borderWidth: 1,
-                  borderColor: colorSemanticTokens.state.info,
                   backgroundColor: colorSemanticTokens.state.infoSoft,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
@@ -239,10 +234,10 @@ export default function FriendDetailScreen() {
                     color: colorSemanticTokens.state.info,
                     fontSize: 13,
                     lineHeight: 16,
-                    fontWeight: "700",
+                    fontWeight: "600",
                   }}
                 >
-                  {isEnsuring ? "Starting..." : "Add Expense"}
+                  {isEnsuring ? "Starting..." : "Add expense"}
                 </Text>
               </Pressable>
               {!isSettled ? (
@@ -256,8 +251,6 @@ export default function FriendDetailScreen() {
                   style={{
                     borderRadius: 999,
                     borderCurve: "continuous",
-                    borderWidth: 1,
-                    borderColor: colorSemanticTokens.accent.primary,
                     backgroundColor: colorSemanticTokens.accent.soft,
                     paddingHorizontal: 12,
                     paddingVertical: 6,
@@ -269,10 +262,10 @@ export default function FriendDetailScreen() {
                       color: accent,
                       fontSize: 13,
                       lineHeight: 16,
-                      fontWeight: "700",
+                      fontWeight: "600",
                     }}
                   >
-                    Settle Up
+                    Settle up
                   </Text>
                 </Pressable>
               ) : null}
@@ -282,12 +275,9 @@ export default function FriendDetailScreen() {
           {/* Activity list */}
           <View
             style={{
-              borderRadius: 16,
+              borderRadius: radiusTokens.card,
               borderCurve: "continuous",
-              borderWidth: 2,
-              borderColor: "#E5E5E5",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backgroundColor: colorSemanticTokens.surface.card,
               padding: 16,
               gap: 10,
             }}
@@ -298,7 +288,7 @@ export default function FriendDetailScreen() {
                 color: ink,
                 fontSize: 18,
                 lineHeight: 22,
-                fontWeight: "700",
+                fontWeight: "600",
               }}
             >
               Recent items
@@ -324,10 +314,9 @@ export default function FriendDetailScreen() {
                   <View
                     key={item.expenseId}
                     style={{
-                      borderRadius: 16,
+                      borderRadius: radiusTokens.card,
                       borderCurve: "continuous",
-                      borderWidth: 1,
-                      borderColor: stroke,
+                      backgroundColor: colorSemanticTokens.background.subtle,
                       padding: 12,
                       gap: 6,
                     }}
@@ -369,7 +358,7 @@ export default function FriendDetailScreen() {
                                 color: accent,
                                 fontSize: 11,
                                 lineHeight: 14,
-                                fontWeight: "700",
+                                fontWeight: "600",
                               }}
                             >
                               Settlement
@@ -383,7 +372,7 @@ export default function FriendDetailScreen() {
                           color: itemPositive ? accent : muted,
                           fontSize: 16,
                           lineHeight: 20,
-                          fontWeight: "700",
+                          fontWeight: "600",
                           fontVariant: ["tabular-nums"],
                         }}
                       >

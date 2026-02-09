@@ -29,8 +29,6 @@ export function LiquidSurface({
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
           backgroundColor: "#FFFFFF",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
         },
         style,
       ]}

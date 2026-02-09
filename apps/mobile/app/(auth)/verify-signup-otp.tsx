@@ -2,6 +2,8 @@ import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, Text } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import { colorSemanticTokens } from "@/design/tokens/colors";
 import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { useAuth } from "@/features/auth/state/auth-provider";
@@ -138,10 +140,10 @@ export default function VerifySignupOtpScreen() {
   const disableVerify = isSubmitting || isResending || code.length !== 6;
   const resendLabel =
     resendSecondsRemaining > 0
-      ? `RESEND CODE IN ${resendSecondsRemaining}s`
+      ? `Resend code in ${resendSecondsRemaining}s`
       : isResending
-        ? "SENDING CODE..."
-        : "RESEND CODE";
+        ? "Sending code..."
+        : "Resend code";
 
   return (
     <AuthScreenShell title="Verify your email">
@@ -149,7 +151,7 @@ export default function VerifySignupOtpScreen() {
         style={{
           fontSize: 14,
           fontWeight: "400",
-          color: "#6B6B6B",
+          color: colorSemanticTokens.text.secondary,
           textAlign: "center",
           lineHeight: 21,
         }}
@@ -183,7 +185,7 @@ export default function VerifySignupOtpScreen() {
           style={{
             fontSize: 13,
             fontWeight: "400",
-            color: "#58CC02",
+            color: colorSemanticTokens.state.success,
             textAlign: "center",
           }}
         >
@@ -191,32 +193,13 @@ export default function VerifySignupOtpScreen() {
         </Text>
       ) : null}
 
-      <Pressable
-        disabled={disableVerify}
+      <Button
+        label="Verify code"
         onPress={handleVerifyCode}
-        style={{
-          backgroundColor: "#1CB0F6",
-          borderRadius: 16,
-          borderCurve: "continuous",
-          minHeight: 50,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 14,
-          opacity: disableVerify ? 0.5 : 1,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "700",
-            color: "#FFFFFF",
-            textTransform: "uppercase",
-            letterSpacing: 0.8,
-          }}
-        >
-          VERIFY CODE
-        </Text>
-      </Pressable>
+        loading={isSubmitting}
+        disabled={disableVerify}
+        size="lg"
+      />
 
       <Pressable
         disabled={resendSecondsRemaining > 0 || isResending}
@@ -229,10 +212,8 @@ export default function VerifySignupOtpScreen() {
         <Text
           style={{
             fontSize: 13,
-            fontWeight: "700",
-            color: "#1CB0F6",
-            textTransform: "uppercase",
-            letterSpacing: 0.4,
+            fontWeight: "600",
+            color: colorSemanticTokens.accent.primary,
           }}
         >
           {resendLabel}
@@ -244,13 +225,11 @@ export default function VerifySignupOtpScreen() {
           <Text
             style={{
               fontSize: 13,
-              fontWeight: "700",
-              color: "#1CB0F6",
-              textTransform: "uppercase",
-              letterSpacing: 0.4,
+              fontWeight: "600",
+              color: colorSemanticTokens.accent.primary,
             }}
           >
-            BACK TO SIGN UP
+            Back to sign up
           </Text>
         </Pressable>
       </Link>

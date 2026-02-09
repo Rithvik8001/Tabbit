@@ -10,7 +10,13 @@ import {
   View,
 } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import {
@@ -216,126 +222,196 @@ export default function EditExpenseScreen() {
   // Loading state
   if (isLoadingExpense) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFFFFF",
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 24,
+          gap: 12,
         }}
       >
-        <ActivityIndicator size="large" color={accent} />
-      </View>
+        <PageHeading
+          size="section"
+          title="Edit Expense"
+          subtitle="Update amount, split, and participants."
+          leading={
+            <HeaderPillButton label="Back" onPress={() => router.back()} />
+          }
+        />
+        <View
+          style={{
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: 20,
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={accent} />
+        </View>
+      </ScrollView>
     );
   }
 
   // Error state
   if (loadError) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFFFFF",
-          padding: 20,
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 24,
+          gap: 12,
         }}
       >
-        <Text
-          selectable
+        <PageHeading
+          size="section"
+          title="Edit Expense"
+          subtitle="Update amount, split, and participants."
+          leading={
+            <HeaderPillButton label="Back" onPress={() => router.back()} />
+          }
+        />
+        <View
           style={{
-            color: ink,
-            fontSize: 18,
-            lineHeight: 22,
-            fontWeight: "700",
-            textAlign: "center",
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: 16,
+            gap: 8,
           }}
         >
-          Could not load expense
-        </Text>
-        <Text
-          selectable
-          style={{
-            color: muted,
-            fontSize: 15,
-            lineHeight: 20,
-            fontWeight: "500",
-            textAlign: "center",
-            marginTop: 8,
-          }}
-        >
-          {loadError}
-        </Text>
-      </View>
+          <Text
+            selectable
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
+          >
+            Could not load expense
+          </Text>
+          <Text
+            selectable
+            style={{
+              color: muted,
+              fontSize: 15,
+              lineHeight: 20,
+              fontWeight: "500",
+            }}
+          >
+            {loadError}
+          </Text>
+        </View>
+      </ScrollView>
     );
   }
 
   // Guard: settlement
   if (expense?.entryType === "settlement") {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFFFFF",
-          padding: 20,
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 24,
+          gap: 12,
         }}
       >
-        <Text
-          selectable
+        <PageHeading
+          size="section"
+          title="Edit Expense"
+          subtitle="Update amount, split, and participants."
+          leading={
+            <HeaderPillButton label="Back" onPress={() => router.back()} />
+          }
+        />
+        <View
           style={{
-            color: ink,
-            fontSize: 18,
-            lineHeight: 22,
-            fontWeight: "700",
-            textAlign: "center",
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: 16,
+            gap: 8,
           }}
         >
-          Settlements cannot be edited
-        </Text>
-        <Text
-          selectable
-          style={{
-            color: muted,
-            fontSize: 15,
-            lineHeight: 20,
-            fontWeight: "500",
-            textAlign: "center",
-            marginTop: 8,
-          }}
-        >
-          Delete and re-create the settlement if needed.
-        </Text>
-      </View>
+          <Text
+            selectable
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
+          >
+            Settlements cannot be edited
+          </Text>
+          <Text
+            selectable
+            style={{
+              color: muted,
+              fontSize: 15,
+              lineHeight: 20,
+              fontWeight: "500",
+            }}
+          >
+            Delete and re-create the settlement if needed.
+          </Text>
+        </View>
+      </ScrollView>
     );
   }
 
   // Guard: not creator
   if (expense && user && expense.createdBy !== user.id) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFFFFF",
-          padding: 20,
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 24,
+          gap: 12,
         }}
       >
-        <Text
-          selectable
+        <PageHeading
+          size="section"
+          title="Edit Expense"
+          subtitle="Update amount, split, and participants."
+          leading={
+            <HeaderPillButton label="Back" onPress={() => router.back()} />
+          }
+        />
+        <View
           style={{
-            color: ink,
-            fontSize: 18,
-            lineHeight: 22,
-            fontWeight: "700",
-            textAlign: "center",
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: 16,
+            gap: 8,
           }}
         >
-          Only the creator can edit this expense
-        </Text>
-      </View>
+          <Text
+            selectable
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
+          >
+            Only the creator can edit this expense
+          </Text>
+        </View>
+      </ScrollView>
     );
   }
 
@@ -356,15 +432,21 @@ export default function EditExpenseScreen() {
         gap: 12,
       }}
     >
+      <PageHeading
+        size="section"
+        title="Edit Expense"
+        subtitle="Update amount, split, and participants."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
+      />
+
       {/* Description */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -383,7 +465,7 @@ export default function EditExpenseScreen() {
               color: ink,
               fontSize: 18,
               lineHeight: 22,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             Description
@@ -409,11 +491,11 @@ export default function EditExpenseScreen() {
           placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -427,12 +509,9 @@ export default function EditExpenseScreen() {
       {/* Amount */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -443,7 +522,7 @@ export default function EditExpenseScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Amount
@@ -453,11 +532,11 @@ export default function EditExpenseScreen() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
           }}
         >
@@ -467,7 +546,7 @@ export default function EditExpenseScreen() {
               color: muted,
               fontSize: 20,
               lineHeight: 24,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           >
             $
@@ -486,7 +565,7 @@ export default function EditExpenseScreen() {
               color: ink,
               fontSize: 20,
               lineHeight: 24,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           />
         </View>
@@ -495,12 +574,9 @@ export default function EditExpenseScreen() {
       {/* Date */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -511,7 +587,7 @@ export default function EditExpenseScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Date
@@ -524,11 +600,11 @@ export default function EditExpenseScreen() {
           placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -542,12 +618,9 @@ export default function EditExpenseScreen() {
       {/* Who paid */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -558,7 +631,7 @@ export default function EditExpenseScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Who paid?
@@ -575,7 +648,7 @@ export default function EditExpenseScreen() {
                 key={member.userId}
                 onPress={() => setPaidBy(member.userId)}
                 style={{
-                  borderRadius: 16,
+                  borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected
@@ -609,12 +682,9 @@ export default function EditExpenseScreen() {
       {/* Split type */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -625,7 +695,7 @@ export default function EditExpenseScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Split type
@@ -640,7 +710,7 @@ export default function EditExpenseScreen() {
                 key={option.type}
                 onPress={() => setSplitType(option.type)}
                 style={{
-                  borderRadius: 16,
+                  borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected
@@ -660,7 +730,7 @@ export default function EditExpenseScreen() {
                     color: isSelected ? accent : ink,
                     fontSize: 16,
                     lineHeight: 20,
-                    fontWeight: "700",
+                    fontWeight: "600",
                   }}
                 >
                   {option.label}
@@ -685,12 +755,9 @@ export default function EditExpenseScreen() {
       {/* Participants */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -701,7 +768,7 @@ export default function EditExpenseScreen() {
             color: ink,
             fontSize: 18,
             lineHeight: 22,
-            fontWeight: "700",
+            fontWeight: "600",
           }}
         >
           Participants ({participantCount})
@@ -720,7 +787,7 @@ export default function EditExpenseScreen() {
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    borderRadius: 16,
+                    borderRadius: radiusTokens.control,
                     borderCurve: "continuous",
                     borderWidth: 1,
                     borderColor: isChecked
@@ -755,7 +822,7 @@ export default function EditExpenseScreen() {
                           color: colorSemanticTokens.text.inverse,
                           fontSize: 13,
                           lineHeight: 15,
-                          fontWeight: "800",
+                          fontWeight: "600",
                         }}
                       >
                         ✓
@@ -920,7 +987,7 @@ export default function EditExpenseScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: colorSemanticTokens.state.danger,
@@ -943,64 +1010,24 @@ export default function EditExpenseScreen() {
       ) : null}
 
       {/* Save button */}
-      <Pressable
-        accessibilityRole="button"
-        disabled={isSaving}
+      <Button
+        label={isSaving ? "Saving..." : "Save changes"}
         onPress={handleSave}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          backgroundColor: isSaving
-            ? colorSemanticTokens.accent.softStrong
-            : accent,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: isSaving ? 0.8 : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.text.inverse,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isSaving ? "Saving..." : "Save Changes"}
-        </Text>
-      </Pressable>
+        disabled={isSaving}
+        loading={isSaving}
+        size="lg"
+      />
 
       {/* Delete button */}
-      <Pressable
-        accessibilityRole="button"
-        disabled={isDeleting}
+      <Button
+        label={isDeleting ? "Deleting..." : "Delete expense"}
         onPress={handleDelete}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          borderWidth: 1,
-          borderColor: colorSemanticTokens.state.danger,
-          backgroundColor: colorSemanticTokens.state.dangerSoft,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: isDeleting ? 0.6 : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.state.danger,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isDeleting ? "Deleting..." : "Delete Expense"}
-        </Text>
-      </Pressable>
+        disabled={isDeleting}
+        loading={isDeleting}
+        variant="soft"
+        tone="danger"
+        size="lg"
+      />
     </ScrollView>
   );
 }

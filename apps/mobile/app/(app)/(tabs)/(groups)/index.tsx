@@ -1,9 +1,12 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
 import { Button } from "@/design/primitives/button";
 import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";
@@ -22,7 +25,7 @@ function LoadingGroupCard() {
             width: 42,
             height: 42,
             borderRadius: radiusTokens.pill,
-            backgroundColor: "#E5E5E5",
+            backgroundColor: colorSemanticTokens.border.subtle,
           }}
         />
         <View style={{ flex: 1, gap: 8 }}>
@@ -31,7 +34,7 @@ function LoadingGroupCard() {
               width: "65%",
               height: 14,
               borderRadius: 999,
-              backgroundColor: "#E5E5E5",
+              backgroundColor: colorSemanticTokens.border.subtle,
             }}
           />
           <View
@@ -39,7 +42,7 @@ function LoadingGroupCard() {
               width: "38%",
               height: 12,
               borderRadius: 999,
-              backgroundColor: "#E5E5E5",
+              backgroundColor: colorSemanticTokens.border.subtle,
             }}
           />
         </View>
@@ -57,31 +60,17 @@ export default function GroupsTabScreen() {
   };
 
   return (
-    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.sm }}>
-      <Stack.Screen
-        options={{
-          headerRight: () => (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Create group"
-              onPress={openCreateScreen}
-              hitSlop={8}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: radiusTokens.pill,
-                borderCurve: "continuous",
-                backgroundColor: colorSemanticTokens.accent.soft,
-                borderWidth: 1,
-                borderColor: colorSemanticTokens.border.accent,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <FontAwesome name="plus" size={14} color={colorSemanticTokens.accent.primary} />
-            </Pressable>
-          ),
-        }}
+    <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
+      <PageHeading
+        title="Groups"
+        subtitle="Split trips, rent, and every shared moment."
+        trailing={
+          <HeaderPillButton
+            label="+ Group"
+            onPress={openCreateScreen}
+            tone="accent"
+          />
+        }
       />
 
       {isLoading

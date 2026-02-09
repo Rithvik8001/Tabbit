@@ -47,7 +47,7 @@ export function ScreenContainer({
     <View
       style={{
         flex: 1,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: colorSemanticTokens.background.canvas,
       }}
     >
       <View
@@ -92,11 +92,11 @@ export function ScreenContainer({
             }}
             style={{
               borderTopWidth: 1,
-              borderTopColor: "#E5E5E5",
+              borderTopColor: colorSemanticTokens.border.subtle,
               paddingHorizontal: spacingTokens.screenHorizontal,
               paddingTop: spacingTokens.sm,
               paddingBottom: Math.max(insets.bottom, spacingTokens.sm),
-              backgroundColor: "#FFFFFF",
+              backgroundColor: colorSemanticTokens.background.chrome,
             }}
           >
             {footer}

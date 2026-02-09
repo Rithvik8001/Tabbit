@@ -2,7 +2,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { Button } from "@/design/primitives/button";
+import {
+  HeaderPillButton,
+  PageHeading,
+} from "@/design/primitives/page-heading";
 import { colorSemanticTokens } from "@/design/tokens/colors";
+import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import {
@@ -156,15 +162,21 @@ export default function AddExpenseScreen() {
         gap: 12,
       }}
     >
+      <PageHeading
+        size="section"
+        title="Add Expense"
+        subtitle="Capture it once. Split it right."
+        leading={
+          <HeaderPillButton label="Back" onPress={() => router.back()} />
+        }
+      />
+
       {/* Description */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -179,7 +191,7 @@ export default function AddExpenseScreen() {
         >
           <Text
             selectable
-            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+            style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
           >
             Description
           </Text>
@@ -200,11 +212,11 @@ export default function AddExpenseScreen() {
           selectionColor={accent}
           autoFocus
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -218,19 +230,16 @@ export default function AddExpenseScreen() {
       {/* Amount */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
         >
           Amount
         </Text>
@@ -239,17 +248,17 @@ export default function AddExpenseScreen() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
           }}
         >
           <Text
             selectable
-            style={{ color: muted, fontSize: 20, lineHeight: 24, fontWeight: "700" }}
+            style={{ color: muted, fontSize: 20, lineHeight: 24, fontWeight: "600" }}
           >
             $
           </Text>
@@ -267,7 +276,7 @@ export default function AddExpenseScreen() {
               color: ink,
               fontSize: 20,
               lineHeight: 24,
-              fontWeight: "700",
+              fontWeight: "600",
             }}
           />
         </View>
@@ -276,19 +285,16 @@ export default function AddExpenseScreen() {
       {/* Date */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
         >
           Date
         </Text>
@@ -300,11 +306,11 @@ export default function AddExpenseScreen() {
           placeholderTextColor={colorSemanticTokens.text.tertiary}
           selectionColor={accent}
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            borderWidth: 2,
-            borderColor: "#E5E5E5",
-            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: stroke,
+            backgroundColor: colorSemanticTokens.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -318,19 +324,16 @@ export default function AddExpenseScreen() {
       {/* Who paid */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
         >
           Who paid?
         </Text>
@@ -346,7 +349,7 @@ export default function AddExpenseScreen() {
                 key={member.userId}
                 onPress={() => setPaidBy(member.userId)}
                 style={{
-                  borderRadius: 16,
+                  borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
@@ -375,19 +378,16 @@ export default function AddExpenseScreen() {
       {/* Split type */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
         >
           Split type
         </Text>
@@ -401,7 +401,7 @@ export default function AddExpenseScreen() {
                 key={option.type}
                 onPress={() => setSplitType(option.type)}
                 style={{
-                  borderRadius: 16,
+                  borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected ? colorSemanticTokens.accent.primary : stroke,
@@ -417,7 +417,7 @@ export default function AddExpenseScreen() {
                     color: isSelected ? accent : ink,
                     fontSize: 16,
                     lineHeight: 20,
-                    fontWeight: "700",
+                    fontWeight: "600",
                   }}
                 >
                   {option.label}
@@ -442,19 +442,16 @@ export default function AddExpenseScreen() {
       {/* Participants */}
       <View
         style={{
-          borderRadius: 16,
+          borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          borderWidth: 2,
-          borderColor: "#E5E5E5",
-          backgroundColor: "#FFFFFF",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: colorSemanticTokens.surface.card,
           padding: 16,
           gap: 10,
         }}
       >
         <Text
           selectable
-          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }}
+          style={{ color: ink, fontSize: 18, lineHeight: 22, fontWeight: "600" }}
         >
           Participants ({participantCount})
         </Text>
@@ -472,7 +469,7 @@ export default function AddExpenseScreen() {
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    borderRadius: 16,
+                    borderRadius: radiusTokens.control,
                     borderCurve: "continuous",
                     borderWidth: 1,
                     borderColor: isChecked ? colorSemanticTokens.accent.primary : stroke,
@@ -501,7 +498,7 @@ export default function AddExpenseScreen() {
                           color: colorSemanticTokens.text.inverse,
                           fontSize: 13,
                           lineHeight: 15,
-                          fontWeight: "800",
+                          fontWeight: "600",
                         }}
                       >
                         ✓
@@ -649,7 +646,7 @@ export default function AddExpenseScreen() {
       {formError ? (
         <View
           style={{
-            borderRadius: 16,
+            borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: colorSemanticTokens.state.danger,
@@ -667,32 +664,13 @@ export default function AddExpenseScreen() {
       ) : null}
 
       {/* Submit */}
-      <Pressable
-        accessibilityRole="button"
-        disabled={isCreating}
+      <Button
+        label={isCreating ? "Adding..." : "Add expense"}
         onPress={handleCreate}
-        style={{
-          borderRadius: 16,
-          borderCurve: "continuous",
-          backgroundColor: isCreating ? colorSemanticTokens.accent.softStrong : accent,
-          paddingVertical: 14,
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: isCreating ? 0.8 : 1,
-        }}
-      >
-        <Text
-          selectable
-          style={{
-            color: colorSemanticTokens.text.inverse,
-            fontSize: 16,
-            lineHeight: 20,
-            fontWeight: "700",
-          }}
-        >
-          {isCreating ? "Adding..." : "Add Expense"}
-        </Text>
-      </Pressable>
+        disabled={isCreating}
+        loading={isCreating}
+        size="lg"
+      />
     </ScrollView>
   );
 }

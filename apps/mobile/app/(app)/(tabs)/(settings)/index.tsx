@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 
 import { Button } from "@/design/primitives/button";
 import { LiquidSurface } from "@/design/primitives/liquid-surface";
+import { PageHeading } from "@/design/primitives/page-heading";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { TextField } from "@/design/primitives/text-field";
 import { colorSemanticTokens } from "@/design/tokens/colors";
@@ -111,6 +112,11 @@ export default function SettingsTabScreen() {
 
   return (
     <ScreenContainer contentContainerStyle={{ gap: spacingTokens.md }}>
+      <PageHeading
+        title="Settings"
+        subtitle="Profile, notifications, and account controls."
+      />
+
       <LiquidSurface kind="strong" contentStyle={{ padding: spacingTokens.cardPadding, gap: spacingTokens.sm }}>
         <Text selectable style={[typographyScale.labelMd, { color: colorSemanticTokens.text.tertiary }]}>
           Account

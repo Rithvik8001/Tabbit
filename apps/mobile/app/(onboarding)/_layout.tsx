@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-import { colorTokens } from "@/design/tokens/color";
+import { colorSemanticTokens } from "@/design/tokens/colors";
 
 export default function OnboardingLayout() {
   return (
@@ -8,7 +8,7 @@ export default function OnboardingLayout() {
       screenOptions={{
         animation: "fade",
         headerShown: false,
-        contentStyle: { backgroundColor: colorTokens.surface.base },
+        contentStyle: { backgroundColor: colorSemanticTokens.background.canvas },
       }}
     >
       <Stack.Screen name="index" />

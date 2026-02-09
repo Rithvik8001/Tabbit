@@ -1,23 +1,23 @@
 import type { TextStyle } from "react-native";
 
 export const fontFamilyTokens = {
-  bodyRegular: undefined,
-  bodyMedium: undefined,
-  bodySemiBold: undefined,
-  bodyBold: undefined,
-  displayRegular: undefined,
-  displayMedium: undefined,
-  displaySemiBold: undefined,
-  displayBold: undefined,
-  regular: undefined,
-  medium: undefined,
-  semibold: undefined,
-  bold: undefined,
+  bodyRegular: "Sora_400Regular",
+  bodyMedium: "Sora_500Medium",
+  bodySemiBold: "Sora_600SemiBold",
+  bodyBold: "Sora_700Bold",
+  displayRegular: "Sora_400Regular",
+  displayMedium: "Sora_500Medium",
+  displaySemiBold: "Sora_700Bold",
+  displayBold: "Sora_800ExtraBold",
+  regular: "Sora_400Regular",
+  medium: "Sora_500Medium",
+  semibold: "Sora_600SemiBold",
+  bold: "Sora_700Bold",
 } as const;
 
 type TypographyVariant = Pick<
   TextStyle,
-  "fontSize" | "lineHeight" | "letterSpacing" | "fontWeight"
+  "fontSize" | "lineHeight" | "letterSpacing" | "fontWeight" | "fontFamily"
 >;
 
 export type TypographyTokens = Record<
@@ -39,78 +39,91 @@ export type TypographyTokens = Record<
 
 export const typographyScale: TypographyTokens = {
   displayXl: {
+    fontFamily: fontFamilyTokens.displayBold,
     fontSize: 42,
     lineHeight: 52,
     fontWeight: "800",
     letterSpacing: -0.3,
   },
   displayLg: {
+    fontFamily: fontFamilyTokens.displaySemiBold,
     fontSize: 34,
-    lineHeight: 42,
-    fontWeight: "700",
+    lineHeight: 44,
+    fontWeight: "600",
     letterSpacing: -0.2,
   },
   displayMd: {
+    fontFamily: fontFamilyTokens.displaySemiBold,
     fontSize: 28,
-    lineHeight: 36,
-    fontWeight: "700",
+    lineHeight: 38,
+    fontWeight: "600",
     letterSpacing: -0.1,
   },
   headingLg: {
+    fontFamily: fontFamilyTokens.bodyBold,
     fontSize: 24,
-    lineHeight: 32,
-    fontWeight: "700",
+    lineHeight: 34,
+    fontWeight: "600",
     letterSpacing: 0,
   },
   headingMd: {
+    fontFamily: fontFamilyTokens.bodyBold,
     fontSize: 20,
     lineHeight: 28,
     fontWeight: "600",
     letterSpacing: 0,
   },
   headingSm: {
+    fontFamily: fontFamilyTokens.bodySemiBold,
     fontSize: 17,
     lineHeight: 24,
     fontWeight: "600",
     letterSpacing: 0,
   },
   bodyLg: {
+    fontFamily: fontFamilyTokens.bodyRegular,
     fontSize: 16,
-    lineHeight: 26,
+    lineHeight: 28,
     fontWeight: "400",
     letterSpacing: 0,
   },
   bodyMd: {
+    fontFamily: fontFamilyTokens.bodyRegular,
     fontSize: 15,
-    lineHeight: 24,
+    lineHeight: 26,
     fontWeight: "400",
     letterSpacing: 0,
   },
   bodySm: {
+    fontFamily: fontFamilyTokens.bodyRegular,
     fontSize: 13,
-    lineHeight: 20,
+    lineHeight: 22,
     fontWeight: "400",
     letterSpacing: 0,
   },
   labelLg: {
+    fontFamily: fontFamilyTokens.bodyMedium,
     fontSize: 15,
     lineHeight: 22,
-    fontWeight: "600",
-    letterSpacing: 0.2,
+    fontWeight: "500",
+    letterSpacing: 0,
   },
   labelMd: {
+    fontFamily: fontFamilyTokens.bodyMedium,
     fontSize: 13,
     lineHeight: 18,
-    fontWeight: "600",
-    letterSpacing: 0.2,
+    fontWeight: "500",
+    letterSpacing: 0,
   },
   labelSm: {
+    fontFamily: fontFamilyTokens.bodyMedium,
     fontSize: 12,
     lineHeight: 16,
-    fontWeight: "600",
-    letterSpacing: 0.3,
+    fontWeight: "500",
+    letterSpacing: 0,
   },
   caption: {
+    fontFamily: fontFamilyTokens.bodyRegular,
     fontSize: 11,
     lineHeight: 16,
     fontWeight: "400",

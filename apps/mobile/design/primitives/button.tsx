@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
 import type { GestureResponderEvent } from "react-native";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -29,25 +29,19 @@ type ButtonProps = {
 
 const isIOS = process.env.EXPO_OS === "ios";
 
-const SHADOW_HEIGHT = 4;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-type SolidPalette = {
-  face: string;
-  shadow: string;
-  text: string;
-};
-
-function getSolidPalette(tone: ButtonTone): SolidPalette {
+function getSolidPalette(tone: ButtonTone) {
   switch (tone) {
     case "danger":
-      return { face: "#FF4B4B", shadow: "#EA2B2B", text: "#FFFFFF" };
+      return { bg: colorSemanticTokens.state.danger, text: "#FFFFFF" };
     case "neutral":
-      return { face: "#E5E5E5", shadow: "#CCCCCC", text: "#3C3C3C" };
+      return { bg: colorSemanticTokens.background.subtle, text: colorSemanticTokens.text.primary };
     case "blue":
-      return { face: "#1CB0F6", shadow: "#1899D6", text: "#FFFFFF" };
+      return { bg: colorSemanticTokens.state.info, text: "#FFFFFF" };
     case "accent":
     default:
-      return { face: "#58CC02", shadow: "#46A302", text: "#FFFFFF" };
+      return { bg: colorSemanticTokens.accent.primary, text: "#FFFFFF" };
   }
 }
 
@@ -55,28 +49,24 @@ function getSoftPalette(tone: ButtonTone) {
   switch (tone) {
     case "danger":
       return {
-        backgroundColor: colorSemanticTokens.state.dangerSoft,
-        borderColor: "#FF4B4B",
-        color: "#FF4B4B",
+        bg: colorSemanticTokens.state.dangerSoft,
+        text: colorSemanticTokens.state.danger,
       };
     case "neutral":
       return {
-        backgroundColor: "#F7F7F7",
-        borderColor: "#E5E5E5",
-        color: "#3C3C3C",
+        bg: colorSemanticTokens.background.subtle,
+        text: colorSemanticTokens.text.primary,
       };
     case "blue":
       return {
-        backgroundColor: colorSemanticTokens.state.infoSoft,
-        borderColor: "#1CB0F6",
-        color: "#1CB0F6",
+        bg: colorSemanticTokens.state.infoSoft,
+        text: colorSemanticTokens.state.info,
       };
     case "accent":
     default:
       return {
-        backgroundColor: colorSemanticTokens.accent.soft,
-        borderColor: "#58CC02",
-        color: "#58CC02",
+        bg: colorSemanticTokens.accent.soft,
+        text: colorSemanticTokens.accent.primary,
       };
   }
 }
@@ -84,25 +74,27 @@ function getSoftPalette(tone: ButtonTone) {
 function getGhostColor(tone: ButtonTone) {
   switch (tone) {
     case "danger":
-      return "#FF4B4B";
+      return colorSemanticTokens.state.danger;
     case "blue":
-      return "#1CB0F6";
+      return colorSemanticTokens.state.info;
     case "neutral":
-      return "#3C3C3C";
+      return colorSemanticTokens.text.primary;
     case "accent":
     default:
-      return "#58CC02";
+      return colorSemanticTokens.accent.primary;
   }
 }
 
-function getSizeStyles(size: ButtonSize) {
-  if (size === "sm") {
-    return { paddingVertical: 8, paddingHorizontal: 14 };
-  }
-  if (size === "lg") {
-    return { paddingVertical: 14, paddingHorizontal: 20 };
-  }
-  return { paddingVertical: 12, paddingHorizontal: 16 };
+function getHeight(size: ButtonSize) {
+  if (size === "sm") return 44;
+  if (size === "lg") return 62;
+  return 52;
+}
+
+function getPadding(size: ButtonSize) {
+  if (size === "sm") return { paddingVertical: 8, paddingHorizontal: 16 };
+  if (size === "lg") return { paddingVertical: 16, paddingHorizontal: 28 };
+  return { paddingVertical: 12, paddingHorizontal: 22 };
 }
 
 export function Button({
@@ -115,19 +107,25 @@ export function Button({
   size = "md",
 }: ButtonProps) {
   const shouldReduceMotion = useReducedMotion();
-  const translateY = useSharedValue(0);
+  const scale = useSharedValue(1);
 
-  const animatedFaceStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
   }));
 
-  const animatePress = (pressed: boolean) => {
-    translateY.value = withTiming(pressed ? SHADOW_HEIGHT : 0, {
+  const isDisabled = disabled || loading;
+
+  const handlePressIn = () => {
+    scale.value = withTiming(0.97, {
       duration: shouldReduceMotion ? 0 : motionTokens.duration.press,
     });
   };
 
-  const isDisabled = disabled || loading;
+  const handlePressOut = () => {
+    scale.value = withTiming(1, {
+      duration: shouldReduceMotion ? 0 : motionTokens.duration.fast,
+    });
+  };
 
   const handlePress = (_event: GestureResponderEvent) => {
     if (isDisabled) return;
@@ -137,152 +135,143 @@ export function Button({
     onPress?.();
   };
 
-  // Solid 3D button
+  const minHeight = getHeight(size);
+  const padding = getPadding(size);
+  const fontSize = size === "sm" ? 14 : size === "lg" ? 17 : 16;
+
   if (variant === "solid") {
     const palette = getSolidPalette(tone);
-    const minH = size === "lg" ? 50 : size === "sm" ? 36 : 44;
-    const sizeStyles = getSizeStyles(size);
+    const resolvedPalette = isDisabled
+      ? {
+          bg: "#A7A3B0",
+          text: "#F3F2F6",
+        }
+      : palette;
 
     return (
-      <View
-        style={{
-          borderRadius: radiusTokens.button,
-          borderCurve: "continuous",
-          overflow: "hidden",
-          opacity: isDisabled ? 0.5 : 1,
-        }}
+      <AnimatedPressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled: isDisabled, busy: loading }}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={isDisabled}
+        onPress={handlePress}
+        style={[
+          animatedStyle,
+          {
+            minHeight,
+            borderRadius: radiusTokens.pill,
+            borderCurve: "continuous",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+            gap: 8,
+            backgroundColor: resolvedPalette.bg,
+            opacity: 1,
+            boxShadow: isDisabled
+              ? "none"
+              : "0 8px 18px rgba(57, 19, 138, 0.22)",
+            ...padding,
+          },
+        ]}
       >
-        {/* Shadow layer */}
-        <View
+        {loading ? (
+          <ActivityIndicator size="small" color={resolvedPalette.text} />
+        ) : null}
+        <Text
+          selectable
           style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: SHADOW_HEIGHT,
-            backgroundColor: palette.shadow,
-            borderBottomLeftRadius: radiusTokens.button,
-            borderBottomRightRadius: radiusTokens.button,
+            fontSize,
+            fontWeight: "700",
+            color: resolvedPalette.text,
           }}
-        />
-        {/* Face layer */}
-        <Animated.View style={animatedFaceStyle}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: isDisabled, busy: loading }}
-            onPressIn={() => animatePress(true)}
-            onPressOut={() => animatePress(false)}
-            disabled={isDisabled}
-            onPress={handlePress}
-            style={{
-              minHeight: minH,
-              borderRadius: radiusTokens.button,
-              borderCurve: "continuous",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "row",
-              gap: 8,
-              backgroundColor: palette.face,
-              ...sizeStyles,
-            }}
-          >
-            {loading ? <ActivityIndicator size="small" color={palette.text} /> : null}
-            <Text
-              selectable
-              style={{
-
-                fontSize: size === "sm" ? 13 : 15,
-                fontWeight: "700",
-                color: palette.text,
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              {label}
-            </Text>
-          </Pressable>
-        </Animated.View>
-      </View>
+        >
+          {label}
+        </Text>
+      </AnimatedPressable>
     );
   }
-
-  // Soft and ghost variants — flat style
-  const sizeStyles = getSizeStyles(size);
 
   if (variant === "ghost") {
     const color = isDisabled ? colorSemanticTokens.text.tertiary : getGhostColor(tone);
     return (
-      <Pressable
+      <AnimatedPressable
         accessibilityRole="button"
         accessibilityState={{ disabled: isDisabled, busy: loading }}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         disabled={isDisabled}
         onPress={handlePress}
-        style={{
-          minHeight: 44,
-          borderRadius: radiusTokens.button,
-          borderCurve: "continuous",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "row",
-          gap: 8,
-          ...sizeStyles,
-          opacity: isDisabled ? 0.5 : 1,
-        }}
+        style={[
+          animatedStyle,
+          {
+            minHeight,
+            borderRadius: radiusTokens.pill,
+            borderCurve: "continuous",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+            gap: 8,
+            opacity: isDisabled ? 0.5 : 1,
+            ...padding,
+          },
+        ]}
       >
         {loading ? <ActivityIndicator size="small" color={color} /> : null}
         <Text
           selectable
           style={{
-            fontSize: 15,
+            fontSize,
             fontWeight: "700",
             color,
-            letterSpacing: 0.2,
           }}
         >
           {label}
         </Text>
-      </Pressable>
+      </AnimatedPressable>
     );
   }
 
   // Soft variant
   const softPalette = isDisabled
-    ? { backgroundColor: "#F7F7F7", borderColor: "#E5E5E5", color: colorSemanticTokens.text.tertiary }
+    ? { bg: colorSemanticTokens.background.subtle, text: colorSemanticTokens.text.tertiary }
     : getSoftPalette(tone);
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={isDisabled}
       onPress={handlePress}
-      style={{
-        minHeight: 44,
-        borderRadius: radiusTokens.button,
-        borderCurve: "continuous",
-        borderWidth: 2,
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "row",
-        gap: 8,
-        ...sizeStyles,
-        backgroundColor: softPalette.backgroundColor,
-        borderColor: softPalette.borderColor,
-        opacity: isDisabled ? 0.5 : 1,
-      }}
+      style={[
+        animatedStyle,
+        {
+          minHeight,
+          borderRadius: radiusTokens.pill,
+          borderCurve: "continuous",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "row",
+          gap: 8,
+          backgroundColor: softPalette.bg,
+          opacity: isDisabled ? 0.5 : 1,
+          ...padding,
+        },
+      ]}
     >
-      {loading ? <ActivityIndicator size="small" color={softPalette.color} /> : null}
+      {loading ? <ActivityIndicator size="small" color={softPalette.text} /> : null}
       <Text
         selectable
         style={{
-          fontSize: 15,
+          fontSize,
           fontWeight: "700",
-          color: softPalette.color,
-          letterSpacing: 0.2,
+          color: softPalette.text,
         }}
       >
         {label}
       </Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
