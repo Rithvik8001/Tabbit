@@ -25,7 +25,7 @@ serve(async (req) => {
 
     const splitUserId: string = record.user_id;
     const expenseId: string = record.expense_id;
-    const splitAmountCents: number = record.amount;
+    const splitAmountCents: number = record.share_cents;
 
     // Look up the parent expense
     const { data: expense, error: expenseError } = await supabaseAdmin
