@@ -10,6 +10,7 @@ import {
 
 import { BalanceListRow } from "@/design/primitives/balance-list-row";
 import { Button } from "@/design/primitives/button";
+import { FilterChipRow } from "@/design/primitives/filter-chip-row";
 import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-cta";
 import { OverallBalanceStrip } from "@/design/primitives/overall-balance-strip";
 import { ScreenContainer } from "@/design/primitives/screen-container";
@@ -24,11 +25,21 @@ import { listExpensesForGroup } from "@/features/groups/lib/expenses-repository"
 import { formatCents } from "@/features/groups/lib/format-currency";
 import type { GroupListRowVM } from "@/features/groups/types/group.types";
 import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
+import {
+  BALANCE_CHIPS,
+  GROUP_SORT_CHIPS,
+  matchesBalanceFilter,
+  sortGroups,
+  toneToDirection,
+  type BalanceFilter,
+  type GroupSort,
+} from "@/features/shared/lib/list-filter-utils";
 
 type GroupStatus = {
   statusLabel: string;
   statusAmount: string | null;
   tone: "positive" | "negative" | "neutral";
+  netCents: number;
 };
 
 function computeNetForUser(
@@ -69,7 +80,8 @@ export default function GroupsTabScreen() {
 
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
-  const [hideSettled, setHideSettled] = useState(false);
+  const [balanceFilter, setBalanceFilter] = useState<BalanceFilter>("all");
+  const [groupSort, setGroupSort] = useState<GroupSort>("newest");
   const [statusByGroupId, setStatusByGroupId] = useState<
     Record<string, GroupStatus>
   >({});
@@ -93,6 +105,7 @@ export default function GroupsTabScreen() {
                 statusLabel: "status unavailable",
                 statusAmount: null,
                 tone: "neutral",
+                netCents: 0,
               } satisfies GroupStatus,
             ] as const;
           }
@@ -106,6 +119,7 @@ export default function GroupsTabScreen() {
                 statusLabel: "you owe",
                 statusAmount: formatCents(Math.abs(netCents)),
                 tone: "negative",
+                netCents,
               } satisfies GroupStatus,
             ] as const;
           }
@@ -117,6 +131,7 @@ export default function GroupsTabScreen() {
                 statusLabel: "you are owed",
                 statusAmount: formatCents(Math.abs(netCents)),
                 tone: "positive",
+                netCents,
               } satisfies GroupStatus,
             ] as const;
           }
@@ -127,6 +142,7 @@ export default function GroupsTabScreen() {
               statusLabel: "settled up",
               statusAmount: null,
               tone: "neutral",
+              netCents: 0,
             } satisfies GroupStatus,
           ] as const;
         }),
@@ -144,12 +160,19 @@ export default function GroupsTabScreen() {
     };
   }, [groups, user?.id]);
 
-  const rows = useMemo<GroupListRowVM[]>(() => {
+  type GroupRowWithMeta = GroupListRowVM & {
+    netCents: number;
+    createdAt: string;
+    tone: "positive" | "negative" | "neutral";
+  };
+
+  const rows = useMemo<GroupRowWithMeta[]>(() => {
     return groups.map((group) => {
       const status = statusByGroupId[group.id] ?? {
         statusLabel: "loading...",
         statusAmount: null,
-        tone: "neutral",
+        tone: "neutral" as const,
+        netCents: 0,
       };
 
       return {
@@ -160,6 +183,8 @@ export default function GroupsTabScreen() {
         statusLabel: status.statusLabel,
         statusAmount: status.statusAmount,
         tone: status.tone,
+        netCents: status.netCents,
+        createdAt: group.createdAt,
       };
     });
   }, [groups, statusByGroupId]);
@@ -167,19 +192,16 @@ export default function GroupsTabScreen() {
   const filteredRows = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
-    return rows.filter((row) => {
-      if (hideSettled && row.statusLabel === "settled up") {
+    const filtered = rows.filter((row) => {
+      if (!matchesBalanceFilter(toneToDirection(row.tone), balanceFilter))
         return false;
-      }
-
-      if (!normalized) {
-        return true;
-      }
-
+      if (!normalized) return true;
       const haystack = `${row.title} ${row.subtitle ?? ""}`.toLowerCase();
       return haystack.includes(normalized);
     });
-  }, [hideSettled, query, rows]);
+
+    return sortGroups(filtered, groupSort);
+  }, [balanceFilter, groupSort, query, rows]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -222,10 +244,20 @@ export default function GroupsTabScreen() {
           />
         ) : null}
 
-        <OverallBalanceStrip
-          netBalanceCents={snapshot.netBalanceCents}
-          onFilterPress={() => setHideSettled((current) => !current)}
-        />
+        <OverallBalanceStrip netBalanceCents={snapshot.netBalanceCents} />
+
+        <View style={{ gap: spacingTokens.xs }}>
+          <FilterChipRow
+            chips={BALANCE_CHIPS}
+            activeKey={balanceFilter}
+            onSelect={setBalanceFilter}
+          />
+          <FilterChipRow
+            chips={GROUP_SORT_CHIPS}
+            activeKey={groupSort}
+            onSelect={setGroupSort}
+          />
+        </View>
 
         {error ? (
           <View
@@ -295,7 +327,9 @@ export default function GroupsTabScreen() {
                 { color: colorSemanticTokens.text.primary },
               ]}
             >
-              No groups yet
+              {groups.length > 0
+                ? "No groups match this filter"
+                : "No groups yet"}
             </Text>
             <Text
               selectable
@@ -304,7 +338,9 @@ export default function GroupsTabScreen() {
                 { color: colorSemanticTokens.text.secondary },
               ]}
             >
-              Start your first group to split shared costs.
+              {groups.length > 0
+                ? "Try a different filter or search term."
+                : "Start your first group to split shared costs."}
             </Text>
           </View>
         ) : null}

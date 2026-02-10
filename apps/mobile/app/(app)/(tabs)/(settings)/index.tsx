@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Button } from "@/design/primitives/button";
 import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-cta";
 import { ScreenContainer } from "@/design/primitives/screen-container";
-import { TabTopActions } from "@/design/primitives/tab-top-actions";
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
@@ -41,14 +40,20 @@ function AccountRow({
       <View style={{ flex: 1, gap: 2 }}>
         <Text
           selectable
-          style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+          style={[
+            typographyScale.headingMd,
+            { color: colorSemanticTokens.text.primary },
+          ]}
         >
           {label}
         </Text>
         {subtitle ? (
           <Text
             selectable
-            style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+            style={[
+              typographyScale.bodySm,
+              { color: colorSemanticTokens.text.secondary },
+            ]}
           >
             {subtitle}
           </Text>
@@ -56,7 +61,10 @@ function AccountRow({
       </View>
       <Text
         selectable
-        style={[typographyScale.headingSm, { color: colorSemanticTokens.text.tertiary }]}
+        style={[
+          typographyScale.headingSm,
+          { color: colorSemanticTokens.text.tertiary },
+        ]}
       >
         ›
       </Text>
@@ -100,8 +108,6 @@ export default function SettingsTabScreen() {
           paddingBottom: spacingTokens["6xl"] + 120,
         }}
       >
-        <TabTopActions onSearchPress={() => {}} />
-
         <View
           style={{
             borderRadius: radiusTokens.card,
@@ -128,7 +134,10 @@ export default function SettingsTabScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingLg, { color: colorSemanticTokens.accent.primary }]}
+              style={[
+                typographyScale.headingLg,
+                { color: colorSemanticTokens.accent.primary },
+              ]}
             >
               {displayName.trim().slice(0, 1).toUpperCase()}
             </Text>
@@ -136,13 +145,19 @@ export default function SettingsTabScreen() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text
               selectable
-              style={[typographyScale.headingLg, { color: colorSemanticTokens.text.primary }]}
+              style={[
+                typographyScale.headingLg,
+                { color: colorSemanticTokens.text.primary },
+              ]}
             >
               {displayName}
             </Text>
             <Text
               selectable
-              style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}
+              style={[
+                typographyScale.bodyMd,
+                { color: colorSemanticTokens.text.secondary },
+              ]}
             >
               {email}
             </Text>
@@ -151,7 +166,10 @@ export default function SettingsTabScreen() {
             <Pressable>
               <Text
                 selectable
-                style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
+                style={[
+                  typographyScale.headingSm,
+                  { color: colorSemanticTokens.accent.primary },
+                ]}
               >
                 Edit
               </Text>
@@ -162,33 +180,30 @@ export default function SettingsTabScreen() {
         <View style={{ gap: spacingTokens.sm }}>
           <Link href="/(app)/(tabs)/(settings)/profile" asChild>
             <Pressable>
-              <AccountRow label="Profile" subtitle="Username and account details" />
+              <AccountRow
+                label="Profile"
+                subtitle="Username and account details"
+              />
             </Pressable>
           </Link>
 
           <Link href="/(app)/(tabs)/(settings)/notifications" asChild>
             <Pressable>
-              <AccountRow label="Notifications" subtitle="Email updates and alerts" />
+              <AccountRow
+                label="Notifications"
+                subtitle="Email updates and alerts"
+              />
             </Pressable>
           </Link>
-
-          <AccountRow
-            label="Scan code"
-            subtitle="Coming soon"
-            disabled
-          />
-
-          <AccountRow
-            label="Bank connections"
-            subtitle="Coming soon"
-            disabled
-          />
         </View>
 
         {signOutError ? (
           <Text
             selectable
-            style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+            style={[
+              typographyScale.bodySm,
+              { color: colorSemanticTokens.state.danger },
+            ]}
           >
             {signOutError}
           </Text>

@@ -10,6 +10,7 @@ import {
 
 import { BalanceListRow } from "@/design/primitives/balance-list-row";
 import { Button } from "@/design/primitives/button";
+import { FilterChipRow } from "@/design/primitives/filter-chip-row";
 import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-cta";
 import { OverallBalanceStrip } from "@/design/primitives/overall-balance-strip";
 import { ScreenContainer } from "@/design/primitives/screen-container";
@@ -23,6 +24,14 @@ import { useFriends } from "@/features/friends/hooks/use-friends";
 import type { FriendListRowVM } from "@/features/friends/types/friend.types";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
+import {
+  BALANCE_CHIPS,
+  FRIEND_SORT_CHIPS,
+  matchesBalanceFilter,
+  sortFriends,
+  type BalanceFilter,
+  type FriendSort,
+} from "@/features/shared/lib/list-filter-utils";
 
 function mapFriendRow(friend: {
   userId: string;
@@ -86,26 +95,22 @@ export default function FriendsTabScreen() {
 
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
-  const [hideSettled, setHideSettled] = useState(false);
-
-  const rows = useMemo(() => friends.map(mapFriendRow), [friends]);
+  const [balanceFilter, setBalanceFilter] = useState<BalanceFilter>("all");
+  const [friendSort, setFriendSort] = useState<FriendSort>("balance");
 
   const filteredRows = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
-    return rows.filter((row) => {
-      if (hideSettled && row.statusLabel === "settled up") {
-        return false;
-      }
-
-      if (!normalized) {
-        return true;
-      }
-
-      const haystack = `${row.title} ${row.subtitle ?? ""}`.toLowerCase();
+    const filtered = friends.filter((friend) => {
+      if (!matchesBalanceFilter(friend.direction, balanceFilter)) return false;
+      if (!normalized) return true;
+      const haystack =
+        `${friend.displayName ?? ""} ${friend.email ?? ""}`.toLowerCase();
       return haystack.includes(normalized);
     });
-  }, [hideSettled, query, rows]);
+
+    return sortFriends(filtered, friendSort).map(mapFriendRow);
+  }, [balanceFilter, friendSort, friends, query]);
 
   const hasErrors = Boolean(friendsError || requestsError);
   const isLoading = isFriendsLoading || isRequestsLoading;
@@ -155,10 +160,20 @@ export default function FriendsTabScreen() {
           />
         ) : null}
 
-        <OverallBalanceStrip
-          netBalanceCents={snapshot.netBalanceCents}
-          onFilterPress={() => setHideSettled((current) => !current)}
-        />
+        <OverallBalanceStrip netBalanceCents={snapshot.netBalanceCents} />
+
+        <View style={{ gap: spacingTokens.xs }}>
+          <FilterChipRow
+            chips={BALANCE_CHIPS}
+            activeKey={balanceFilter}
+            onSelect={setBalanceFilter}
+          />
+          <FilterChipRow
+            chips={FRIEND_SORT_CHIPS}
+            activeKey={friendSort}
+            onSelect={setFriendSort}
+          />
+        </View>
 
         {incomingRequests.length + outgoingRequests.length > 0 ? (
           <View
@@ -363,7 +378,9 @@ export default function FriendsTabScreen() {
                 { color: colorSemanticTokens.text.primary },
               ]}
             >
-              No friends yet
+              {friends.length > 0
+                ? "No friends match this filter"
+                : "No friends yet"}
             </Text>
             <Text
               selectable
@@ -372,7 +389,9 @@ export default function FriendsTabScreen() {
                 { color: colorSemanticTokens.text.secondary },
               ]}
             >
-              Add your first friend to start splitting.
+              {friends.length > 0
+                ? "Try a different filter or search term."
+                : "Add your first friend to start splitting."}
             </Text>
           </View>
         ) : null}
