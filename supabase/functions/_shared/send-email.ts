@@ -5,6 +5,7 @@ export async function sendEmail(
   to: string,
   subject: string,
   html: string,
+  text?: string,
 ): Promise<{ ok: boolean; error?: string }> {
   if (!RESEND_API_KEY) {
     console.error("RESEND_API_KEY is not set");
@@ -12,13 +13,24 @@ export async function sendEmail(
   }
 
   try {
+    const payload: Record<string, string> = {
+      from: FROM_ADDRESS,
+      to,
+      subject,
+      html,
+    };
+
+    if (text && text.trim().length > 0) {
+      payload.text = text;
+    }
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: FROM_ADDRESS, to, subject, html }),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {

@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -63,6 +63,7 @@ export default function AddExpenseScreen() {
     returnFriendId?: string | string[];
   }>();
   const router = useRouter();
+  const navigation = useNavigation();
   const { user } = useAuth();
   const { group, members } = useGroupDetail(id);
   const { createExpense, isCreating } = useGroupExpenses(id, members);
@@ -123,6 +124,42 @@ export default function AddExpenseScreen() {
     seededGroupIdRef.current = id;
   }, [group, id, members, user?.id]);
 
+  // Handle cross-tab navigation when modal is being dismissed
+  useEffect(() => {
+    const normalizedReturnTab =
+      returnTab === "friends" ||
+      returnTab === "groups" ||
+      returnTab === "activity"
+        ? returnTab
+        : null;
+    const normalizedReturnFriendId = normalizeReturnFriendId(returnFriendId);
+
+    if (!normalizedReturnTab || normalizedReturnTab === "groups") {
+      return;
+    }
+
+    const unsubscribe = navigation.addListener("beforeRemove", () => {
+      // When modal is being removed and we need to return to a different tab,
+      // navigate to the correct location after a short delay
+      setTimeout(() => {
+        if (normalizedReturnTab === "friends") {
+          if (normalizedReturnFriendId) {
+            router.navigate({
+              pathname: "/(app)/(tabs)/(friends)/[friendId]",
+              params: { friendId: normalizedReturnFriendId },
+            });
+          } else {
+            router.navigate("/(app)/(tabs)/(friends)");
+          }
+        } else if (normalizedReturnTab === "activity") {
+          router.navigate("/(app)/(tabs)/(activity)");
+        }
+      }, 100);
+    });
+
+    return unsubscribe;
+  }, [navigation, returnTab, returnFriendId, router]);
+
   const amountCents = Math.round(parseFloat(amountText || "0") * 100);
   const participantIds = Array.from(selectedParticipants);
   const participantCount = participantIds.length;
@@ -136,26 +173,36 @@ export default function AddExpenseScreen() {
   const normalizedReturnFriendId = normalizeReturnFriendId(returnFriendId);
 
   const handleClose = () => {
-    if (normalizedReturnTab === "groups") {
-      router.dismissTo("/(app)/(tabs)/(groups)");
-      return;
-    }
-
+    // For cross-tab navigation, we need to dismiss the modal first,
+    // then navigate to the target location
     if (normalizedReturnTab === "friends") {
-      if (normalizedReturnFriendId) {
-        router.dismissTo({
-          pathname: "/(app)/(tabs)/(friends)/[friendId]",
-          params: { friendId: normalizedReturnFriendId },
-        });
-        return;
-      }
+      router.dismiss();
 
-      router.dismissTo("/(app)/(tabs)/(friends)");
+      // Use setTimeout to ensure the modal is fully dismissed before navigating
+      setTimeout(() => {
+        if (normalizedReturnFriendId) {
+          router.navigate({
+            pathname: "/(app)/(tabs)/(friends)/[friendId]",
+            params: { friendId: normalizedReturnFriendId },
+          });
+        } else {
+          router.navigate("/(app)/(tabs)/(friends)");
+        }
+      }, 100);
       return;
     }
 
     if (normalizedReturnTab === "activity") {
-      router.dismissTo("/(app)/(tabs)/(activity)");
+      router.dismiss();
+
+      setTimeout(() => {
+        router.navigate("/(app)/(tabs)/(activity)");
+      }, 100);
+      return;
+    }
+
+    if (normalizedReturnTab === "groups") {
+      router.dismissTo("/(app)/(tabs)/(groups)");
       return;
     }
 

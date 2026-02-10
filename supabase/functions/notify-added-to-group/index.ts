@@ -61,10 +61,13 @@ serve(async (req) => {
 
     const groupLabel = `${group.emoji || ""} ${group.name}`.trim();
 
+    const template = addedToGroupEmail(groupLabel);
+
     await sendEmail(
       member.email,
-      `You were added to ${groupLabel}`,
-      addedToGroupEmail(groupLabel),
+      template.subject,
+      template.html,
+      template.text,
     );
 
     return new Response("OK", { status: 200 });

@@ -86,7 +86,10 @@ export function BalanceListRow({
         <Text
           selectable
           numberOfLines={1}
-          style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+          style={[
+            typographyScale.headingMd,
+            { color: colorSemanticTokens.text.primary },
+          ]}
         >
           {title}
         </Text>
@@ -94,7 +97,10 @@ export function BalanceListRow({
           <Text
             selectable
             numberOfLines={1}
-            style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+            style={[
+              typographyScale.bodySm,
+              { color: colorSemanticTokens.text.secondary },
+            ]}
           >
             {subtitle}
           </Text>
@@ -111,7 +117,10 @@ export function BalanceListRow({
         {amountText ? (
           <Text
             selectable
-            style={[typographyScale.headingMd, { color: resolvedStatusColor, fontVariant: ["tabular-nums"] }]}
+            style={[
+              typographyScale.headingMd,
+              { color: resolvedStatusColor, fontVariant: ["tabular-nums"] },
+            ]}
           >
             {amountText}
           </Text>

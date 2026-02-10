@@ -57,10 +57,13 @@ serve(async (req) => {
 
     const requesterName = requester.display_name || "Someone";
 
+    const template = friendRequestEmail(requesterName);
+
     await sendEmail(
       addressee.email,
-      `${requesterName} sent you a friend request`,
-      friendRequestEmail(requesterName),
+      template.subject,
+      template.html,
+      template.text,
     );
 
     return new Response("OK", { status: 200 });

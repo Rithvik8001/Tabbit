@@ -1,5 +1,36 @@
-// Branded email templates for Tabbit notifications
-// Table-based layout with inline CSS for maximum email client compatibility
+// Clean minimal email templates for Tabbit notifications.
+// Table-based layout + inline CSS for broad email client compatibility.
+
+export type NotificationEmailPayload = {
+  subject: string;
+  html: string;
+  text: string;
+};
+
+type DetailRow = {
+  label: string;
+  value: string;
+};
+
+type NotificationTemplateInput = {
+  preheader: string;
+  eventLabel: string;
+  title: string;
+  message: string;
+  details?: DetailRow[];
+};
+
+const TOKENS = {
+  background: "#F3F1F6",
+  surface: "#FFFFFF",
+  border: "#E2DEE8",
+  textPrimary: "#1A1A1A",
+  textSecondary: "#6B7280",
+  accent: "#5D18EB",
+} as const;
+
+const FONT_STACK =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
 function escapeHtml(str: string): string {
   return str
@@ -10,140 +41,97 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#39;");
 }
 
-const CATEGORY = {
-  friend: { accent: "#58CC02", bg: "#E8F5E9", label: "FRIENDS" },
-  group: { accent: "#1CB0F6", bg: "#E3F2FD", label: "GROUPS" },
-  expense: { accent: "#FF9800", bg: "#FFF3E0", label: "EXPENSES" },
-} as const;
-
-type Category = keyof typeof CATEGORY;
-
-const FONT_STACK =
-  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-
-function emojiCircle(emoji: string, bgColor: string): string {
-  return `<td width="48" height="48" align="center" valign="middle" style="width:48px;height:48px;border-radius:24px;background-color:${bgColor};font-size:22px;line-height:48px;">
-    ${emoji}
-  </td>`;
+function normalizeText(value: string, fallback: string): string {
+  const trimmed = value.replace(/\s+/g, " ").trim();
+  return trimmed.length > 0 ? trimmed : fallback;
 }
 
-function ctaButton(label: string, accentColor: string): string {
-  return `<table cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
-    <tr>
-      <td align="center" style="border-radius:12px;background-color:${accentColor};">
-        <table cellpadding="0" cellspacing="0" border="0" width="100%">
-          <tr>
-            <td align="center" style="border-radius:12px;background-color:${accentColor};padding:14px 32px;font-family:${FONT_STACK};font-size:15px;font-weight:700;color:#ffffff;text-transform:uppercase;letter-spacing:0.8px;">
-              ${escapeHtml(label)}
-            </td>
-          </tr>
-          <tr>
-            <td height="3" style="height:3px;border-radius:0 0 12px 12px;background-color:rgba(0,0,0,0.15);font-size:0;line-height:0;">&nbsp;</td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>`;
+function renderMessage(value: string): string {
+  return escapeHtml(value).replace(/\n/g, "<br>");
 }
 
-function contentCard(
-  emoji: string,
-  title: string,
-  body: string,
-  category: Category,
-): string {
-  const { accent, bg } = CATEGORY[category];
-  return `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-radius:12px;background-color:${bg};border:1px solid ${bg};">
-    <tr>
-      <td style="padding:20px 24px;">
-        <table cellpadding="0" cellspacing="0" border="0" width="100%">
-          <tr>
-            ${emojiCircle(emoji, "#ffffff")}
-            <td width="12" style="width:12px;"></td>
-            <td style="font-family:${FONT_STACK};font-size:13px;font-weight:700;color:${accent};text-transform:uppercase;letter-spacing:0.8px;">
-              ${escapeHtml(title)}
-            </td>
-          </tr>
-        </table>
-        <table cellpadding="0" cellspacing="0" border="0" width="100%">
-          <tr><td height="12" style="height:12px;font-size:0;line-height:0;">&nbsp;</td></tr>
-          <tr>
-            <td style="font-family:${FONT_STACK};font-size:15px;line-height:22px;color:#333333;">
-              ${body}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>`;
+function renderDetailRows(details: DetailRow[]): string {
+  if (details.length === 0) {
+    return "";
+  }
+
+  const rows = details
+    .map((detail) => {
+      return `<tr>
+        <td valign="top" style="padding:8px 0;font-family:${FONT_STACK};font-size:13px;line-height:20px;color:${TOKENS.textSecondary};width:80px;">
+          ${escapeHtml(detail.label)}
+        </td>
+        <td valign="top" style="padding:8px 0;font-family:${FONT_STACK};font-size:13px;line-height:20px;color:${TOKENS.textPrimary};font-weight:600;">
+          ${escapeHtml(detail.value)}
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  return `<tr>
+    <td style="padding:20px 0 0 0;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid ${TOKENS.border};">
+        ${rows}
+      </table>
+    </td>
+  </tr>`;
 }
 
-function wrapInLayout(category: Category, innerHtml: string): string {
-  const { accent, label } = CATEGORY[category];
+function renderNotificationTemplate(input: NotificationTemplateInput): string {
+  const detailsHtml = renderDetailRows(input.details ?? []);
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tabbit</title>
+  <title>Tabbit notification</title>
 </head>
-<body style="margin:0;padding:0;background-color:#F7F7F7;font-family:${FONT_STACK};">
-  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#F7F7F7;">
+<body style="margin:0;padding:0;background-color:${TOKENS.background};font-family:${FONT_STACK};">
+  <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;line-height:0;mso-hide:all;">
+    ${escapeHtml(input.preheader)}
+  </span>
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:${TOKENS.background};">
     <tr>
-      <td align="center" style="padding:32px 16px;">
-        <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;border-radius:16px;border:2px solid #E5E5E5;background-color:#FFFFFF;overflow:hidden;">
-          <!-- Accent bar -->
+      <td align="center" style="padding:28px 12px;">
+        <table cellpadding="0" cellspacing="0" border="0" width="560" style="max-width:560px;width:100%;background-color:${TOKENS.surface};border:1px solid ${TOKENS.border};border-radius:16px;overflow:hidden;">
           <tr>
-            <td height="4" style="height:4px;background-color:${accent};font-size:0;line-height:0;">&nbsp;</td>
-          </tr>
-          <!-- Header -->
-          <tr>
-            <td style="padding:20px 24px 16px 24px;">
+            <td style="padding:20px 24px;border-bottom:1px solid ${TOKENS.border};">
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td style="font-family:${FONT_STACK};font-size:24px;font-weight:700;color:#0F172A;">
+                  <td style="font-family:${FONT_STACK};font-size:22px;line-height:28px;font-weight:700;color:${TOKENS.textPrimary};">
                     Tabbit
                   </td>
                   <td align="right" valign="middle">
-                    <table cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="padding:4px 10px;border-radius:8px;background-color:${accent};font-family:${FONT_STACK};font-size:11px;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:0.8px;">
-                          ${escapeHtml(label)}
-                        </td>
-                      </tr>
-                    </table>
+                    <span style="display:inline-block;padding:6px 10px;border:1px solid ${TOKENS.accent};border-radius:999px;font-family:${FONT_STACK};font-size:11px;line-height:14px;letter-spacing:0.3px;font-weight:700;color:${TOKENS.accent};text-transform:uppercase;">
+                      ${escapeHtml(input.eventLabel)}
+                    </span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          <!-- Divider -->
-          <tr>
-            <td style="padding:0 24px;">
-              <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr><td height="1" style="height:1px;background-color:#E5E5E5;font-size:0;line-height:0;">&nbsp;</td></tr>
-              </table>
-            </td>
-          </tr>
-          <!-- Content -->
           <tr>
             <td style="padding:24px;">
-              ${innerHtml}
-            </td>
-          </tr>
-          <!-- Footer divider -->
-          <tr>
-            <td style="padding:0 24px;">
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr><td height="1" style="height:1px;background-color:#E5E5E5;font-size:0;line-height:0;">&nbsp;</td></tr>
+                <tr>
+                  <td style="font-family:${FONT_STACK};font-size:24px;line-height:32px;font-weight:700;color:${TOKENS.textPrimary};">
+                    ${escapeHtml(input.title)}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top:12px;font-family:${FONT_STACK};font-size:15px;line-height:24px;color:${TOKENS.textSecondary};">
+                    ${renderMessage(input.message)}
+                  </td>
+                </tr>
+                ${detailsHtml}
               </table>
             </td>
           </tr>
-          <!-- Footer -->
           <tr>
-            <td style="padding:20px 24px;font-family:${FONT_STACK};font-size:13px;color:#999999;text-align:center;line-height:20px;">
-              Tabbit &mdash; Split expenses with friends<br>
-              Manage notification preferences in the app.
+            <td style="padding:16px 24px;border-top:1px solid ${TOKENS.border};font-family:${FONT_STACK};font-size:12px;line-height:18px;color:${TOKENS.textSecondary};text-align:center;">
+              Tabbit &middot; Shared expenses made simple.<br>
+              You are receiving this transactional notification based on your account activity.
             </td>
           </tr>
         </table>
@@ -154,69 +142,53 @@ function wrapInLayout(category: Category, innerHtml: string): string {
 </html>`;
 }
 
-// --- Template builders ---
+export function friendRequestEmail(requesterName: string): NotificationEmailPayload {
+  const requester = normalizeText(requesterName, "Someone");
+  const subject = `${requester} sent you a friend request`;
 
-export function friendRequestEmail(requesterName: string): string {
-  const safe = escapeHtml(requesterName);
-  const card = contentCard(
-    "\u{1F44B}",
-    "New Friend Request",
-    `<strong>${safe}</strong> sent you a friend request on Tabbit.`,
-    "friend",
-  );
-  const helper = `<table cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr><td height="16" style="height:16px;font-size:0;line-height:0;">&nbsp;</td></tr>
-    <tr>
-      <td style="font-family:${FONT_STACK};font-size:14px;color:#666666;text-align:center;">
-        Open the app to accept or decline.
-      </td>
-    </tr>
-    <tr><td height="20" style="height:20px;font-size:0;line-height:0;">&nbsp;</td></tr>
-  </table>`;
-  const cta = ctaButton("Open Tabbit", CATEGORY.friend.accent);
-  return wrapInLayout("friend", card + helper + cta);
+  return {
+    subject,
+    html: renderNotificationTemplate({
+      preheader: subject,
+      eventLabel: "Friends",
+      title: "New friend request",
+      message: `${requester} sent you a friend request on Tabbit.`,
+    }),
+    text: `${requester} sent you a friend request on Tabbit.\nOpen the app to accept or decline it.`,
+  };
 }
 
-export function friendAcceptedEmail(acceptorName: string): string {
-  const safe = escapeHtml(acceptorName);
-  const card = contentCard(
-    "\u{1F389}",
-    "Friend Request Accepted",
-    `<strong>${safe}</strong> accepted your friend request on Tabbit.`,
-    "friend",
-  );
-  const helper = `<table cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr><td height="16" style="height:16px;font-size:0;line-height:0;">&nbsp;</td></tr>
-    <tr>
-      <td style="font-family:${FONT_STACK};font-size:14px;color:#666666;text-align:center;">
-        You can now split expenses together!
-      </td>
-    </tr>
-    <tr><td height="20" style="height:20px;font-size:0;line-height:0;">&nbsp;</td></tr>
-  </table>`;
-  const cta = ctaButton("Open Tabbit", CATEGORY.friend.accent);
-  return wrapInLayout("friend", card + helper + cta);
+export function friendAcceptedEmail(acceptorName: string): NotificationEmailPayload {
+  const acceptor = normalizeText(acceptorName, "Someone");
+  const subject = `${acceptor} accepted your friend request`;
+
+  return {
+    subject,
+    html: renderNotificationTemplate({
+      preheader: subject,
+      eventLabel: "Friends",
+      title: "Friend request accepted",
+      message: `${acceptor} accepted your friend request. You can now split expenses together.`,
+    }),
+    text: `${acceptor} accepted your friend request on Tabbit.\nYou can now split expenses together.`,
+  };
 }
 
-export function addedToGroupEmail(groupLabel: string): string {
-  const safe = escapeHtml(groupLabel);
-  const card = contentCard(
-    "\u{1F465}",
-    "Added to Group",
-    `You were added to <strong>${safe}</strong> on Tabbit.`,
-    "group",
-  );
-  const helper = `<table cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr><td height="16" style="height:16px;font-size:0;line-height:0;">&nbsp;</td></tr>
-    <tr>
-      <td style="font-family:${FONT_STACK};font-size:14px;color:#666666;text-align:center;">
-        Open the app to see the group.
-      </td>
-    </tr>
-    <tr><td height="20" style="height:20px;font-size:0;line-height:0;">&nbsp;</td></tr>
-  </table>`;
-  const cta = ctaButton("Open Tabbit", CATEGORY.group.accent);
-  return wrapInLayout("group", card + helper + cta);
+export function addedToGroupEmail(groupLabel: string): NotificationEmailPayload {
+  const group = normalizeText(groupLabel, "your group");
+  const subject = `You were added to ${group}`;
+
+  return {
+    subject,
+    html: renderNotificationTemplate({
+      preheader: subject,
+      eventLabel: "Groups",
+      title: "Added to group",
+      message: `You were added to ${group}.`,
+      details: [{ label: "Group", value: group }],
+    }),
+    text: `You were added to ${group} on Tabbit.\nOpen the app to view the group details.`,
+  };
 }
 
 export function newExpenseEmail(
@@ -224,53 +196,51 @@ export function newExpenseEmail(
   description: string,
   amount: string,
   groupLabel: string,
-): string {
-  const safePayer = escapeHtml(payerName);
-  const safeDesc = escapeHtml(description);
-  const safeAmount = escapeHtml(amount);
-  const safeGroup = escapeHtml(groupLabel);
-  const card = contentCard(
-    "\u{1F4B8}",
-    "New Expense",
-    `<strong>${safePayer}</strong> added <strong>&ldquo;${safeDesc}&rdquo;</strong> (${safeAmount}) in ${safeGroup}.`,
-    "expense",
-  );
-  const helper = `<table cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr><td height="16" style="height:16px;font-size:0;line-height:0;">&nbsp;</td></tr>
-    <tr>
-      <td style="font-family:${FONT_STACK};font-size:14px;color:#666666;text-align:center;">
-        Open the app to see the details.
-      </td>
-    </tr>
-    <tr><td height="20" style="height:20px;font-size:0;line-height:0;">&nbsp;</td></tr>
-  </table>`;
-  const cta = ctaButton("Open Tabbit", CATEGORY.expense.accent);
-  return wrapInLayout("expense", card + helper + cta);
+): NotificationEmailPayload {
+  const payer = normalizeText(payerName, "Someone");
+  const safeDescription = normalizeText(description, "an expense");
+  const safeAmount = normalizeText(amount, "$0.00");
+  const group = normalizeText(groupLabel, "your group");
+  const subject = `${payer} added ${safeAmount} in ${group}`;
+
+  return {
+    subject,
+    html: renderNotificationTemplate({
+      preheader: subject,
+      eventLabel: "Expenses",
+      title: "New expense recorded",
+      message: `${payer} added "${safeDescription}" in ${group}.`,
+      details: [
+        { label: "Amount", value: safeAmount },
+        { label: "Group", value: group },
+      ],
+    }),
+    text: `New expense in ${group}.\n${payer} added "${safeDescription}" for ${safeAmount}.`,
+  };
 }
 
 export function settlementRecordedEmail(
   payerName: string,
   amount: string,
   groupLabel: string,
-): string {
-  const safePayer = escapeHtml(payerName);
-  const safeAmount = escapeHtml(amount);
-  const safeGroup = escapeHtml(groupLabel);
-  const card = contentCard(
-    "\u{2705}",
-    "Settlement Recorded",
-    `<strong>${safePayer}</strong> settled <strong>${safeAmount}</strong> with you in ${safeGroup}.`,
-    "expense",
-  );
-  const helper = `<table cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr><td height="16" style="height:16px;font-size:0;line-height:0;">&nbsp;</td></tr>
-    <tr>
-      <td style="font-family:${FONT_STACK};font-size:14px;color:#666666;text-align:center;">
-        Open the app to see the details.
-      </td>
-    </tr>
-    <tr><td height="20" style="height:20px;font-size:0;line-height:0;">&nbsp;</td></tr>
-  </table>`;
-  const cta = ctaButton("Open Tabbit", CATEGORY.expense.accent);
-  return wrapInLayout("expense", card + helper + cta);
+): NotificationEmailPayload {
+  const payer = normalizeText(payerName, "Someone");
+  const safeAmount = normalizeText(amount, "$0.00");
+  const group = normalizeText(groupLabel, "your group");
+  const subject = `${payer} recorded a payment of ${safeAmount}`;
+
+  return {
+    subject,
+    html: renderNotificationTemplate({
+      preheader: subject,
+      eventLabel: "Expenses",
+      title: "Payment recorded",
+      message: `${payer} recorded a payment with you in ${group}.`,
+      details: [
+        { label: "Amount", value: safeAmount },
+        { label: "Group", value: group },
+      ],
+    }),
+    text: `Payment recorded in ${group}.\n${payer} recorded a payment of ${safeAmount} with you.`,
+  };
 }

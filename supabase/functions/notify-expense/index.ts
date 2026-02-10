@@ -111,14 +111,17 @@ serve(async (req) => {
 
       const payerName = payer.display_name || "Someone";
 
+      const template = settlementRecordedEmail(
+        payerName,
+        formatCents(splitAmountCents),
+        groupLabel,
+      );
+
       await sendEmail(
         recipient.email,
-        `${payerName} settled ${formatCents(splitAmountCents)} with you`,
-        settlementRecordedEmail(
-          payerName,
-          formatCents(splitAmountCents),
-          groupLabel,
-        ),
+        template.subject,
+        template.html,
+        template.text,
       );
     } else {
       // Regular expense: notify split participant (skip the payer / creator)
@@ -144,15 +147,18 @@ serve(async (req) => {
       const payerName = payer.display_name || "Someone";
       const description = expense.description || "an expense";
 
+      const template = newExpenseEmail(
+        payerName,
+        description,
+        formatCents(splitAmountCents),
+        groupLabel,
+      );
+
       await sendEmail(
         participant.email,
-        `${payerName} added ${formatCents(splitAmountCents)} in ${groupLabel}`,
-        newExpenseEmail(
-          payerName,
-          description,
-          formatCents(splitAmountCents),
-          groupLabel,
-        ),
+        template.subject,
+        template.html,
+        template.text,
       );
     }
 

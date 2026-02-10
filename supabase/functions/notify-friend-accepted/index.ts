@@ -67,10 +67,13 @@ serve(async (req) => {
 
     const acceptorName = acceptor.display_name || "Someone";
 
+    const template = friendAcceptedEmail(acceptorName);
+
     await sendEmail(
       requester.email,
-      `${acceptorName} accepted your friend request`,
-      friendAcceptedEmail(acceptorName),
+      template.subject,
+      template.html,
+      template.text,
     );
 
     return new Response("OK", { status: 200 });
