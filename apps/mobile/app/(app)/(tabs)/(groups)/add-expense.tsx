@@ -46,7 +46,7 @@ const accent = colorSemanticTokens.accent.primary;
 export default function AddExpenseScreen() {
   const { id, returnTab } = useLocalSearchParams<{
     id: string;
-    returnTab?: "friends" | "groups" | string;
+    returnTab?: "friends" | "groups" | "activity" | string;
   }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -114,7 +114,11 @@ export default function AddExpenseScreen() {
   const participantCount = participantIds.length;
 
   const normalizedReturnTab =
-    returnTab === "friends" || returnTab === "groups" ? returnTab : null;
+    returnTab === "friends" ||
+    returnTab === "groups" ||
+    returnTab === "activity"
+      ? returnTab
+      : null;
 
   const handleClose = () => {
     if (normalizedReturnTab === "groups") {
@@ -124,6 +128,11 @@ export default function AddExpenseScreen() {
 
     if (normalizedReturnTab === "friends") {
       router.dismissTo("/(app)/(tabs)/(friends)");
+      return;
+    }
+
+    if (normalizedReturnTab === "activity") {
+      router.dismissTo("/(app)/(tabs)/(activity)");
       return;
     }
 

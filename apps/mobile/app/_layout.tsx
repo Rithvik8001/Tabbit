@@ -1,11 +1,3 @@
-import {
-  useFonts,
-  Sora_400Regular,
-  Sora_500Medium,
-  Sora_600SemiBold,
-  Sora_700Bold,
-  Sora_800ExtraBold,
-} from "@expo-google-fonts/sora";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -20,21 +12,14 @@ void SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { session, isAuthLoading } = useAuth();
-  const [fontsLoaded] = useFonts({
-    Sora_400Regular,
-    Sora_500Medium,
-    Sora_600SemiBold,
-    Sora_700Bold,
-    Sora_800ExtraBold,
-  });
 
   useEffect(() => {
-    if (!isAuthLoading && fontsLoaded) {
+    if (!isAuthLoading) {
       void SplashScreen.hideAsync();
     }
-  }, [isAuthLoading, fontsLoaded]);
+  }, [isAuthLoading]);
 
-  if (isAuthLoading || !fontsLoaded) {
+  if (isAuthLoading) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator color={colorSemanticTokens.accent.primary} />

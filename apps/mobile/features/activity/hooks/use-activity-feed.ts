@@ -1,68 +1,106 @@
-import { useMemo, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
 
-import { formatCents } from "@/features/groups/lib/format-currency";
-import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
-import type { ActivityRowVM } from "@/features/activity/types/activity.types";
+import { useAuth } from "@/features/auth/state/auth-provider";
+import { listActivityFeedPage } from "@/features/activity/lib/activity-repository";
+import type { ActivityFeedItem } from "@/features/activity/types/activity.types";
 
-const PAGE_STEP = 10;
+const DEFAULT_PAGE_SIZE = 25;
 
-function formatTimestamp(value: string): string {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
+function mergeUniqueEvents(
+  previous: ActivityFeedItem[],
+  incoming: ActivityFeedItem[],
+): ActivityFeedItem[] {
+  if (incoming.length === 0) {
+    return previous;
   }
 
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(parsed);
-  } catch {
-    return parsed.toISOString().slice(0, 16).replace("T", " ");
+  const byEventId = new Map(previous.map((item) => [item.eventId, item]));
+  for (const item of incoming) {
+    byEventId.set(item.eventId, item);
   }
+
+  return Array.from(byEventId.values()).sort((left, right) => {
+    const leftTime = new Date(left.occurredAt).getTime();
+    const rightTime = new Date(right.occurredAt).getTime();
+    const leftSafeTime = Number.isNaN(leftTime) ? 0 : leftTime;
+    const rightSafeTime = Number.isNaN(rightTime) ? 0 : rightTime;
+
+    if (rightSafeTime !== leftSafeTime) {
+      return rightSafeTime - leftSafeTime;
+    }
+
+    return right.eventId.localeCompare(left.eventId);
+  });
 }
 
-export function useActivityFeed(initialLimit = 20) {
-  const [limit, setLimit] = useState(initialLimit);
-  const { activity, isLoading, error, refresh } = useHomeDashboard({
-    activityLimit: limit,
-  });
+export function useActivityFeed(pageSize = DEFAULT_PAGE_SIZE) {
+  const { user } = useAuth();
+  const [items, setItems] = useState<ActivityFeedItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const rows = useMemo<ActivityRowVM[]>(() => {
-    return activity.map((item) => {
-      const isPositive = item.direction === "you_are_owed";
-      const impactLabel = isPositive ? "you are owed" : "you owe";
+  const refresh = useCallback(async () => {
+    if (!user?.id) {
+      setItems([]);
+      setHasMore(false);
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
 
-      return {
-        id: item.expenseId,
-        groupId: item.groupId,
-        title: item.description,
-        subtitle: item.groupEmoji
-          ? `${item.groupEmoji} ${item.groupName}`
-          : item.groupName,
-        timestampLabel: formatTimestamp(item.createdAt),
-        impactLabel,
-        impactAmount: formatCents(Math.abs(item.netCents)),
-        hasReceipt: item.receiptAttached,
-        tone: isPositive ? "positive" : "negative",
-      };
-    });
-  }, [activity]);
+    setIsLoading(true);
 
-  const canLoadMore = activity.length >= limit;
+    const result = await listActivityFeedPage(pageSize, 0);
 
-  const loadMore = () => {
-    setLimit((current) => current + PAGE_STEP);
-  };
+    if (!result.ok) {
+      setError(result.message);
+      setIsLoading(false);
+      return;
+    }
+
+    setItems(result.data);
+    setHasMore(result.hasMore);
+    setError(null);
+    setIsLoading(false);
+  }, [pageSize, user?.id]);
+
+  const loadMore = useCallback(async () => {
+    if (!user?.id || isLoading || isLoadingMore || !hasMore) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+
+    const result = await listActivityFeedPage(pageSize, items.length);
+
+    if (!result.ok) {
+      setError(result.message);
+      setIsLoadingMore(false);
+      return;
+    }
+
+    setItems((current) => mergeUniqueEvents(current, result.data));
+    setHasMore(result.hasMore);
+    setError(null);
+    setIsLoadingMore(false);
+  }, [hasMore, isLoading, isLoadingMore, items.length, pageSize, user?.id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void refresh();
+    }, [refresh]),
+  );
 
   return {
-    rows,
+    items,
     isLoading,
+    isLoadingMore,
+    hasMore,
     error,
     refresh,
     loadMore,
-    canLoadMore,
   };
 }

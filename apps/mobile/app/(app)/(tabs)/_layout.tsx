@@ -46,7 +46,7 @@ export default function AppTabsLayout() {
     <NativeTabs
       tintColor={tabTint}
       backgroundColor={colorSemanticTokens.background.chrome}
-      labelStyle={{ fontSize: 11, fontWeight: "500", fontFamily: "Sora_500Medium" }}
+      labelStyle={{ fontSize: 11, fontWeight: "500" }}
     >
       <NativeTabs.Trigger name="(friends)">
         <Label>Friends</Label>

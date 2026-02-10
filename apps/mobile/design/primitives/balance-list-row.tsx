@@ -72,9 +72,9 @@ export function BalanceListRow({
             selectable
             style={{
               color: colorSemanticTokens.text.secondary,
-              fontFamily: "Sora_700Bold",
               fontSize: 16,
               lineHeight: 20,
+              fontWeight: "700",
             }}
           >
             {(leadingText ?? title).trim().slice(0, 1).toUpperCase()}

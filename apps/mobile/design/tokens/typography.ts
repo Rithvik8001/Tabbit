@@ -1,19 +1,33 @@
 import type { TextStyle } from "@/design/primitives/sora-native";
 
-export const fontFamilyTokens = {
-  bodyRegular: "Sora_400Regular",
-  bodyMedium: "Sora_500Medium",
-  bodySemiBold: "Sora_600SemiBold",
-  bodyBold: "Sora_700Bold",
-  displayRegular: "Sora_400Regular",
-  displayMedium: "Sora_500Medium",
-  displaySemiBold: "Sora_700Bold",
-  displayBold: "Sora_800ExtraBold",
-  regular: "Sora_400Regular",
-  medium: "Sora_500Medium",
-  semibold: "Sora_600SemiBold",
-  bold: "Sora_700Bold",
-} as const;
+export const fontFamilyTokens: Record<
+  | "bodyRegular"
+  | "bodyMedium"
+  | "bodySemiBold"
+  | "bodyBold"
+  | "displayRegular"
+  | "displayMedium"
+  | "displaySemiBold"
+  | "displayBold"
+  | "regular"
+  | "medium"
+  | "semibold"
+  | "bold",
+  TextStyle["fontFamily"]
+> = {
+  bodyRegular: undefined,
+  bodyMedium: undefined,
+  bodySemiBold: undefined,
+  bodyBold: undefined,
+  displayRegular: undefined,
+  displayMedium: undefined,
+  displaySemiBold: undefined,
+  displayBold: undefined,
+  regular: undefined,
+  medium: undefined,
+  semibold: undefined,
+  bold: undefined,
+};
 
 type TypographyVariant = Pick<
   TextStyle,

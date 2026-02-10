@@ -41,7 +41,7 @@ function SelectionDot({ isSelected }: { isSelected: boolean }) {
   );
 }
 
-type ReturnTab = "friends" | "groups";
+type ReturnTab = "friends" | "groups" | "activity";
 type ExpenseContextScope = "friends" | "groups" | "all";
 
 function normalizeScope(
@@ -55,13 +55,28 @@ function normalizeScope(
   return "all";
 }
 
+function normalizeReturnTab(
+  value: string | string[] | undefined,
+): ReturnTab | null {
+  const first = Array.isArray(value) ? value[0] : value;
+  if (first === "friends" || first === "groups" || first === "activity") {
+    return first;
+  }
+
+  return null;
+}
+
 export default function AddExpenseContextScreen() {
   const router = useRouter();
-  const { scope: scopeParam } = useLocalSearchParams<{ scope?: string | string[] }>();
+  const { scope: scopeParam, returnTab: returnTabParam } = useLocalSearchParams<{
+    scope?: string | string[];
+    returnTab?: string | string[];
+  }>();
   const { groups, isLoading: isGroupsLoading } = useGroups();
   const { friends, isLoading: isFriendsLoading } = useFriends();
 
   const scope = normalizeScope(scopeParam);
+  const returnTab = normalizeReturnTab(returnTabParam);
   const showGroups = scope !== "friends";
   const showFriends = scope !== "groups";
 
@@ -134,8 +149,11 @@ export default function AddExpenseContextScreen() {
     setIsSubmitting(true);
 
     void (async () => {
+      const resolvedReturnTab =
+        returnTab ?? (scope === "friends" ? "friends" : "groups");
+
       if (selectedGroupId) {
-        openExpenseForm(selectedGroupId, scope === "friends" ? "friends" : "groups");
+        openExpenseForm(selectedGroupId, resolvedReturnTab);
         return;
       }
 
@@ -152,7 +170,7 @@ export default function AddExpenseContextScreen() {
         return;
       }
 
-      openExpenseForm(directGroupResult.data, scope === "groups" ? "groups" : "friends");
+      openExpenseForm(directGroupResult.data, resolvedReturnTab);
     })();
   };
 
