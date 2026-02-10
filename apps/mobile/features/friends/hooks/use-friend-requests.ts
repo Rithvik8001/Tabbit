@@ -20,9 +20,11 @@ type UseFriendRequestsValue = {
   outgoingRequests: FriendRequest[];
   isLoading: boolean;
   error: string | null;
+  actionError: string | null;
   isSendingToUser: (userId: string) => boolean;
   isMutatingRequest: (requestId: string) => boolean;
   refresh: () => Promise<void>;
+  clearActionError: () => void;
   sendRequest: (
     targetUserId: string,
   ) => Promise<ActionResult<{ requestId: string }>>;
@@ -45,6 +47,7 @@ export function useFriendRequests(): UseFriendRequestsValue {
   const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [sendingUserIds, setSendingUserIds] = useState<Set<string>>(new Set());
   const [mutatingRequestIds, setMutatingRequestIds] = useState<Set<string>>(
     new Set(),
@@ -92,6 +95,7 @@ export function useFriendRequests(): UseFriendRequestsValue {
       setIncomingRequests([]);
       setOutgoingRequests([]);
       setError(null);
+      setActionError(null);
       setIsLoading(false);
       return;
     }
@@ -118,8 +122,13 @@ export function useFriendRequests(): UseFriendRequestsValue {
     setIncomingRequests(incomingResult.data);
     setOutgoingRequests(outgoingResult.data);
     setError(null);
+    setActionError(null);
     setIsLoading(false);
   }, [user?.id]);
+
+  const clearActionError = useCallback(() => {
+    setActionError(null);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -132,22 +141,29 @@ export function useFriendRequests(): UseFriendRequestsValue {
       targetUserId: string,
     ): Promise<ActionResult<{ requestId: string }>> => {
       if (!user?.id) {
-        return { ok: false, message: "Sign in to send friend requests." };
+        const message = "Sign in to send friend requests.";
+        setActionError(message);
+        return { ok: false, message };
       }
 
       if (sendingUserIds.has(targetUserId)) {
-        return { ok: false, message: "A request is already being sent." };
+        const message = "A request is already being sent.";
+        setActionError(message);
+        return { ok: false, message };
       }
 
+      setActionError(null);
       setSendingUser(targetUserId, true);
       const result = await sendFriendRequest(targetUserId);
       setSendingUser(targetUserId, false);
 
       if (!result.ok) {
+        setActionError(result.message);
         return { ok: false, message: result.message };
       }
 
       await refresh();
+      setActionError(null);
 
       return { ok: true, data: { requestId: result.data.requestId } };
     },
@@ -161,21 +177,26 @@ export function useFriendRequests(): UseFriendRequestsValue {
       ActionResult<{ requestId: string; directGroupId: string | null }>
     > => {
       if (mutatingRequestIds.has(requestId)) {
+        const message = "This request is already being processed.";
+        setActionError(message);
         return {
           ok: false,
-          message: "This request is already being processed.",
+          message,
         };
       }
 
+      setActionError(null);
       setRequestMutation(requestId, true);
       const result = await respondToFriendRequest(requestId, "accept");
       setRequestMutation(requestId, false);
 
       if (!result.ok) {
+        setActionError(result.message);
         return { ok: false, message: result.message };
       }
 
       await refresh();
+      setActionError(null);
 
       return {
         ok: true,
@@ -191,21 +212,26 @@ export function useFriendRequests(): UseFriendRequestsValue {
   const declineRequest = useCallback(
     async (requestId: string): Promise<ActionResult<{ requestId: string }>> => {
       if (mutatingRequestIds.has(requestId)) {
+        const message = "This request is already being processed.";
+        setActionError(message);
         return {
           ok: false,
-          message: "This request is already being processed.",
+          message,
         };
       }
 
+      setActionError(null);
       setRequestMutation(requestId, true);
       const result = await respondToFriendRequest(requestId, "decline");
       setRequestMutation(requestId, false);
 
       if (!result.ok) {
+        setActionError(result.message);
         return { ok: false, message: result.message };
       }
 
       await refresh();
+      setActionError(null);
 
       return { ok: true, data: { requestId: result.data.requestId } };
     },
@@ -215,21 +241,26 @@ export function useFriendRequests(): UseFriendRequestsValue {
   const cancelRequestAction = useCallback(
     async (requestId: string): Promise<ActionResult<{ requestId: string }>> => {
       if (mutatingRequestIds.has(requestId)) {
+        const message = "This request is already being processed.";
+        setActionError(message);
         return {
           ok: false,
-          message: "This request is already being processed.",
+          message,
         };
       }
 
+      setActionError(null);
       setRequestMutation(requestId, true);
       const result = await cancelFriendRequest(requestId);
       setRequestMutation(requestId, false);
 
       if (!result.ok) {
+        setActionError(result.message);
         return { ok: false, message: result.message };
       }
 
       await refresh();
+      setActionError(null);
 
       return { ok: true, data: { requestId: result.data.requestId } };
     },
@@ -241,9 +272,11 @@ export function useFriendRequests(): UseFriendRequestsValue {
     outgoingRequests,
     isLoading,
     error,
+    actionError,
     isSendingToUser,
     isMutatingRequest,
     refresh,
+    clearActionError,
     sendRequest: sendRequestAction,
     acceptRequest,
     declineRequest,

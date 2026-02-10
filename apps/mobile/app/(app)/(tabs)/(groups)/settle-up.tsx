@@ -24,9 +24,11 @@ import {
   uploadAndAttachExpenseReceipt,
 } from "@/features/groups/lib/expense-receipt-upload";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
+import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
+import { isValidDateOnly } from "@/features/shared/lib/date-only";
 import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
 const ink = colorSemanticTokens.text.primary;
@@ -67,6 +69,12 @@ export default function GroupSettleUpScreen() {
   const { group, members, isLoading, error, refresh } = useGroupDetail(
     groupId ?? undefined,
   );
+  const {
+    simplifiedDebts,
+    isLoading: isLoadingExpenses,
+    error: expensesError,
+    refresh: refreshExpenses,
+  } = useGroupExpenses(groupId ?? undefined, members);
 
   const [amountText, setAmountText] = useState("");
   const [dateText, setDateText] = useState(getTodayString());
@@ -78,7 +86,7 @@ export default function GroupSettleUpScreen() {
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
   const receiptsEnabled = areExpenseReceiptsEnabled();
 
-  const maxAmountCents = useMemo(() => {
+  const routeMaxAmountCents = useMemo(() => {
     if (!maxAmountCentsRaw) {
       return NaN;
     }
@@ -86,14 +94,35 @@ export default function GroupSettleUpScreen() {
     return Number.parseInt(maxAmountCentsRaw, 10);
   }, [maxAmountCentsRaw]);
 
+  const latestDebtEdge = useMemo(() => {
+    if (!fromUserId || !toUserId) {
+      return null;
+    }
+
+    return (
+      simplifiedDebts.find(
+        (debt) => debt.fromUserId === fromUserId && debt.toUserId === toUserId,
+      ) ?? null
+    );
+  }, [fromUserId, simplifiedDebts, toUserId]);
+
+  const maxAmountCents = latestDebtEdge?.amountCents ?? 0;
+
   useEffect(() => {
-    if (!Number.isFinite(maxAmountCents) || maxAmountCents <= 0) {
+    const initialAmountCents =
+      maxAmountCents > 0
+        ? maxAmountCents
+        : Number.isFinite(routeMaxAmountCents) && routeMaxAmountCents > 0
+          ? routeMaxAmountCents
+          : NaN;
+
+    if (!Number.isFinite(initialAmountCents) || initialAmountCents <= 0) {
       setAmountText("");
       return;
     }
 
-    setAmountText((maxAmountCents / 100).toFixed(2));
-  }, [maxAmountCents]);
+    setAmountText((initialAmountCents / 100).toFixed(2));
+  }, [maxAmountCents, routeMaxAmountCents]);
 
   const fromMember = members.find((member) => member.userId === fromUserId);
   const toMember = members.find((member) => member.userId === toUserId);
@@ -126,8 +155,18 @@ export default function GroupSettleUpScreen() {
       return;
     }
 
-    if (!Number.isFinite(maxAmountCents) || maxAmountCents <= 0) {
-      setFormError("Settlement amount limit is invalid.");
+    if (isLoadingExpenses) {
+      setFormError("Loading latest balances. Please wait.");
+      return;
+    }
+
+    if (expensesError) {
+      setFormError("Could not verify latest balances. Retry and try again.");
+      return;
+    }
+
+    if (!latestDebtEdge || maxAmountCents <= 0) {
+      setFormError("No outstanding balance found for this member pair.");
       return;
     }
 
@@ -153,6 +192,11 @@ export default function GroupSettleUpScreen() {
 
     if (!dateText.match(/^\d{4}-\d{2}-\d{2}$/)) {
       setFormError("Enter a valid date in YYYY-MM-DD format.");
+      return;
+    }
+
+    if (!isValidDateOnly(dateText)) {
+      setFormError("That date doesn't exist. Check the month and day.");
       return;
     }
 
@@ -191,8 +235,8 @@ export default function GroupSettleUpScreen() {
 
         if (!uploadResult.ok) {
           Alert.alert(
-            "Settlement recorded",
-            `${uploadResult.message} The settlement was saved without a receipt.`,
+            "Payment recorded",
+            `${uploadResult.message} The payment was saved without a receipt.`,
           );
         }
       }
@@ -218,13 +262,19 @@ export default function GroupSettleUpScreen() {
     })();
   };
 
+  const canSubmitLatestEdge =
+    Boolean(latestDebtEdge) &&
+    maxAmountCents > 0 &&
+    !isLoadingExpenses &&
+    !expensesError;
+
   const isDisabled =
     isSubmitting ||
     !user ||
     !groupId ||
     !fromUserId ||
     !toUserId ||
-    !Number.isFinite(maxAmountCents);
+    !canSubmitLatestEdge;
 
   return (
     <ScrollView
@@ -240,7 +290,7 @@ export default function GroupSettleUpScreen() {
     >
       <PageHeading
         size="section"
-        title="Settle Up"
+        title="Record payment"
         subtitle="Record a payment and close the loop."
         leading={
           <HeaderPillButton label="Back" onPress={() => router.back()} />
@@ -265,7 +315,7 @@ export default function GroupSettleUpScreen() {
               fontWeight: "600",
             }}
           >
-            Loading settlement details...
+            Loading payment details...
           </Text>
         </View>
       ) : null}
@@ -330,6 +380,101 @@ export default function GroupSettleUpScreen() {
         </View>
       ) : null}
 
+      {expensesError ? (
+        <View
+          style={{
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: 16,
+            gap: 10,
+          }}
+        >
+          <Text
+            selectable
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
+          >
+            Could not load latest balances
+          </Text>
+          <Text
+            selectable
+            style={{
+              color: muted,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "400",
+            }}
+          >
+            {expensesError}
+          </Text>
+          <Pressable
+            onPress={() => {
+              void refreshExpenses();
+            }}
+            style={{
+              alignSelf: "flex-start",
+              borderRadius: 999,
+              borderCurve: "continuous",
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              backgroundColor: colorSemanticTokens.background.subtle,
+            }}
+          >
+            <Text
+              selectable
+              style={{
+                color: ink,
+                fontSize: 13,
+                lineHeight: 16,
+                fontWeight: "600",
+              }}
+            >
+              Retry balances
+            </Text>
+          </Pressable>
+        </View>
+      ) : null}
+
+      {!isLoadingExpenses && !expensesError && !latestDebtEdge ? (
+        <View
+          style={{
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: 16,
+            gap: 8,
+          }}
+        >
+          <Text
+            selectable
+            style={{
+              color: ink,
+              fontSize: 18,
+              lineHeight: 22,
+              fontWeight: "600",
+            }}
+          >
+            Nothing to settle
+          </Text>
+          <Text
+            selectable
+            style={{
+              color: muted,
+              fontSize: 14,
+              lineHeight: 18,
+              fontWeight: "400",
+            }}
+          >
+            This debt is already settled or no longer valid.
+          </Text>
+        </View>
+      ) : null}
+
       <View
         style={{
           borderRadius: radiusTokens.card,
@@ -382,7 +527,7 @@ export default function GroupSettleUpScreen() {
             fontWeight: "600",
           }}
         >
-          Direction
+          Payment details
         </Text>
         <Text
           selectable
@@ -479,8 +624,12 @@ export default function GroupSettleUpScreen() {
           }}
         >
           Maximum allowed:{" "}
-          {Number.isFinite(maxAmountCents)
+          {maxAmountCents > 0
             ? formatCents(maxAmountCents)
+            : isLoadingExpenses &&
+                Number.isFinite(routeMaxAmountCents) &&
+                routeMaxAmountCents > 0
+              ? formatCents(routeMaxAmountCents)
             : "N/A"}
         </Text>
 
@@ -556,7 +705,7 @@ export default function GroupSettleUpScreen() {
         label={
           isSubmitting || isUploadingReceipt
             ? "Recording..."
-            : "Record settlement"
+            : "Record payment"
         }
         onPress={handleSubmit}
         loading={isSubmitting || isUploadingReceipt}

@@ -9,6 +9,7 @@ export function computeMemberBalances(
   expenses: ExpenseWithSplits[],
   members: GroupMember[],
 ): MemberBalance[] {
+  const memberLookup = new Map(members.map((member) => [member.userId, member]));
   const netMap = new Map<string, number>();
 
   for (const member of members) {
@@ -17,8 +18,15 @@ export function computeMemberBalances(
 
   for (const expense of expenses) {
     const payerId = expense.paidBy;
+    if (!netMap.has(payerId)) {
+      netMap.set(payerId, 0);
+    }
 
     for (const split of expense.splits) {
+      if (!netMap.has(split.userId)) {
+        netMap.set(split.userId, 0);
+      }
+
       if (split.userId === payerId) continue;
 
       // Payer is owed this amount
@@ -31,12 +39,16 @@ export function computeMemberBalances(
     }
   }
 
-  return members.map((member) => ({
-    userId: member.userId,
-    displayName: member.displayName,
-    email: member.email,
-    netCents: netMap.get(member.userId) ?? 0,
-  }));
+  return Array.from(netMap.entries()).map(([userId, netCents]) => {
+    const member = memberLookup.get(userId);
+    return {
+      userId,
+      displayName: member?.displayName ?? null,
+      email: member?.email ?? null,
+      netCents,
+      isCurrentMember: Boolean(member),
+    };
+  });
 }
 
 export function simplifyDebts(
@@ -44,9 +56,7 @@ export function simplifyDebts(
   members: GroupMember[],
 ): BalanceEdge[] {
   const balances = computeMemberBalances(expenses, members);
-  const memberLookup = new Map(
-    members.map((m) => [m.userId, m.displayName ?? m.email]),
-  );
+  const balanceLookup = new Map(balances.map((balance) => [balance.userId, balance]));
 
   const creditors: { userId: string; amount: number }[] = [];
   const debtors: { userId: string; amount: number }[] = [];
@@ -71,11 +81,18 @@ export function simplifyDebts(
     const settle = Math.min(creditors[ci].amount, debtors[di].amount);
 
     if (settle > 0) {
+      const debtor = balanceLookup.get(debtors[di].userId);
+      const creditor = balanceLookup.get(creditors[ci].userId);
+
       edges.push({
         fromUserId: debtors[di].userId,
-        fromName: memberLookup.get(debtors[di].userId) ?? null,
+        fromName: debtor?.displayName ?? null,
+        fromEmail: debtor?.email ?? null,
+        fromIsCurrentMember: debtor?.isCurrentMember ?? false,
         toUserId: creditors[ci].userId,
-        toName: memberLookup.get(creditors[ci].userId) ?? null,
+        toName: creditor?.displayName ?? null,
+        toEmail: creditor?.email ?? null,
+        toIsCurrentMember: creditor?.isCurrentMember ?? false,
         amountCents: settle,
       });
     }

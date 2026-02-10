@@ -163,7 +163,9 @@ export async function listExpensesForGroup(
     .from("expenses")
     .select(expenseWithSplitsColumns)
     .eq("group_id", groupId)
-    .order("expense_date", { ascending: false });
+    .order("expense_date", { ascending: false })
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false });
 
   if (error) {
     return {
@@ -240,7 +242,7 @@ export async function createSettlement(
   }
 
   return createExpense(input.groupId, {
-    description: "Settle Up",
+    description: "Record payment",
     amountCents: input.amountCents,
     expenseDate: input.expenseDate,
     splitType: "exact",

@@ -60,7 +60,7 @@ export function useDirectFriendGroup(
     ActionResult<string>
   > => {
     if (!user?.id) {
-      return { ok: false, message: "Sign in to create a direct split." };
+      return { ok: false, message: "Sign in to create a 1:1 group." };
     }
 
     if (!friendId) {

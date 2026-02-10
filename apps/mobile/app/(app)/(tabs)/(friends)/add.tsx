@@ -89,17 +89,19 @@ export default function AddFriendScreen() {
 
   useEffect(() => {
     const normalized = query.trim().toLowerCase();
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
 
     setSearchError(null);
     setStatusMessage(null);
 
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
     if (normalized.length < 2) {
       setSuggestions([]);
       setIsSearching(false);
-
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
 
       return;
     }
@@ -112,16 +114,9 @@ export default function AddFriendScreen() {
       return;
     }
 
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
     setIsSearching(true);
 
     debounceTimeoutRef.current = setTimeout(() => {
-      const requestId = requestIdRef.current + 1;
-      requestIdRef.current = requestId;
-
       void (async () => {
         const result = await searchFriendCandidates(
           normalized,

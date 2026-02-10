@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ActivityIndicator,
@@ -15,6 +15,7 @@ import { typographyScale } from "@/design/tokens/typography";
 import { useDirectFriendGroup } from "@/features/friends/hooks/use-direct-friend-group";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
 import { formatCents } from "@/features/groups/lib/format-currency";
+import { formatDateOnly } from "@/features/shared/lib/date-only";
 
 type ActivityGroup = {
   monthLabel: string;
@@ -31,27 +32,17 @@ type ActivityGroup = {
 };
 
 function monthLabel(value: string): string {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
+  return formatDateOnly(value, {
     month: "long",
     year: "numeric",
-  }).format(parsed);
+  });
 }
 
 function shortDate(value: string): string {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
+  return formatDateOnly(value, {
     month: "short",
     day: "2-digit",
-  }).format(parsed);
+  });
 }
 
 export default function FriendDetailScreen() {
@@ -61,6 +52,7 @@ export default function FriendDetailScreen() {
   const { friend, activity, isLoading, error, refresh } =
     useFriendDetail(friendId);
   const { ensureDirectGroup, isEnsuring } = useDirectFriendGroup(friendId);
+  const [addExpenseError, setAddExpenseError] = useState<string | null>(null);
 
   const friendName = friend?.displayName ?? friend?.email ?? "Friend";
   const isSettled = friend?.direction === "settled";
@@ -92,10 +84,13 @@ export default function FriendDetailScreen() {
       return;
     }
 
+    setAddExpenseError(null);
+
     void (async () => {
       const result = await ensureDirectGroup();
 
       if (!result.ok) {
+        setAddExpenseError(result.message);
         return;
       }
 
@@ -281,6 +276,18 @@ export default function FriendDetailScreen() {
                 </Text>
               </Pressable>
             </ScrollView>
+
+            {addExpenseError ? (
+              <Text
+                selectable
+                style={[
+                  typographyScale.bodySm,
+                  { color: colorSemanticTokens.state.danger },
+                ]}
+              >
+                {addExpenseError}
+              </Text>
+            ) : null}
           </View>
 
           {groupedActivity.map((bucket) => (
@@ -364,11 +371,13 @@ export default function FriendDetailScreen() {
                           color:
                             item.netCents > 0
                               ? colorSemanticTokens.financial.positive
-                              : colorSemanticTokens.financial.negative,
+                              : item.netCents < 0
+                                ? colorSemanticTokens.financial.negative
+                                : colorSemanticTokens.text.secondary,
                         },
                       ]}
                     >
-                      {item.netCents > 0 ? "+" : "-"}
+                      {item.netCents > 0 ? "+" : item.netCents < 0 ? "-" : ""}
                       {formatCents(Math.abs(item.netCents))}
                     </Text>
                   </View>
@@ -377,6 +386,39 @@ export default function FriendDetailScreen() {
             </View>
           ))}
         </>
+      ) : null}
+
+      {!isLoading && !error && !friend ? (
+        <View
+          style={{
+            borderRadius: radiusTokens.card,
+            borderCurve: "continuous",
+            borderWidth: 1,
+            borderColor: colorSemanticTokens.border.subtle,
+            backgroundColor: colorSemanticTokens.surface.card,
+            padding: spacingTokens.cardPadding,
+            gap: spacingTokens.sm,
+          }}
+        >
+          <Text
+            selectable
+            style={[
+              typographyScale.headingMd,
+              { color: colorSemanticTokens.text.primary },
+            ]}
+          >
+            Friend unavailable
+          </Text>
+          <Text
+            selectable
+            style={[
+              typographyScale.bodyMd,
+              { color: colorSemanticTokens.text.secondary },
+            ]}
+          >
+            This friend is no longer available. Go back and pick another friend.
+          </Text>
+        </View>
       ) : null}
     </ScrollView>
   );

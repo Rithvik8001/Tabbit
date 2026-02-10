@@ -32,7 +32,9 @@ export default function GroupSettingsScreen() {
     isDeleting,
   } = useGroupDetail(id);
 
-  const isAdmin = group && user ? group.createdBy === user.id : false;
+  const isAdmin = members.some(
+    (member) => member.userId === user?.id && member.role === "admin",
+  );
 
   const handleDeleteGroup = () => {
     Alert.alert(

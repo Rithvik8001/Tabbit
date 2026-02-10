@@ -294,7 +294,7 @@ export async function getDirectFriendGroup(
   if (error) {
     return {
       ok: false,
-      message: normalizeError("Unable to load direct friend group.", error),
+      message: normalizeError("Unable to load 1:1 group.", error),
     };
   }
 
@@ -315,10 +315,7 @@ export async function ensureDirectFriendGroup(
   if (error) {
     return {
       ok: false,
-      message: normalizeError(
-        "Unable to start a direct split with this friend.",
-        error,
-      ),
+      message: normalizeError("Unable to start a 1:1 group with this friend.", error),
     };
   }
 
@@ -328,7 +325,7 @@ export async function ensureDirectFriendGroup(
   if (!directGroupId) {
     return {
       ok: false,
-      message: "Could not resolve a direct split group for this friend.",
+      message: "Could not resolve a 1:1 group for this friend.",
     };
   }
 

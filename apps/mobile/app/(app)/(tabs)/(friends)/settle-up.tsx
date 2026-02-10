@@ -28,6 +28,7 @@ import {
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
+import { isValidDateOnly } from "@/features/shared/lib/date-only";
 
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -99,7 +100,7 @@ export default function FriendSettleUpScreen() {
       ? { ...existingDirect, isDirect: true }
       : {
           id: directGroupId,
-          name: `Direct with ${friendLabel}`,
+          name: `1:1 with ${friendLabel}`,
           emoji: "\uD83E\uDD1D",
           isDirect: true,
         };
@@ -183,6 +184,11 @@ export default function FriendSettleUpScreen() {
 
     if (!dateText.match(/^\d{4}-\d{2}-\d{2}$/)) {
       setFormError("Enter a valid date in YYYY-MM-DD format.");
+      return;
+    }
+
+    if (!isValidDateOnly(dateText)) {
+      setFormError("That date doesn't exist. Check the month and day.");
       return;
     }
 
@@ -435,7 +441,7 @@ export default function FriendSettleUpScreen() {
                   fontWeight: "500",
                 }}
               >
-                Checking direct split group...
+                Checking 1:1 group...
               </Text>
             ) : null}
             {directGroupError ? (
@@ -499,7 +505,7 @@ export default function FriendSettleUpScreen() {
                       >
                         {group.emoji ? `${group.emoji} ` : ""}
                         {group.name}
-                        {group.isDirect ? " \u00B7 Direct" : ""}
+                        {group.isDirect ? " \u00B7 1:1" : ""}
                       </Text>
                     </Pressable>
                   );

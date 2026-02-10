@@ -63,6 +63,8 @@ export default function AddMemberScreen() {
 
   useEffect(() => {
     const normalized = query.trim().toLowerCase();
+    requestIdRef.current += 1;
+    const requestId = requestIdRef.current;
 
     if (
       selectedCandidate &&
@@ -97,9 +99,6 @@ export default function AddMemberScreen() {
     setIsSearching(true);
 
     debounceTimeoutRef.current = setTimeout(() => {
-      const requestId = requestIdRef.current + 1;
-      requestIdRef.current = requestId;
-
       void (async () => {
         const result = await searchMemberCandidates(
           normalized,

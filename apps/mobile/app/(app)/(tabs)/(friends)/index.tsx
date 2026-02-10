@@ -23,7 +23,7 @@ import { useFriendRequests } from "@/features/friends/hooks/use-friend-requests"
 import { useFriends } from "@/features/friends/hooks/use-friends";
 import type { FriendListRowVM } from "@/features/friends/types/friend.types";
 import { formatCents } from "@/features/groups/lib/format-currency";
-import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
+import { useHomeSnapshot } from "@/features/home/hooks/use-home-snapshot";
 import {
   BALANCE_CHIPS,
   FRIEND_SORT_CHIPS,
@@ -84,7 +84,7 @@ function mapFriendRow(friend: {
 
 export default function FriendsTabScreen() {
   const router = useRouter();
-  const { snapshot } = useHomeDashboard({ activityLimit: 1 });
+  const { snapshot } = useHomeSnapshot();
   const {
     friends,
     isLoading: isFriendsLoading,
@@ -96,11 +96,13 @@ export default function FriendsTabScreen() {
     outgoingRequests,
     isLoading: isRequestsLoading,
     error: requestsError,
+    actionError,
     refresh: refreshRequests,
     acceptRequest,
     declineRequest,
     cancelRequest,
     isMutatingRequest,
+    clearActionError,
   } = useFriendRequests();
 
   const [showSearch, setShowSearch] = useState(false);
@@ -207,6 +209,45 @@ export default function FriendsTabScreen() {
               Requests
             </Text>
 
+            {actionError ? (
+              <View
+                style={{
+                  borderRadius: radiusTokens.control,
+                  borderCurve: "continuous",
+                  borderWidth: 1,
+                  borderColor: colorSemanticTokens.state.danger,
+                  backgroundColor: colorSemanticTokens.state.dangerSoft,
+                  padding: spacingTokens.sm,
+                  gap: spacingTokens.xs,
+                }}
+              >
+                <Text
+                  selectable
+                  style={[
+                    typographyScale.bodySm,
+                    { color: colorSemanticTokens.state.danger },
+                  ]}
+                >
+                  {actionError}
+                </Text>
+                <Pressable
+                  onPress={clearActionError}
+                  accessibilityRole="button"
+                  style={{ alignSelf: "flex-start" }}
+                >
+                  <Text
+                    selectable
+                    style={[
+                      typographyScale.headingSm,
+                      { color: colorSemanticTokens.state.danger },
+                    ]}
+                  >
+                    Dismiss
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null}
+
             {incomingRequests.map((request) => (
               <View
                 key={request.requestId}
@@ -255,7 +296,9 @@ export default function FriendsTabScreen() {
                       variant="soft"
                       tone="danger"
                       onPress={() => {
-                        void declineRequest(request.requestId);
+                        void (async () => {
+                          await declineRequest(request.requestId);
+                        })();
                       }}
                       loading={isMutatingRequest(request.requestId)}
                       disabled={isMutatingRequest(request.requestId)}
@@ -303,7 +346,9 @@ export default function FriendsTabScreen() {
                   variant="soft"
                   tone="neutral"
                   onPress={() => {
-                    void cancelRequest(request.requestId);
+                    void (async () => {
+                      await cancelRequest(request.requestId);
+                    })();
                   }}
                   loading={isMutatingRequest(request.requestId)}
                   disabled={isMutatingRequest(request.requestId)}

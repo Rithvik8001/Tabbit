@@ -1,6 +1,8 @@
 import { supabase } from "@/features/auth/lib/supabase-client";
 import type {
   CreateGroupInput,
+  GroupBalanceSummary,
+  GroupBalanceSummaryRow,
   Group,
   GroupListItem,
   GroupListRow,
@@ -35,6 +37,31 @@ function mapGroupListRow(row: GroupListRow): GroupListItem {
     ...mapGroupRow(row),
     memberCount: row.group_members?.[0]?.count ?? 0,
     expenseCount: row.expenses?.[0]?.count ?? 0,
+  };
+}
+
+function toSafeNumber(value: number | string | null | undefined): number {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizeDirection(value: string): GroupBalanceSummary["direction"] {
+  if (value === "you_are_owed") {
+    return "you_are_owed";
+  }
+
+  if (value === "you_owe") {
+    return "you_owe";
+  }
+
+  return "settled";
+}
+
+function mapGroupBalanceSummaryRow(row: GroupBalanceSummaryRow): GroupBalanceSummary {
+  return {
+    groupId: row.group_id,
+    netCents: toSafeNumber(row.net_cents),
+    direction: normalizeDirection(row.direction),
   };
 }
 
@@ -86,6 +113,26 @@ export async function listGroupsForUser(): Promise<
   return {
     ok: true,
     data: rows.map(mapGroupListRow),
+  };
+}
+
+export async function getGroupBalanceSummaries(): Promise<
+  GroupsRepositoryResult<GroupBalanceSummary[]>
+> {
+  const { data, error } = await supabase.rpc("get_group_balance_summaries");
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeGroupsError("Unable to load group balances right now.", error),
+    };
+  }
+
+  const rows = (data ?? []) as GroupBalanceSummaryRow[];
+
+  return {
+    ok: true,
+    data: rows.map(mapGroupBalanceSummaryRow),
   };
 }
 

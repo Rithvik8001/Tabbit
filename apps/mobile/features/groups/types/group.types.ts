@@ -42,6 +42,7 @@ export type GroupListRowVM = {
   title: string;
   subtitle: string | null;
   leadingEmoji: string | null;
+  statusState: "ready" | "loading" | "unavailable";
   statusLabel: string;
   statusAmount: string | null;
   tone: "positive" | "negative" | "neutral";
@@ -50,4 +51,18 @@ export type GroupListRowVM = {
 export type GroupListRow = GroupRow & {
   group_members: { count: number }[];
   expenses: { count: number }[];
+};
+
+export type GroupBalanceDirection = "you_owe" | "you_are_owed" | "settled";
+
+export type GroupBalanceSummary = {
+  groupId: string;
+  netCents: number;
+  direction: GroupBalanceDirection;
+};
+
+export type GroupBalanceSummaryRow = {
+  group_id: string;
+  net_cents: number | string;
+  direction: string;
 };

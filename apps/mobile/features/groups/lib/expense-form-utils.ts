@@ -1,5 +1,6 @@
 import type { SplitType, ExpenseSplitInput } from "@/features/groups/types/expense.types";
 import { formatCents } from "@/features/groups/lib/format-currency";
+import { isValidDateOnly } from "@/features/shared/lib/date-only";
 
 export const MAX_DESCRIPTION_LENGTH = 100;
 
@@ -46,14 +47,62 @@ export function computePercentSplits(
   percentAmounts: Record<string, string>,
   amountCents: number,
 ): ExpenseSplitInput[] {
-  return participantIds.map((userId) => {
-    const pct = parseFloat(percentAmounts[userId] || "0");
+  if (participantIds.length === 0) {
+    return [];
+  }
+
+  const drafts = participantIds.map((userId, index) => {
+    const parsedPercent = Number.parseFloat(percentAmounts[userId] || "0");
+    const percentShare = Number.isFinite(parsedPercent) ? parsedPercent : 0;
+    const rawShare = (amountCents * percentShare) / 100;
+    const flooredShare = Math.floor(rawShare);
+
     return {
       userId,
-      shareCents: Math.round((amountCents * pct) / 100),
-      percentShare: pct,
+      index,
+      percentShare,
+      shareCents: flooredShare,
+      fractional: rawShare - flooredShare,
     };
   });
+
+  const baseSum = drafts.reduce((sum, item) => sum + item.shareCents, 0);
+  let remainder = amountCents - baseSum;
+
+  if (remainder !== 0) {
+    const ordered = [...drafts].sort((a, b) => {
+      if (remainder > 0) {
+        return b.fractional - a.fractional || a.index - b.index;
+      }
+      return a.fractional - b.fractional || a.index - b.index;
+    });
+
+    let cursor = 0;
+    while (remainder !== 0 && ordered.length > 0) {
+      const current = ordered[cursor % ordered.length];
+
+      if (remainder > 0) {
+        current.shareCents += 1;
+        remainder -= 1;
+      } else if (current.shareCents > 0) {
+        current.shareCents -= 1;
+        remainder += 1;
+      }
+
+      cursor += 1;
+      if (cursor > participantIds.length * 1000) {
+        break;
+      }
+    }
+  }
+
+  return drafts
+    .sort((a, b) => a.index - b.index)
+    .map((item) => ({
+      userId: item.userId,
+      shareCents: item.shareCents,
+      percentShare: item.percentShare,
+    }));
 }
 
 export function validateExpenseForm(params: {
@@ -104,12 +153,27 @@ export function validateExpenseForm(params: {
       return `Exact amounts must add up to ${formatCents(amountCents)}. Currently ${formatCents(sum)}.`;
     }
   } else if (splitType === "percent") {
-    const pctSum = participantIds.reduce(
-      (s, uid) => s + parseFloat(percentAmounts[uid] || "0"),
-      0,
+    const percentages = participantIds.map((uid) =>
+      Number.parseFloat(percentAmounts[uid] || "0"),
     );
+
+    if (percentages.some((value) => !Number.isFinite(value))) {
+      return "Enter valid percentages for each participant.";
+    }
+
+    if (percentages.some((value) => value < 0 || value > 100)) {
+      return "Each percentage must be between 0 and 100.";
+    }
+
+    const pctSum = percentages.reduce((sum, value) => sum + value, 0);
     if (Math.abs(pctSum - 100) > 0.01) {
       return `Percentages must add up to 100%. Currently ${pctSum.toFixed(1)}%.`;
+    }
+
+    const splits = computePercentSplits(participantIds, percentAmounts, amountCents);
+    const splitSum = splits.reduce((sum, split) => sum + split.shareCents, 0);
+    if (splitSum !== amountCents) {
+      return `Percent splits must add up to ${formatCents(amountCents)}. Currently ${formatCents(splitSum)}.`;
     }
   }
 
@@ -117,8 +181,7 @@ export function validateExpenseForm(params: {
     return "Enter a valid date in YYYY-MM-DD format.";
   }
 
-  const parsedDate = new Date(dateText + "T00:00:00");
-  if (isNaN(parsedDate.getTime())) {
+  if (!isValidDateOnly(dateText)) {
     return "That date doesn't exist. Check the month and day.";
   }
 

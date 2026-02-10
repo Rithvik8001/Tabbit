@@ -19,12 +19,11 @@ import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
-import { useAuth } from "@/features/auth/state/auth-provider";
 import { useGroups } from "@/features/groups/hooks/use-groups";
-import { listExpensesForGroup } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
+import { getGroupBalanceSummaries } from "@/features/groups/lib/groups-repository";
 import type { GroupListRowVM } from "@/features/groups/types/group.types";
-import { useHomeDashboard } from "@/features/home/hooks/use-home-dashboard";
+import { useHomeSnapshot } from "@/features/home/hooks/use-home-snapshot";
 import {
   BALANCE_CHIPS,
   GROUP_SORT_CHIPS,
@@ -36,73 +35,91 @@ import {
 } from "@/features/shared/lib/list-filter-utils";
 
 type GroupStatus = {
+  statusState: "ready" | "loading" | "unavailable";
   statusLabel: string;
   statusAmount: string | null;
   tone: "positive" | "negative" | "neutral";
   netCents: number;
 };
 
-function computeNetForUser(
-  expenses: {
-    paidBy: string;
-    splits: { userId: string; shareCents: number }[];
-  }[],
-  userId: string,
-): number {
-  let net = 0;
-
-  for (const expense of expenses) {
-    if (expense.paidBy === userId) {
-      for (const split of expense.splits) {
-        if (split.userId !== userId) {
-          net += split.shareCents;
-        }
-      }
-      continue;
-    }
-
-    const currentUserSplit = expense.splits.find(
-      (split) => split.userId === userId,
-    );
-    if (currentUserSplit) {
-      net -= currentUserSplit.shareCents;
-    }
-  }
-
-  return net;
-}
-
 export default function GroupsTabScreen() {
   const router = useRouter();
-  const { user } = useAuth();
-  const { snapshot } = useHomeDashboard({ activityLimit: 1 });
+  const { snapshot } = useHomeSnapshot();
   const { groups, isLoading, error, refresh } = useGroups();
 
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [balanceFilter, setBalanceFilter] = useState<BalanceFilter>("all");
   const [groupSort, setGroupSort] = useState<GroupSort>("newest");
+  const [balanceError, setBalanceError] = useState<string | null>(null);
   const [statusByGroupId, setStatusByGroupId] = useState<
     Record<string, GroupStatus>
   >({});
 
   useEffect(() => {
-    if (!user?.id || groups.length === 0) {
+    if (groups.length === 0) {
+      setBalanceError(null);
       setStatusByGroupId({});
       return;
     }
 
     let isCancelled = false;
+    const loadingStatuses = Object.fromEntries(
+      groups.map((group) => [
+        group.id,
+        {
+          statusState: "loading",
+          statusLabel: "Calculating balance",
+          statusAmount: null,
+          tone: "neutral",
+          netCents: 0,
+        } satisfies GroupStatus,
+      ]),
+    );
+    setStatusByGroupId(loadingStatuses);
+    setBalanceError(null);
 
     void (async () => {
-      const entries = await Promise.all(
-        groups.map(async (group) => {
-          const result = await listExpensesForGroup(group.id);
-          if (!result.ok) {
+      if (isCancelled) {
+        return;
+      }
+
+      const summaryResult = await getGroupBalanceSummaries();
+      if (isCancelled) {
+        return;
+      }
+
+      if (!summaryResult.ok) {
+        setBalanceError(summaryResult.message);
+        const unavailableStatuses = Object.fromEntries(
+          groups.map((group) => [
+            group.id,
+            {
+              statusState: "unavailable",
+              statusLabel: "Balance unavailable",
+              statusAmount: null,
+              tone: "neutral",
+              netCents: 0,
+            } satisfies GroupStatus,
+          ]),
+        );
+        setStatusByGroupId(unavailableStatuses);
+        return;
+      }
+
+      const summaryByGroupId = new Map(
+        summaryResult.data.map((summary) => [summary.groupId, summary]),
+      );
+
+      const statuses = Object.fromEntries(
+        groups.map((group) => {
+          const summary = summaryByGroupId.get(group.id);
+          if (!summary) {
             return [
               group.id,
               {
-                statusLabel: "status unavailable",
+                statusState: "unavailable",
+                statusLabel: "Balance unavailable",
                 statusAmount: null,
                 tone: "neutral",
                 netCents: 0,
@@ -110,28 +127,28 @@ export default function GroupsTabScreen() {
             ] as const;
           }
 
-          const netCents = computeNetForUser(result.data, user.id);
-
-          if (netCents < 0) {
+          if (summary.direction === "you_owe") {
             return [
               group.id,
               {
+                statusState: "ready",
                 statusLabel: "you owe",
-                statusAmount: formatCents(Math.abs(netCents)),
+                statusAmount: formatCents(Math.abs(summary.netCents)),
                 tone: "negative",
-                netCents,
+                netCents: summary.netCents,
               } satisfies GroupStatus,
             ] as const;
           }
 
-          if (netCents > 0) {
+          if (summary.direction === "you_are_owed") {
             return [
               group.id,
               {
+                statusState: "ready",
                 statusLabel: "you are owed",
-                statusAmount: formatCents(Math.abs(netCents)),
+                statusAmount: formatCents(Math.abs(summary.netCents)),
                 tone: "positive",
-                netCents,
+                netCents: summary.netCents,
               } satisfies GroupStatus,
             ] as const;
           }
@@ -139,6 +156,7 @@ export default function GroupsTabScreen() {
           return [
             group.id,
             {
+              statusState: "ready",
               statusLabel: "settled up",
               statusAmount: null,
               tone: "neutral",
@@ -148,17 +166,14 @@ export default function GroupsTabScreen() {
         }),
       );
 
-      if (isCancelled) {
-        return;
-      }
-
-      setStatusByGroupId(Object.fromEntries(entries));
+      setStatusByGroupId(statuses);
+      setBalanceError(null);
     })();
 
     return () => {
       isCancelled = true;
     };
-  }, [groups, user?.id]);
+  }, [groups]);
 
   type GroupRowWithMeta = GroupListRowVM & {
     netCents: number;
@@ -169,9 +184,10 @@ export default function GroupsTabScreen() {
   const rows = useMemo<GroupRowWithMeta[]>(() => {
     return groups.map((group) => {
       const status = statusByGroupId[group.id] ?? {
-        statusLabel: "loading...",
+        statusState: "loading" as const,
+        statusLabel: "Calculating balance",
         statusAmount: null,
-        tone: "neutral" as const,
+        tone: "neutral",
         netCents: 0,
       };
 
@@ -180,6 +196,7 @@ export default function GroupsTabScreen() {
         title: group.name,
         subtitle: `${group.memberCount} ${group.memberCount === 1 ? "member" : "members"} · ${group.expenseCount} ${group.expenseCount === 1 ? "expense" : "expenses"}`,
         leadingEmoji: group.emoji,
+        statusState: status.statusState,
         statusLabel: status.statusLabel,
         statusAmount: status.statusAmount,
         tone: status.tone,
@@ -193,12 +210,26 @@ export default function GroupsTabScreen() {
     const normalized = query.trim().toLowerCase();
 
     const filtered = rows.filter((row) => {
-      if (!matchesBalanceFilter(toneToDirection(row.tone), balanceFilter))
-        return false;
+      if (balanceFilter !== "all") {
+        if (row.statusState !== "ready") {
+          return false;
+        }
+
+        if (!matchesBalanceFilter(toneToDirection(row.tone), balanceFilter)) {
+          return false;
+        }
+      }
+
       if (!normalized) return true;
       const haystack = `${row.title} ${row.subtitle ?? ""}`.toLowerCase();
       return haystack.includes(normalized);
     });
+
+    if (groupSort === "balance") {
+      const readyRows = filtered.filter((row) => row.statusState === "ready");
+      const pendingRows = filtered.filter((row) => row.statusState !== "ready");
+      return [...sortGroups(readyRows, "balance"), ...sortGroups(pendingRows, "newest")];
+    }
 
     return sortGroups(filtered, groupSort);
   }, [balanceFilter, groupSort, query, rows]);
@@ -294,6 +325,39 @@ export default function GroupsTabScreen() {
               variant="soft"
               onPress={() => void refresh()}
             />
+          </View>
+        ) : null}
+
+        {balanceError && !error ? (
+          <View
+            style={{
+              borderRadius: radiusTokens.card,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: colorSemanticTokens.state.warning,
+              backgroundColor: colorSemanticTokens.state.warningSoft,
+              padding: spacingTokens.md,
+              gap: spacingTokens.sm,
+            }}
+          >
+            <Text
+              selectable
+              style={[
+                typographyScale.headingSm,
+                { color: colorSemanticTokens.state.warning },
+              ]}
+            >
+              Balances may be outdated
+            </Text>
+            <Text
+              selectable
+              style={[
+                typographyScale.bodySm,
+                { color: colorSemanticTokens.state.warning },
+              ]}
+            >
+              {balanceError}
+            </Text>
           </View>
         ) : null}
 

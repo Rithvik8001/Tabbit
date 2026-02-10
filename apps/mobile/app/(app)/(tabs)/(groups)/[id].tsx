@@ -17,30 +17,21 @@ import { formatCents } from "@/features/groups/lib/format-currency";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
 import type { ExpenseWithSplits } from "@/features/groups/types/expense.types";
+import { formatDateOnly } from "@/features/shared/lib/date-only";
 import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
 function monthLabel(value: string): string {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
+  return formatDateOnly(value, {
     month: "long",
     year: "numeric",
-  }).format(parsed);
+  });
 }
 
 function shortDate(value: string): string {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
+  return formatDateOnly(value, {
     month: "short",
     day: "2-digit",
-  }).format(parsed);
+  });
 }
 
 export default function GroupDetailScreen() {
@@ -49,8 +40,18 @@ export default function GroupDetailScreen() {
   const { user } = useAuth();
 
   const { group, members, isLoading, error, refresh } = useGroupDetail(id);
-  const { expenses, userBalance, simplifiedDebts, deleteExpense } =
-    useGroupExpenses(id, members);
+  const {
+    expenses,
+    userBalance,
+    simplifiedDebts,
+    deleteExpense,
+    isLoading: isExpensesLoading,
+    error: expensesError,
+    refresh: refreshExpenses,
+  } = useGroupExpenses(id, members);
+  const isAdmin = members.some(
+    (member) => member.userId === user?.id && member.role === "admin",
+  );
 
   const groupedExpenses = useMemo(() => {
     const map = new Map<string, typeof expenses>();
@@ -337,11 +338,15 @@ export default function GroupDetailScreen() {
                 { color: colorSemanticTokens.text.primary },
               ]}
             >
-              {userBalance.direction === "you_are_owed"
-                ? "You are owed"
-                : userBalance.direction === "you_owe"
-                  ? "You owe"
-                  : "You are settled up"}
+              {isExpensesLoading
+                ? "Loading balances"
+                : expensesError
+                  ? "Balance unavailable"
+                  : userBalance.direction === "you_are_owed"
+                    ? "You are owed"
+                    : userBalance.direction === "you_owe"
+                      ? "You owe"
+                      : "You are settled up"}
             </Text>
             <Text
               selectable
@@ -349,7 +354,9 @@ export default function GroupDetailScreen() {
                 typographyScale.displayMd,
                 {
                   color:
-                    userBalance.direction === "you_are_owed"
+                    isExpensesLoading || expensesError
+                      ? colorSemanticTokens.text.secondary
+                      : userBalance.direction === "you_are_owed"
                       ? colorSemanticTokens.financial.positive
                       : userBalance.direction === "you_owe"
                         ? colorSemanticTokens.financial.negative
@@ -357,69 +364,192 @@ export default function GroupDetailScreen() {
                 },
               ]}
             >
-              {userBalance.direction === "settled"
-                ? "$0.00"
-                : formatCents(Math.abs(userBalance.netCents))}
+              {isExpensesLoading
+                ? "..."
+                : expensesError
+                  ? "—"
+                  : userBalance.direction === "settled"
+                    ? "$0.00"
+                    : formatCents(Math.abs(userBalance.netCents))}
             </Text>
 
-            {debtsInvolvingCurrentUser.map((debt) => {
-              const isPayer = debt.fromUserId === user?.id;
+            {isExpensesLoading ? (
+              <Text
+                selectable
+                style={[
+                  typographyScale.bodySm,
+                  { color: colorSemanticTokens.text.secondary },
+                ]}
+              >
+                Loading latest balances...
+              </Text>
+            ) : null}
 
-              return (
-                <View
-                  key={`${debt.fromUserId}-${debt.toUserId}`}
-                  style={{
-                    borderRadius: radiusTokens.control,
-                    borderCurve: "continuous",
-                    backgroundColor: colorSemanticTokens.background.subtle,
-                    paddingHorizontal: spacingTokens.sm,
-                    paddingVertical: spacingTokens.xs,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: spacingTokens.sm,
-                  }}
+            {expensesError ? (
+              <View style={{ gap: spacingTokens.xs }}>
+                <Text
+                  selectable
+                  style={[
+                    typographyScale.bodySm,
+                    { color: colorSemanticTokens.state.danger },
+                  ]}
                 >
+                  {expensesError}
+                </Text>
+                <Pressable onPress={() => void refreshExpenses()}>
                   <Text
                     selectable
                     style={[
-                      typographyScale.bodySm,
-                      { color: colorSemanticTokens.text.primary, flex: 1 },
+                      typographyScale.headingSm,
+                      { color: colorSemanticTokens.accent.primary },
                     ]}
                   >
-                    {isPayer
-                      ? `You owe ${debt.toName ?? "member"} ${formatCents(debt.amountCents)}`
-                      : `${debt.fromName ?? "member"} owes you ${formatCents(debt.amountCents)}`}
+                    Retry balances
                   </Text>
-                  <Pressable
-                    onPress={() => {
-                      router.push({
-                        pathname: "/(app)/(tabs)/(groups)/settle-up",
-                        params: {
-                          id: group.id,
-                          fromUserId: debt.fromUserId,
-                          toUserId: debt.toUserId,
-                          maxAmountCents: String(debt.amountCents),
-                        },
-                      });
+                </Pressable>
+              </View>
+            ) : null}
+
+            {!isExpensesLoading &&
+              !expensesError &&
+              debtsInvolvingCurrentUser.map((debt) => {
+                const isPayer = debt.fromUserId === user?.id;
+                const fromLabel = getGroupMemberLabel({
+                  displayName: debt.fromName,
+                  email: debt.fromEmail,
+                  isCurrentUser: debt.fromUserId === user?.id,
+                });
+                const toLabel = getGroupMemberLabel({
+                  displayName: debt.toName,
+                  email: debt.toEmail,
+                  isCurrentUser: debt.toUserId === user?.id,
+                });
+                const canRecordPayment =
+                  debt.fromIsCurrentMember && debt.toIsCurrentMember;
+
+                return (
+                  <View
+                    key={`${debt.fromUserId}-${debt.toUserId}`}
+                    style={{
+                      borderRadius: radiusTokens.control,
+                      borderCurve: "continuous",
+                      backgroundColor: colorSemanticTokens.background.subtle,
+                      paddingHorizontal: spacingTokens.sm,
+                      paddingVertical: spacingTokens.xs,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: spacingTokens.sm,
                     }}
                   >
                     <Text
                       selectable
                       style={[
-                        typographyScale.headingSm,
-                        { color: colorSemanticTokens.accent.primary },
+                        typographyScale.bodySm,
+                        { color: colorSemanticTokens.text.primary, flex: 1 },
                       ]}
                     >
-                      Settle
+                      {isPayer
+                        ? `You owe ${toLabel} ${formatCents(debt.amountCents)}`
+                        : `${fromLabel} owes you ${formatCents(debt.amountCents)}`}
                     </Text>
-                  </Pressable>
-                </View>
-              );
-            })}
+                    {canRecordPayment ? (
+                      <Pressable
+                        onPress={() => {
+                          router.push({
+                            pathname: "/(app)/(tabs)/(groups)/settle-up",
+                            params: {
+                              id: group.id,
+                              fromUserId: debt.fromUserId,
+                              toUserId: debt.toUserId,
+                              maxAmountCents: String(debt.amountCents),
+                            },
+                          });
+                        }}
+                      >
+                        <Text
+                          selectable
+                          style={[
+                            typographyScale.headingSm,
+                            { color: colorSemanticTokens.accent.primary },
+                          ]}
+                        >
+                          Record payment
+                        </Text>
+                      </Pressable>
+                    ) : (
+                      <Text
+                        selectable
+                        style={[
+                          typographyScale.bodySm,
+                          { color: colorSemanticTokens.text.tertiary },
+                        ]}
+                      >
+                        Unavailable
+                      </Text>
+                    )}
+                  </View>
+                );
+              })}
           </View>
 
-          {groupedExpenses.map((bucket) => (
+          {isExpensesLoading ? (
+            <Text
+              selectable
+              style={[
+                typographyScale.bodyMd,
+                { color: colorSemanticTokens.text.secondary },
+              ]}
+            >
+              Loading expenses...
+            </Text>
+          ) : null}
+
+          {expensesError ? (
+            <View
+              style={{
+                borderRadius: radiusTokens.card,
+                borderCurve: "continuous",
+                borderWidth: 1,
+                borderColor: colorSemanticTokens.state.danger,
+                backgroundColor: colorSemanticTokens.state.dangerSoft,
+                padding: spacingTokens.md,
+                gap: spacingTokens.sm,
+              }}
+            >
+              <Text
+                selectable
+                style={[
+                  typographyScale.headingSm,
+                  { color: colorSemanticTokens.state.danger },
+                ]}
+              >
+                Could not load expenses
+              </Text>
+              <Text
+                selectable
+                style={[
+                  typographyScale.bodySm,
+                  { color: colorSemanticTokens.state.danger },
+                ]}
+              >
+                {expensesError}
+              </Text>
+              <Pressable onPress={() => void refreshExpenses()}>
+                <Text
+                  selectable
+                  style={[
+                    typographyScale.headingSm,
+                    { color: colorSemanticTokens.accent.primary },
+                  ]}
+                >
+                  Retry expenses
+                </Text>
+              </Pressable>
+            </View>
+          ) : null}
+
+          {!isExpensesLoading && !expensesError && groupedExpenses.map((bucket) => (
             <View key={bucket.label} style={{ gap: spacingTokens.sm }}>
               
               <Text
@@ -434,7 +564,7 @@ export default function GroupDetailScreen() {
               {bucket.items.map((expense) => {
                 const canDelete =
                   expense.createdBy === user?.id ||
-                  group.createdBy === user?.id;
+                  isAdmin;
                 const canEdit =
                   expense.createdBy === user?.id &&
                   expense.entryType !== "settlement";

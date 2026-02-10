@@ -7,7 +7,7 @@ export type FriendBalanceRow = {
   user_id: string;
   display_name: string | null;
   email: string | null;
-  net_cents: number;
+  net_cents: number | string;
 };
 
 /** Domain model for friend balance */
@@ -32,15 +32,15 @@ export type FriendListRowVM = {
 export type FriendActivityRow = {
   expense_id: string;
   description: string;
-  amount_cents: number;
+  amount_cents: number | string;
   expense_date: string;
   group_id: string;
   group_name: string;
   group_emoji: string | null;
   entry_type: ExpenseEntryType;
   paid_by_me: boolean;
-  my_share: number;
-  friend_share: number;
+  my_share: number | string;
+  friend_share: number | string;
   receipt_attached: boolean | null;
 };
 

@@ -90,12 +90,17 @@ export type MemberBalance = {
   displayName: string | null;
   email: string | null;
   netCents: number;
+  isCurrentMember: boolean;
 };
 
 export type BalanceEdge = {
   fromUserId: string;
   fromName: string | null;
+  fromEmail: string | null;
+  fromIsCurrentMember: boolean;
   toUserId: string;
   toName: string | null;
+  toEmail: string | null;
+  toIsCurrentMember: boolean;
   amountCents: number;
 };

@@ -10,6 +10,12 @@ type GroupMembersResult<T> =
   | { ok: true; data: T }
   | { ok: false; message: string };
 
+type RemoveGroupMemberRpcRow = {
+  id: string;
+  group_id: string;
+  user_id: string;
+};
+
 const memberColumns =
   "id, group_id, user_id, role, joined_at, profiles!group_members_user_id_profiles_fk(display_name, email)";
 
@@ -50,6 +56,20 @@ function normalizeError(
 
   if (error.code === "23505") {
     return "This user is already a member of the group.";
+  }
+
+  const normalizedMessage = error.message.toLowerCase();
+
+  if (normalizedMessage.includes("must be settled up")) {
+    return "Settle balances with this member before removing them.";
+  }
+
+  if (normalizedMessage.includes("only admins can remove other members")) {
+    return "Only admins can remove other members in this group.";
+  }
+
+  if (normalizedMessage.includes("group member not found")) {
+    return "This member no longer exists in the group.";
   }
 
   if (error.message.toLowerCase().includes("network")) {
@@ -109,15 +129,22 @@ export async function addGroupMemberByUserId(
 export async function removeGroupMember(
   memberId: string,
 ): Promise<GroupMembersResult<void>> {
-  const { error } = await supabase
-    .from("group_members")
-    .delete()
-    .eq("id", memberId);
+  const { data, error } = await supabase.rpc("remove_group_member_if_settled", {
+    p_group_member_id: memberId,
+  });
 
   if (error) {
     return {
       ok: false,
       message: normalizeError("Unable to remove member.", error),
+    };
+  }
+
+  const rows = (data ?? []) as RemoveGroupMemberRpcRow[];
+  if (rows.length === 0) {
+    return {
+      ok: false,
+      message: "Unable to remove member.",
     };
   }
 
