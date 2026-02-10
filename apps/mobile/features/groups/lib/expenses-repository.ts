@@ -242,7 +242,7 @@ export async function createSettlement(
   }
 
   return createExpense(input.groupId, {
-    description: "Record payment",
+    description: "Payment",
     amountCents: input.amountCents,
     expenseDate: input.expenseDate,
     splitType: "exact",

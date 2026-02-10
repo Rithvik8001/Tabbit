@@ -53,6 +53,7 @@ export type ActivityRowVM = {
   groupId: string;
   groupName: string;
   actorDisplayName: string | null;
+  expenseId: string | null;
   title: string;
   subtitle: string;
   timestampLabel: string;

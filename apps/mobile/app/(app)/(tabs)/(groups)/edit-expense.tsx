@@ -162,7 +162,7 @@ export default function EditExpenseScreen() {
 
     let participants;
     if (splitType === "equal") {
-      participants = computeEqualSplits(participantIds, amountCents);
+      participants = computeEqualSplits(participantIds, amountCents, dateText);
     } else if (splitType === "exact") {
       participants = computeExactSplits(participantIds, exactAmounts);
     } else {

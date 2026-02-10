@@ -18,17 +18,37 @@ export function getTodayString(): string {
   return `${year}-${month}-${day}`;
 }
 
+function simpleHash(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = (hash * 31 + input.charCodeAt(i)) | 0;
+  }
+  return hash >>> 0;
+}
+
 export function computeEqualSplits(
   participantIds: string[],
   amountCents: number,
+  expenseDate?: string,
 ): ExpenseSplitInput[] {
   if (participantIds.length === 0) return [];
   const perPerson = Math.floor(amountCents / participantIds.length);
   const remainder = amountCents - perPerson * participantIds.length;
 
-  return participantIds.map((userId, i) => ({
+  if (remainder === 0) {
+    return participantIds.map((userId) => ({ userId, shareCents: perPerson }));
+  }
+
+  const dateSeed = expenseDate ?? "";
+  const ranked = participantIds
+    .map((userId) => ({ userId, sort: simpleHash(dateSeed + userId) }))
+    .sort((a, b) => a.sort - b.sort);
+
+  const receivesExtra = new Set(ranked.slice(0, remainder).map((r) => r.userId));
+
+  return participantIds.map((userId) => ({
     userId,
-    shareCents: perPerson + (i < remainder ? 1 : 0),
+    shareCents: perPerson + (receivesExtra.has(userId) ? 1 : 0),
   }));
 }
 

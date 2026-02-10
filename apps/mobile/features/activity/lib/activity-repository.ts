@@ -31,7 +31,7 @@ function normalizeDirection(value: string): ActivityDirection {
     return value;
   }
 
-  return "you_owe";
+  return "settled";
 }
 
 function mapActivityRow(row: ActivityFeedRow): ActivityFeedItem {

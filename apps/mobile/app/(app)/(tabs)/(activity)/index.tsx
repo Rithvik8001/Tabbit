@@ -59,63 +59,58 @@ function formatTimestamp(value: string): string {
   }
 }
 
+function actorPrefix(name: string | null): string {
+  return name ? `${name} ` : "";
+}
+
+function buildTitle(item: ActivityFeedItem): string {
+  const actor = actorPrefix(item.actorDisplayName);
+
+  if (item.eventType === "group_joined") {
+    return `${actor}added you to "${item.groupName}"`;
+  }
+
+  if (item.eventType === "settlement") {
+    return `${actor}recorded a payment`;
+  }
+
+  const desc = item.description || "Expense";
+  return `${actor}added "${desc}"`;
+}
+
+function buildStatusLabel(item: ActivityFeedItem): {
+  statusLabel: string;
+  tone: "positive" | "negative" | "neutral";
+} {
+  if (item.eventType === "settlement") {
+    return { statusLabel: "payment", tone: "neutral" };
+  }
+
+  if (item.eventType === "group_joined") {
+    return { statusLabel: "", tone: "neutral" };
+  }
+
+  if (item.direction === "you_are_owed") {
+    return { statusLabel: "you lent", tone: "positive" };
+  }
+
+  if (item.direction === "you_owe") {
+    return { statusLabel: "you owe", tone: "negative" };
+  }
+
+  return { statusLabel: "not involved", tone: "neutral" };
+}
+
 function mapItemToRow(item: ActivityFeedItem): ActivityRowVM {
   const groupLabel = item.groupEmoji
     ? `${item.groupEmoji} ${item.groupName}`
     : item.groupName;
 
-  if (item.eventType === "group_joined") {
-    return {
-      id: item.eventId,
-      eventType: item.eventType,
-      direction: item.direction,
-      groupId: item.groupId,
-      groupName: item.groupName,
-      actorDisplayName: item.actorDisplayName,
-      title: "You were added to this group",
-      subtitle: groupLabel,
-      timestampLabel: formatTimestamp(item.occurredAt),
-      statusLabel: "group update",
-      hasReceipt: false,
-      tone: "neutral",
-    };
-  }
-
-  if (item.direction === "you_are_owed") {
-    return {
-      id: item.eventId,
-      eventType: item.eventType,
-      direction: item.direction,
-      groupId: item.groupId,
-      groupName: item.groupName,
-      actorDisplayName: item.actorDisplayName,
-      title: item.description || "Expense",
-      subtitle: groupLabel,
-      timestampLabel: formatTimestamp(item.occurredAt),
-      statusLabel: "owes you",
-      amountText: formatCents(Math.abs(item.netCents)),
-      hasReceipt: item.receiptAttached,
-      tone: "positive",
-    };
-  }
-
-  if (item.direction === "you_owe") {
-    return {
-      id: item.eventId,
-      eventType: item.eventType,
-      direction: item.direction,
-      groupId: item.groupId,
-      groupName: item.groupName,
-      actorDisplayName: item.actorDisplayName,
-      title: item.description || "Expense",
-      subtitle: groupLabel,
-      timestampLabel: formatTimestamp(item.occurredAt),
-      statusLabel: "you owe",
-      amountText: formatCents(Math.abs(item.netCents)),
-      hasReceipt: item.receiptAttached,
-      tone: "negative",
-    };
-  }
+  const title = buildTitle(item);
+  const { statusLabel, tone } = buildStatusLabel(item);
+  const showAmount =
+    item.eventType !== "group_joined" &&
+    (item.direction === "you_owe" || item.direction === "you_are_owed");
 
   return {
     id: item.eventId,
@@ -124,12 +119,14 @@ function mapItemToRow(item: ActivityFeedItem): ActivityRowVM {
     groupId: item.groupId,
     groupName: item.groupName,
     actorDisplayName: item.actorDisplayName,
-    title: item.description || "Expense",
+    expenseId: item.expenseId,
+    title,
     subtitle: groupLabel,
     timestampLabel: formatTimestamp(item.occurredAt),
-    statusLabel: "no impact",
+    statusLabel,
+    amountText: showAmount ? formatCents(Math.abs(item.netCents)) : undefined,
     hasReceipt: item.receiptAttached,
-    tone: "neutral",
+    tone,
   };
 }
 
@@ -334,10 +331,24 @@ export default function ActivityTabScreen() {
               amountText={row.amountText}
               tone={row.tone}
               onPress={() => {
-                router.push({
-                  pathname: "/(app)/(tabs)/(groups)/[id]",
-                  params: { id: row.groupId },
-                });
+                if (
+                  (row.eventType === "expense" || row.eventType === "settlement") &&
+                  row.expenseId
+                ) {
+                  router.push({
+                    pathname: "/(app)/(tabs)/(activity)/[expenseId]",
+                    params: {
+                      expenseId: row.expenseId,
+                      groupId: row.groupId,
+                      groupName: row.groupName,
+                    },
+                  });
+                } else {
+                  router.push({
+                    pathname: "/(app)/(tabs)/(groups)/[id]",
+                    params: { id: row.groupId },
+                  });
+                }
               }}
             />
           </View>
