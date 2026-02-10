@@ -28,6 +28,11 @@ type ExpenseReceiptRpcRow = {
 const expenseWithSplitsColumns =
   "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at, receipt_bucket, receipt_object_path, receipt_mime_type, receipt_size_bytes, receipt_uploaded_by, receipt_uploaded_at, expense_splits(id, expense_id, user_id, share_cents, percent_share), paid_by_profile:profiles!paid_by(display_name, email)";
 
+type PaidByProfileRow = {
+  display_name: string | null;
+  email: string | null;
+};
+
 export type CreateSettlementInput = {
   groupId: string;
   amountCents: number;
@@ -82,12 +87,34 @@ function mapSplitRow(row: ExpenseSplitRow): ExpenseSplit {
   };
 }
 
+function toNonEmptyLabel(value: string | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function mapPaidByProfileRow(
+  profile: ExpenseWithSplitsRow["paid_by_profile"],
+): PaidByProfileRow | null {
+  if (Array.isArray(profile)) {
+    return profile[0] ?? null;
+  }
+
+  return profile ?? null;
+}
+
 function mapExpenseWithSplitsRow(row: ExpenseWithSplitsRow): ExpenseWithSplits {
-  const profile = row.paid_by_profile?.[0] ?? null;
+  const profile = mapPaidByProfileRow(row.paid_by_profile);
   return {
     ...mapExpenseRow(row),
     splits: (row.expense_splits ?? []).map(mapSplitRow),
-    paidByName: profile?.display_name ?? profile?.email ?? null,
+    paidByName:
+      toNonEmptyLabel(profile?.display_name) ??
+      toNonEmptyLabel(profile?.email) ??
+      null,
   };
 }
 

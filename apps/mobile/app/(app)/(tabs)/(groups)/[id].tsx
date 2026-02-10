@@ -16,6 +16,8 @@ import { useAuth } from "@/features/auth/state/auth-provider";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
+import type { ExpenseWithSplits } from "@/features/groups/types/expense.types";
+import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
 function monthLabel(value: string): string {
   const parsed = new Date(value);
@@ -74,6 +76,27 @@ export default function GroupDetailScreen() {
       (debt) => debt.fromUserId === user?.id || debt.toUserId === user?.id,
     );
   }, [simplifiedDebts, user?.id]);
+
+  const memberByUserId = useMemo(() => {
+    return new Map(members.map((member) => [member.userId, member]));
+  }, [members]);
+
+  const resolvePayerLabel = (expense: ExpenseWithSplits): string => {
+    if (expense.paidBy === user?.id) {
+      return "You";
+    }
+
+    const paidByName = expense.paidByName?.trim();
+    if (paidByName) {
+      return paidByName;
+    }
+
+    const member = memberByUserId.get(expense.paidBy);
+    return getGroupMemberLabel({
+      displayName: member?.displayName,
+      email: member?.email,
+    });
+  };
 
   const handleDeleteExpense = (expenseId: string, description: string) => {
     Alert.alert("Delete Expense", `Delete \"${description}\"?`, [
@@ -455,7 +478,7 @@ export default function GroupDetailScreen() {
                             { color: colorSemanticTokens.text.secondary },
                           ]}
                         >
-                          {`Paid by ${expense.paidByName ?? "Unknown"} · ${shortDate(expense.expenseDate)}`}
+                          {`Paid by ${resolvePayerLabel(expense)} · ${shortDate(expense.expenseDate)}`}
                         </Text>
                         {expense.receiptObjectPath ? (
                           <Pressable

@@ -20,6 +20,7 @@ import type {
   FriendRelationshipStatus,
   FriendSearchCandidate,
 } from "@/features/friends/types/friend-request.types";
+import { getPersonLabel } from "@/features/shared/lib/person-label";
 
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -181,7 +182,10 @@ export default function AddFriendScreen() {
 
       updateCandidateStatus(candidate.userId, "outgoing_pending");
       setStatusMessage(
-        `Request sent to ${candidate.displayName ?? candidate.email ?? "user"}.`,
+        `Request sent to ${getPersonLabel({
+          displayName: candidate.displayName,
+          email: candidate.email,
+        })}.`,
       );
     })();
   };
@@ -338,7 +342,10 @@ export default function AddFriendScreen() {
                           fontWeight: "600",
                         }}
                       >
-                        {candidate.displayName ?? candidate.email ?? "Unknown"}
+                        {getPersonLabel({
+                          displayName: candidate.displayName,
+                          email: candidate.email,
+                        })}
                       </Text>
                       {candidate.email ? (
                         <Text

@@ -27,6 +27,7 @@ import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
+import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -97,8 +98,14 @@ export default function GroupSettleUpScreen() {
   const fromMember = members.find((member) => member.userId === fromUserId);
   const toMember = members.find((member) => member.userId === toUserId);
 
-  const fromLabel = fromMember?.displayName ?? fromMember?.email ?? "Unknown";
-  const toLabel = toMember?.displayName ?? toMember?.email ?? "Unknown";
+  const fromLabel = getGroupMemberLabel({
+    displayName: fromMember?.displayName,
+    email: fromMember?.email,
+  });
+  const toLabel = getGroupMemberLabel({
+    displayName: toMember?.displayName,
+    email: toMember?.email,
+  });
 
   const payerLabel = fromUserId === user?.id ? "You" : fromLabel;
   const payeeLabel = toUserId === user?.id ? "You" : toLabel;

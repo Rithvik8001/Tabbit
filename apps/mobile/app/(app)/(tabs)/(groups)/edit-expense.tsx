@@ -45,6 +45,7 @@ import type {
   ExpenseWithSplits,
 } from "@/features/groups/types/expense.types";
 import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
+import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
 const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
@@ -724,7 +725,10 @@ export default function EditExpenseScreen() {
         <View style={{ gap: 8 }}>
           {members.map((member) => {
             const isSelected = paidBy === member.userId;
-            const label = member.displayName || member.email || "Unknown";
+            const label = getGroupMemberLabel({
+              displayName: member.displayName,
+              email: member.email,
+            });
             const isSelf = member.userId === user?.id;
 
             return (
@@ -861,7 +865,10 @@ export default function EditExpenseScreen() {
         <View style={{ gap: 8 }}>
           {members.map((member) => {
             const isChecked = selectedParticipants.has(member.userId);
-            const label = member.displayName || member.email || "Unknown";
+            const label = getGroupMemberLabel({
+              displayName: member.displayName,
+              email: member.email,
+            });
             const isSelf = member.userId === user?.id;
 
             return (

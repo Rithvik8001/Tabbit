@@ -126,7 +126,6 @@ export default function FriendDetailScreen() {
         }}
       >
         <Pressable onPress={() => router.back()}>
-          
           <Text
             selectable
             style={[
@@ -141,7 +140,6 @@ export default function FriendDetailScreen() {
 
       {isLoading ? (
         <View style={{ paddingTop: spacingTokens.xl, alignItems: "center" }}>
-          
           <ActivityIndicator
             size="large"
             color={colorSemanticTokens.accent.primary}
@@ -168,11 +166,9 @@ export default function FriendDetailScreen() {
               { color: colorSemanticTokens.state.danger },
             ]}
           >
-            
             {error}
           </Text>
           <Pressable onPress={() => void refresh()}>
-            
             <Text
               selectable
               style={[
@@ -180,7 +176,6 @@ export default function FriendDetailScreen() {
                 { color: colorSemanticTokens.accent.primary },
               ]}
             >
-              
               Retry
             </Text>
           </Pressable>
@@ -236,7 +231,6 @@ export default function FriendDetailScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ gap: spacingTokens.sm }}
             >
-              
               {!isSettled ? (
                 <Pressable
                   onPress={() => {
@@ -260,7 +254,6 @@ export default function FriendDetailScreen() {
                       { color: colorSemanticTokens.text.inverse },
                     ]}
                   >
-                    
                     Settle up
                   </Text>
                 </Pressable>
@@ -284,7 +277,6 @@ export default function FriendDetailScreen() {
                     { color: colorSemanticTokens.text.primary },
                   ]}
                 >
-                  
                   {isEnsuring ? "Starting..." : "Add expense"}
                 </Text>
               </Pressable>
@@ -293,7 +285,6 @@ export default function FriendDetailScreen() {
 
           {groupedActivity.map((bucket) => (
             <View key={bucket.monthLabel} style={{ gap: spacingTokens.sm }}>
-              
               <Text
                 selectable
                 style={[
@@ -325,7 +316,6 @@ export default function FriendDetailScreen() {
                     }}
                   >
                     <View style={{ flex: 1, gap: 2 }}>
-                      
                       <Text
                         selectable
                         style={[

@@ -14,6 +14,7 @@ import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
+import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
 export default function GroupSettingsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -265,7 +266,10 @@ export default function GroupSettingsScreen() {
               />
             ) : null}
             {members.map((member) => {
-              const label = member.displayName || member.email || "Unknown";
+              const label = getGroupMemberLabel({
+                displayName: member.displayName,
+                email: member.email,
+              });
               const isSelf = member.userId === user?.id;
 
               return (

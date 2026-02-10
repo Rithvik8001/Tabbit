@@ -10,6 +10,7 @@ import { typographyScale } from "@/design/tokens/typography";
 import { useFriends } from "@/features/friends/hooks/use-friends";
 import { ensureDirectFriendGroup } from "@/features/friends/lib/friend-requests-repository";
 import { useGroups } from "@/features/groups/hooks/use-groups";
+import { getPersonLabel } from "@/features/shared/lib/person-label";
 
 function SelectionDot({ isSelected }: { isSelected: boolean }) {
   return (
@@ -386,7 +387,10 @@ export default function AddExpenseContextScreen() {
 
             {visibleFriends.map((friend) => {
               const isSelected = selectedFriendId === friend.userId;
-              const title = friend.displayName ?? friend.email ?? "Unknown";
+              const title = getPersonLabel({
+                displayName: friend.displayName,
+                email: friend.email,
+              });
 
               return (
                 <Pressable

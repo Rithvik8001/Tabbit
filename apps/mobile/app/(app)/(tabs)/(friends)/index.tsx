@@ -32,6 +32,7 @@ import {
   type BalanceFilter,
   type FriendSort,
 } from "@/features/shared/lib/list-filter-utils";
+import { getPersonLabel } from "@/features/shared/lib/person-label";
 
 function mapFriendRow(friend: {
   userId: string;
@@ -43,7 +44,10 @@ function mapFriendRow(friend: {
   if (friend.direction === "you_owe") {
     return {
       id: friend.userId,
-      title: friend.displayName ?? friend.email ?? "Unknown",
+      title: getPersonLabel({
+        displayName: friend.displayName,
+        email: friend.email,
+      }),
       subtitle: friend.email,
       statusLabel: "you owe",
       statusAmount: formatCents(Math.abs(friend.netCents)),
@@ -54,7 +58,10 @@ function mapFriendRow(friend: {
   if (friend.direction === "you_are_owed") {
     return {
       id: friend.userId,
-      title: friend.displayName ?? friend.email ?? "Unknown",
+      title: getPersonLabel({
+        displayName: friend.displayName,
+        email: friend.email,
+      }),
       subtitle: friend.email,
       statusLabel: "owes you",
       statusAmount: formatCents(Math.abs(friend.netCents)),
@@ -64,7 +71,10 @@ function mapFriendRow(friend: {
 
   return {
     id: friend.userId,
-    title: friend.displayName ?? friend.email ?? "Unknown",
+    title: getPersonLabel({
+      displayName: friend.displayName,
+      email: friend.email,
+    }),
     subtitle: friend.email,
     statusLabel: "settled up",
     statusAmount: null,
@@ -215,7 +225,10 @@ export default function FriendsTabScreen() {
                     { color: colorSemanticTokens.text.primary },
                   ]}
                 >
-                  {request.displayName ?? request.email ?? "Unknown"}
+                  {getPersonLabel({
+                    displayName: request.displayName,
+                    email: request.email,
+                  })}
                 </Text>
                 <View style={{ flexDirection: "row", gap: spacingTokens.sm }}>
                   <View style={{ flex: 1 }}>
@@ -270,7 +283,10 @@ export default function FriendsTabScreen() {
                     { color: colorSemanticTokens.text.primary },
                   ]}
                 >
-                  {request.displayName ?? request.email ?? "Unknown"}
+                  {getPersonLabel({
+                    displayName: request.displayName,
+                    email: request.email,
+                  })}
                 </Text>
                 <Text
                   selectable
