@@ -41,7 +41,13 @@
         }
       ],
       "expo-sqlite",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Tabbit to attach receipt images to expenses."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -26,6 +26,7 @@ type ActivityGroup = {
     groupEmoji: string | null;
     expenseDate: string;
     entryType: "expense" | "settlement";
+    receiptAttached: boolean;
   }[];
 };
 
@@ -344,6 +345,26 @@ export default function FriendDetailScreen() {
                         {item.groupEmoji ? `${item.groupEmoji} ` : ""}
                         {item.groupName} · {shortDate(item.expenseDate)}
                       </Text>
+                      {item.receiptAttached ? (
+                        <Pressable
+                          onPress={() => {
+                            router.push({
+                              pathname: "/(app)/receipt-preview",
+                              params: { expenseId: item.expenseId },
+                            });
+                          }}
+                        >
+                          <Text
+                            selectable
+                            style={[
+                              typographyScale.bodySm,
+                              { color: colorSemanticTokens.accent.primary },
+                            ]}
+                          >
+                            Receipt attached · View
+                          </Text>
+                        </Pressable>
+                      ) : null}
                     </View>
                     <Text
                       selectable

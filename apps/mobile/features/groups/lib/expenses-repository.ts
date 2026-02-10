@@ -1,5 +1,9 @@
 import { supabase } from "@/features/auth/lib/supabase-client";
 import type {
+  AttachExpenseReceiptInput,
+  ExpenseReceiptMetadata,
+} from "@/features/groups/types/expense-receipt.types";
+import type {
   CreateExpenseInput,
   Expense,
   ExpenseRow,
@@ -11,8 +15,18 @@ import type {
 
 type ExpensesResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
+type ExpenseReceiptRpcRow = {
+  expense_id: string;
+  receipt_bucket: string | null;
+  receipt_object_path: string | null;
+  receipt_mime_type: string | null;
+  receipt_size_bytes: number | null;
+  receipt_uploaded_by: string | null;
+  receipt_uploaded_at: string | null;
+};
+
 const expenseWithSplitsColumns =
-  "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at, expense_splits(id, expense_id, user_id, share_cents, percent_share), paid_by_profile:profiles!paid_by(display_name, email)";
+  "id, group_id, description, amount_cents, currency, expense_date, split_type, entry_type, paid_by, created_by, created_at, updated_at, receipt_bucket, receipt_object_path, receipt_mime_type, receipt_size_bytes, receipt_uploaded_by, receipt_uploaded_at, expense_splits(id, expense_id, user_id, share_cents, percent_share), paid_by_profile:profiles!paid_by(display_name, email)";
 
 export type CreateSettlementInput = {
   groupId: string;
@@ -22,8 +36,27 @@ export type CreateSettlementInput = {
   paidTo: string;
 };
 
+function mapExpenseReceiptMetadata(row: {
+  receipt_bucket?: string | null;
+  receipt_object_path?: string | null;
+  receipt_mime_type?: string | null;
+  receipt_size_bytes?: number | null;
+  receipt_uploaded_by?: string | null;
+  receipt_uploaded_at?: string | null;
+}): ExpenseReceiptMetadata {
+  return {
+    receiptBucket: row.receipt_bucket ?? null,
+    receiptObjectPath: row.receipt_object_path ?? null,
+    receiptMimeType: row.receipt_mime_type ?? null,
+    receiptSizeBytes: row.receipt_size_bytes ?? null,
+    receiptUploadedBy: row.receipt_uploaded_by ?? null,
+    receiptUploadedAt: row.receipt_uploaded_at ?? null,
+  };
+}
+
 function mapExpenseRow(row: ExpenseRow): Expense {
   return {
+    ...mapExpenseReceiptMetadata(row),
     id: row.id,
     groupId: row.group_id,
     description: row.description,
@@ -58,6 +91,17 @@ function mapExpenseWithSplitsRow(row: ExpenseWithSplitsRow): ExpenseWithSplits {
   };
 }
 
+function mapExpenseReceiptRpcRow(row: ExpenseReceiptRpcRow): ExpenseReceiptMetadata {
+  return {
+    receiptBucket: row.receipt_bucket,
+    receiptObjectPath: row.receipt_object_path,
+    receiptMimeType: row.receipt_mime_type,
+    receiptSizeBytes: row.receipt_size_bytes,
+    receiptUploadedBy: row.receipt_uploaded_by,
+    receiptUploadedAt: row.receipt_uploaded_at,
+  };
+}
+
 function normalizeError(
   fallbackMessage: string,
   error: { message: string; code?: string | null } | null,
@@ -71,7 +115,7 @@ function normalizeError(
   }
 
   if (error.code === "23514") {
-    return "Expense details are invalid. Check the description, amount, and split.";
+    return "Expense details are invalid. Check the description, amount, split, and receipt metadata.";
   }
 
   if (error.code === "23502") {
@@ -168,23 +212,20 @@ export async function createSettlement(
     };
   }
 
-  return createExpense(
-    input.groupId,
-    {
-      description: "Settle Up",
-      amountCents: input.amountCents,
-      expenseDate: input.expenseDate,
-      splitType: "exact",
-      entryType: "settlement",
-      paidBy: input.paidBy,
-      participants: [
-        {
-          userId: input.paidTo,
-          shareCents: input.amountCents,
-        },
-      ],
-    },
-  );
+  return createExpense(input.groupId, {
+    description: "Settle Up",
+    amountCents: input.amountCents,
+    expenseDate: input.expenseDate,
+    splitType: "exact",
+    entryType: "settlement",
+    paidBy: input.paidBy,
+    participants: [
+      {
+        userId: input.paidTo,
+        shareCents: input.amountCents,
+      },
+    ],
+  });
 }
 
 export async function getExpenseById(
@@ -253,13 +294,94 @@ export async function updateExpense(
   };
 }
 
+export async function attachExpenseReceipt(
+  expenseId: string,
+  input: AttachExpenseReceiptInput,
+): Promise<ExpensesResult<ExpenseReceiptMetadata>> {
+  const { data, error } = await supabase.rpc("attach_expense_receipt", {
+    p_expense_id: expenseId,
+    p_bucket: input.bucket,
+    p_object_path: input.objectPath,
+    p_mime_type: input.mimeType,
+    p_size_bytes: input.sizeBytes,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to attach receipt.", error),
+    };
+  }
+
+  const rows = (data ?? []) as ExpenseReceiptRpcRow[];
+  const row = rows[0];
+
+  if (!row) {
+    return {
+      ok: false,
+      message: "Receipt attachment did not return a result.",
+    };
+  }
+
+  return {
+    ok: true,
+    data: mapExpenseReceiptRpcRow(row),
+  };
+}
+
+export async function clearExpenseReceipt(
+  expenseId: string,
+): Promise<ExpensesResult<ExpenseReceiptMetadata>> {
+  const { data, error } = await supabase.rpc("clear_expense_receipt", {
+    p_expense_id: expenseId,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to clear receipt.", error),
+    };
+  }
+
+  const rows = (data ?? []) as ExpenseReceiptRpcRow[];
+  const row = rows[0];
+
+  if (!row) {
+    return {
+      ok: false,
+      message: "Receipt clear did not return a result.",
+    };
+  }
+
+  return {
+    ok: true,
+    data: mapExpenseReceiptRpcRow(row),
+  };
+}
+
+export async function createExpenseReceiptSignedUrl(
+  bucket: string,
+  objectPath: string,
+  expiresInSeconds = 120,
+): Promise<ExpensesResult<string>> {
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(objectPath, expiresInSeconds);
+
+  if (error || !data?.signedUrl) {
+    return {
+      ok: false,
+      message: normalizeError("Unable to open receipt preview.", error),
+    };
+  }
+
+  return { ok: true, data: data.signedUrl };
+}
+
 export async function deleteExpense(
   expenseId: string,
 ): Promise<ExpensesResult<void>> {
-  const { error } = await supabase
-    .from("expenses")
-    .delete()
-    .eq("id", expenseId);
+  const { error } = await supabase.from("expenses").delete().eq("id", expenseId);
 
   if (error) {
     return {

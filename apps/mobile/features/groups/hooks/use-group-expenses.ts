@@ -21,7 +21,9 @@ import type {
   MemberBalance,
 } from "@/features/groups/types/expense.types";
 
-type ActionResult = { ok: true } | { ok: false; message: string };
+type ActionResult =
+  | { ok: true; expenseId?: string }
+  | { ok: false; message: string };
 
 type UseGroupExpensesValue = {
   expenses: ExpenseWithSplits[];
@@ -108,7 +110,7 @@ export function useGroupExpenses(
 
       await refresh();
 
-      return { ok: true };
+      return { ok: true, expenseId: result.data.id };
     },
     [groupId, user?.id, refresh],
   );

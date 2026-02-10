@@ -123,7 +123,7 @@ export default function ActivityTabScreen() {
           >
             <BalanceListRow
               title={row.title}
-              subtitle={`${row.subtitle} · ${row.timestampLabel}`}
+              subtitle={`${row.subtitle} · ${row.timestampLabel}${row.hasReceipt ? " · Receipt attached" : ""}`}
               statusLabel={row.impactLabel}
               amountText={row.impactAmount}
               tone={row.tone}

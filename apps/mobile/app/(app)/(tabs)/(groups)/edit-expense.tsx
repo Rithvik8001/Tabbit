@@ -18,6 +18,13 @@ import {
 import { colorSemanticTokens } from "@/design/tokens/colors";
 import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
+import { ExpenseReceiptCard } from "@/features/groups/components/expense-receipt-card";
+import {
+  areExpenseReceiptsEnabled,
+  clearExpenseReceiptAttachment,
+  pickAndPrepareExpenseReceipt,
+  uploadAndAttachExpenseReceipt,
+} from "@/features/groups/lib/expense-receipt-upload";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import {
   SPLIT_TYPE_OPTIONS,
@@ -37,6 +44,7 @@ import type {
   SplitType,
   ExpenseWithSplits,
 } from "@/features/groups/types/expense.types";
+import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
 
 const stroke = colorSemanticTokens.border.subtle;
 const ink = colorSemanticTokens.text.primary;
@@ -71,6 +79,11 @@ export default function EditExpenseScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [preparedReceipt, setPreparedReceipt] =
+    useState<PreparedExpenseReceiptUpload | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [isReceiptMutating, setIsReceiptMutating] = useState(false);
+  const receiptsEnabled = areExpenseReceiptsEnabled();
 
   // Fetch expense on mount
   useEffect(() => {
@@ -103,6 +116,8 @@ export default function EditExpenseScreen() {
           }
           setPercentAmounts(pcts);
         }
+        setPreparedReceipt(null);
+        setReceiptError(null);
       } else {
         setLoadError(result.message);
       }
@@ -177,6 +192,28 @@ export default function EditExpenseScreen() {
         return;
       }
 
+      if (
+        receiptsEnabled &&
+        preparedReceipt &&
+        result.data.id &&
+        user?.id
+      ) {
+        setIsReceiptMutating(true);
+        const uploadResult = await uploadAndAttachExpenseReceipt({
+          expenseId: result.data.id,
+          uploaderId: user.id,
+          preparedReceipt,
+        });
+        setIsReceiptMutating(false);
+
+        if (!uploadResult.ok) {
+          Alert.alert(
+            "Expense updated",
+            `${uploadResult.message} You can retry attaching the receipt from Edit Expense.`,
+          );
+        }
+      }
+
       router.back();
     })();
   }, [
@@ -191,7 +228,54 @@ export default function EditExpenseScreen() {
     percentAmounts,
     expenseId,
     router,
+    preparedReceipt,
+    receiptsEnabled,
+    user?.id,
   ]);
+
+  const handlePickReceipt = () => {
+    if (!receiptsEnabled) {
+      return;
+    }
+
+    setReceiptError(null);
+    void (async () => {
+      const result = await pickAndPrepareExpenseReceipt();
+      if (!result.ok) {
+        setReceiptError(result.message);
+        return;
+      }
+
+      setPreparedReceipt(result.data);
+    })();
+  };
+
+  const handleClearAttachedReceipt = () => {
+    if (!expense || !receiptsEnabled) {
+      return;
+    }
+
+    setReceiptError(null);
+    setIsReceiptMutating(true);
+    void (async () => {
+      const result = await clearExpenseReceiptAttachment(expense.id);
+      setIsReceiptMutating(false);
+
+      if (!result.ok) {
+        setReceiptError(result.message);
+        return;
+      }
+
+      setExpense((current) =>
+        current
+          ? {
+              ...current,
+              ...result.data,
+            }
+          : current,
+      );
+    })();
+  };
 
   const handleDelete = useCallback(() => {
     Alert.alert(
@@ -984,6 +1068,34 @@ export default function EditExpenseScreen() {
       </View>
 
       {/* Form error */}
+      {receiptsEnabled ? (
+        <ExpenseReceiptCard
+          preparedReceipt={preparedReceipt}
+          hasAttachedReceipt={Boolean(expense?.receiptObjectPath)}
+          isBusy={isSaving || isDeleting || isReceiptMutating}
+          error={receiptError}
+          onPick={handlePickReceipt}
+          onClearPrepared={() => {
+            setPreparedReceipt(null);
+            setReceiptError(null);
+          }}
+          onPreviewAttached={
+            expense?.receiptObjectPath
+              ? () => {
+                  router.push({
+                    pathname: "/(app)/receipt-preview",
+                    params: { expenseId: expense.id },
+                  });
+                }
+              : undefined
+          }
+          onClearAttached={
+            expense?.receiptObjectPath ? handleClearAttachedReceipt : undefined
+          }
+        />
+      ) : null}
+
+      {/* Form error */}
       {formError ? (
         <View
           style={{
@@ -1013,8 +1125,8 @@ export default function EditExpenseScreen() {
       <Button
         label={isSaving ? "Saving..." : "Save changes"}
         onPress={handleSave}
-        disabled={isSaving}
-        loading={isSaving}
+        disabled={isSaving || isReceiptMutating}
+        loading={isSaving || isReceiptMutating}
         size="lg"
       />
 
@@ -1022,7 +1134,7 @@ export default function EditExpenseScreen() {
       <Button
         label={isDeleting ? "Deleting..." : "Delete expense"}
         onPress={handleDelete}
-        disabled={isDeleting}
+        disabled={isDeleting || isReceiptMutating}
         loading={isDeleting}
         variant="soft"
         tone="danger"

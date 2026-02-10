@@ -19,6 +19,11 @@ import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { formatCents } from "@/features/groups/lib/format-currency";
 import {
+  areExpenseReceiptsEnabled,
+  pickAndPrepareExpenseReceipt,
+  uploadAndAttachExpenseReceipt,
+} from "@/features/groups/lib/expense-receipt-upload";
+import {
   getTodayString,
   SPLIT_TYPE_OPTIONS,
   MAX_DESCRIPTION_LENGTH,
@@ -29,6 +34,8 @@ import {
 } from "@/features/groups/lib/expense-form-utils";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { useGroupExpenses } from "@/features/groups/hooks/use-group-expenses";
+import { ExpenseReceiptCard } from "@/features/groups/components/expense-receipt-card";
+import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
 import type { SplitType } from "@/features/groups/types/expense.types";
 
 const stroke = colorSemanticTokens.border.subtle;
@@ -59,7 +66,12 @@ export default function AddExpenseScreen() {
     {},
   );
   const [formError, setFormError] = useState<string | null>(null);
+  const [preparedReceipt, setPreparedReceipt] =
+    useState<PreparedExpenseReceiptUpload | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
   const seededGroupIdRef = useRef<string | null>(null);
+  const receiptsEnabled = areExpenseReceiptsEnabled();
 
   useEffect(() => {
     seededGroupIdRef.current = null;
@@ -68,6 +80,8 @@ export default function AddExpenseScreen() {
     setExactAmounts({});
     setPercentAmounts({});
     setFormError(null);
+    setPreparedReceipt(null);
+    setReceiptError(null);
   }, [id]);
 
   useEffect(() => {
@@ -176,7 +190,42 @@ export default function AddExpenseScreen() {
         return;
       }
 
+      if (receiptsEnabled && preparedReceipt && result.expenseId && user?.id) {
+        setIsUploadingReceipt(true);
+        const uploadResult = await uploadAndAttachExpenseReceipt({
+          expenseId: result.expenseId,
+          uploaderId: user.id,
+          preparedReceipt,
+        });
+        setIsUploadingReceipt(false);
+
+        if (!uploadResult.ok) {
+          Alert.alert(
+            "Expense saved",
+            `${uploadResult.message} You can retry attaching the receipt from Edit Expense.`,
+          );
+        }
+      }
+
       handleClose();
+    })();
+  };
+
+  const handlePickReceipt = () => {
+    if (!receiptsEnabled) {
+      return;
+    }
+
+    setReceiptError(null);
+    void (async () => {
+      const result = await pickAndPrepareExpenseReceipt();
+
+      if (!result.ok) {
+        setReceiptError(result.message);
+        return;
+      }
+
+      setPreparedReceipt(result.data);
     })();
   };
 
@@ -749,6 +798,20 @@ export default function AddExpenseScreen() {
       </View>
 
       {/* Form error */}
+      {receiptsEnabled ? (
+        <ExpenseReceiptCard
+          preparedReceipt={preparedReceipt}
+          isBusy={isCreating || isUploadingReceipt}
+          error={receiptError}
+          onPick={handlePickReceipt}
+          onClearPrepared={() => {
+            setPreparedReceipt(null);
+            setReceiptError(null);
+          }}
+        />
+      ) : null}
+
+      {/* Form error */}
       {formError ? (
         <View
           style={{
@@ -776,10 +839,10 @@ export default function AddExpenseScreen() {
 
       {/* Submit */}
       <Button
-        label={isCreating ? "Adding..." : "Add expense"}
+        label={isCreating || isUploadingReceipt ? "Adding..." : "Add expense"}
         onPress={handleCreate}
-        disabled={isCreating}
-        loading={isCreating}
+        disabled={isCreating || isUploadingReceipt}
+        loading={isCreating || isUploadingReceipt}
         size="lg"
       />
     </ScrollView>

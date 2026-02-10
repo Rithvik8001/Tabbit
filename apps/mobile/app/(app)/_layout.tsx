@@ -19,6 +19,12 @@ export default function AppShellLayout() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen
+        name="receipt-preview"
+        options={{
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

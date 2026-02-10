@@ -29,6 +29,7 @@ export type HomeActivityRow = {
   created_at: string;
   net_cents: number | string;
   direction: HomeActivityDirection;
+  receipt_attached: boolean | null;
 };
 
 export type HomeActivityItem = {
@@ -42,4 +43,5 @@ export type HomeActivityItem = {
   createdAt: string;
   netCents: number;
   direction: HomeActivityDirection;
+  receiptAttached: boolean;
 };

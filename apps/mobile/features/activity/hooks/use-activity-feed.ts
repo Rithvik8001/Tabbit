@@ -45,6 +45,7 @@ export function useActivityFeed(initialLimit = 20) {
         timestampLabel: formatTimestamp(item.createdAt),
         impactLabel,
         impactAmount: formatCents(Math.abs(item.netCents)),
+        hasReceipt: item.receiptAttached,
         tone: isPositive ? "positive" : "negative",
       };
     });

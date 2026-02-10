@@ -457,6 +457,26 @@ export default function GroupDetailScreen() {
                         >
                           {`Paid by ${expense.paidByName ?? "Unknown"} · ${shortDate(expense.expenseDate)}`}
                         </Text>
+                        {expense.receiptObjectPath ? (
+                          <Pressable
+                            onPress={() => {
+                              router.push({
+                                pathname: "/(app)/receipt-preview",
+                                params: { expenseId: expense.id },
+                              });
+                            }}
+                          >
+                            <Text
+                              selectable
+                              style={[
+                                typographyScale.bodySm,
+                                { color: colorSemanticTokens.accent.primary },
+                              ]}
+                            >
+                              Receipt attached · View
+                            </Text>
+                          </Pressable>
+                        ) : null}
                       </View>
                       <Text
                         selectable

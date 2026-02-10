@@ -42,6 +42,7 @@ function mapFriendActivityRow(row: FriendActivityRow): FriendActivityItem {
     myShare: row.my_share,
     friendShare: row.friend_share,
     netCents: row.paid_by_me ? row.friend_share : -row.my_share,
+    receiptAttached: Boolean(row.receipt_attached),
   };
 }
 

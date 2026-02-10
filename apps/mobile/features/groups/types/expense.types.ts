@@ -1,7 +1,9 @@
+import type { ExpenseReceiptMetadata } from "@/features/groups/types/expense-receipt.types";
+
 export type SplitType = "equal" | "exact" | "percent";
 export type ExpenseEntryType = "expense" | "settlement";
 
-export type Expense = {
+export type Expense = ExpenseReceiptMetadata & {
   id: string;
   groupId: string;
   description: string;
@@ -29,6 +31,12 @@ export type ExpenseRow = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  receipt_bucket?: string | null;
+  receipt_object_path?: string | null;
+  receipt_mime_type?: string | null;
+  receipt_size_bytes?: number | null;
+  receipt_uploaded_by?: string | null;
+  receipt_uploaded_at?: string | null;
 };
 
 export type ExpenseSplit = {

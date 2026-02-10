@@ -41,6 +41,7 @@ export type FriendActivityRow = {
   paid_by_me: boolean;
   my_share: number;
   friend_share: number;
+  receipt_attached: boolean | null;
 };
 
 /** Domain model for a shared expense with a friend */
@@ -58,4 +59,5 @@ export type FriendActivityItem = {
   friendShare: number;
   /** Positive = friend owes me, negative = I owe friend */
   netCents: number;
+  receiptAttached: boolean;
 };

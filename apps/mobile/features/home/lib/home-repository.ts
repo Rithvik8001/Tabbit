@@ -42,6 +42,7 @@ function mapActivityRow(row: HomeActivityRow): HomeActivityItem {
     createdAt: row.created_at,
     netCents: toSafeNumber(row.net_cents),
     direction: normalizeDirection(row.direction),
+    receiptAttached: Boolean(row.receipt_attached),
   };
 }
 

@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   Text,
@@ -18,8 +19,15 @@ import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { useDirectFriendGroup } from "@/features/friends/hooks/use-direct-friend-group";
 import { useFriendDetail } from "@/features/friends/hooks/use-friend-detail";
+import { ExpenseReceiptCard } from "@/features/groups/components/expense-receipt-card";
+import {
+  areExpenseReceiptsEnabled,
+  pickAndPrepareExpenseReceipt,
+  uploadAndAttachExpenseReceipt,
+} from "@/features/groups/lib/expense-receipt-upload";
 import { createSettlement } from "@/features/groups/lib/expenses-repository";
 import { formatCents } from "@/features/groups/lib/format-currency";
+import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
 
 const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
@@ -57,6 +65,11 @@ export default function FriendSettleUpScreen() {
   const [dateText, setDateText] = useState(getTodayString());
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [preparedReceipt, setPreparedReceipt] =
+    useState<PreparedExpenseReceiptUpload | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
+  const receiptsEnabled = areExpenseReceiptsEnabled();
 
   const maxAmountCents = friend ? Math.abs(friend.netCents) : 0;
   const friendLabel = friend?.displayName ?? friend?.email ?? "Friend";
@@ -197,7 +210,46 @@ export default function FriendSettleUpScreen() {
         return;
       }
 
+      if (
+        receiptsEnabled &&
+        preparedReceipt &&
+        result.data.id &&
+        user.id
+      ) {
+        setIsUploadingReceipt(true);
+        const uploadResult = await uploadAndAttachExpenseReceipt({
+          expenseId: result.data.id,
+          uploaderId: user.id,
+          preparedReceipt,
+        });
+        setIsUploadingReceipt(false);
+
+        if (!uploadResult.ok) {
+          Alert.alert(
+            "Settlement recorded",
+            `${uploadResult.message} The settlement was saved without a receipt.`,
+          );
+        }
+      }
+
       router.back();
+    })();
+  };
+
+  const handlePickReceipt = () => {
+    if (!receiptsEnabled) {
+      return;
+    }
+
+    setReceiptError(null);
+    void (async () => {
+      const result = await pickAndPrepareExpenseReceipt();
+      if (!result.ok) {
+        setReceiptError(result.message);
+        return;
+      }
+
+      setPreparedReceipt(result.data);
     })();
   };
 
@@ -611,6 +663,19 @@ export default function FriendSettleUpScreen() {
         </>
       ) : null}
 
+      {receiptsEnabled ? (
+        <ExpenseReceiptCard
+          preparedReceipt={preparedReceipt}
+          isBusy={isSubmitting || isUploadingReceipt}
+          error={receiptError}
+          onPick={handlePickReceipt}
+          onClearPrepared={() => {
+            setPreparedReceipt(null);
+            setReceiptError(null);
+          }}
+        />
+      ) : null}
+
       {formError ? (
         <View
           style={{
@@ -635,11 +700,16 @@ export default function FriendSettleUpScreen() {
       ) : null}
 
       <Button
-        label={isSubmitting ? "Recording..." : "Record settlement"}
+        label={
+          isSubmitting || isUploadingReceipt
+            ? "Recording..."
+            : "Record settlement"
+        }
         onPress={handleSubmit}
-        loading={isSubmitting}
+        loading={isSubmitting || isUploadingReceipt}
         disabled={
           isSubmitting ||
+          isUploadingReceipt ||
           !friend ||
           !user ||
           !selectedGroupId ||

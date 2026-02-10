@@ -6,5 +6,6 @@ export type ActivityRowVM = {
   timestampLabel: string;
   impactLabel: string;
   impactAmount: string;
+  hasReceipt: boolean;
   tone: "positive" | "negative" | "neutral";
 };
