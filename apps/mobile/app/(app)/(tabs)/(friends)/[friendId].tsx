@@ -96,7 +96,11 @@ export default function FriendDetailScreen() {
 
       router.push({
         pathname: "/(app)/(tabs)/(groups)/add-expense",
-        params: { id: result.data },
+        params: {
+          id: result.data,
+          returnTab: "friends",
+          returnFriendId: friend.userId,
+        },
       });
     })();
   };

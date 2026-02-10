@@ -44,10 +44,23 @@ const ink = colorSemanticTokens.text.primary;
 const muted = colorSemanticTokens.text.secondary;
 const accent = colorSemanticTokens.accent.primary;
 
+function normalizeReturnFriendId(
+  value: string | string[] | undefined,
+): string | null {
+  const first = Array.isArray(value) ? value[0] : value;
+  if (typeof first !== "string") {
+    return null;
+  }
+
+  const trimmed = first.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 export default function AddExpenseScreen() {
-  const { id, returnTab } = useLocalSearchParams<{
+  const { id, returnTab, returnFriendId } = useLocalSearchParams<{
     id: string;
     returnTab?: "friends" | "groups" | "activity" | string;
+    returnFriendId?: string | string[];
   }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -120,6 +133,7 @@ export default function AddExpenseScreen() {
     returnTab === "activity"
       ? returnTab
       : null;
+  const normalizedReturnFriendId = normalizeReturnFriendId(returnFriendId);
 
   const handleClose = () => {
     if (normalizedReturnTab === "groups") {
@@ -128,6 +142,14 @@ export default function AddExpenseScreen() {
     }
 
     if (normalizedReturnTab === "friends") {
+      if (normalizedReturnFriendId) {
+        router.dismissTo({
+          pathname: "/(app)/(tabs)/(friends)/[friendId]",
+          params: { friendId: normalizedReturnFriendId },
+        });
+        return;
+      }
+
       router.dismissTo("/(app)/(tabs)/(friends)");
       return;
     }
