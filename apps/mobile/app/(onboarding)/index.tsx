@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/primitives/button";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
@@ -28,6 +28,7 @@ const HIGHLIGHTS = [
 ];
 
 export default function OnboardingScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { isAuthLoading, session } = useAuth();
@@ -39,14 +40,14 @@ export default function OnboardingScreen() {
   }, [isAuthLoading, router, session]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.canvas }}>
       <View
         style={{
           position: "absolute",
           width: 260,
           height: 260,
           borderRadius: radiusTokens.pill,
-          backgroundColor: colorSemanticTokens.accent.soft,
+          backgroundColor: colors.accent.soft,
           top: -70,
           right: -80,
         }}
@@ -57,7 +58,7 @@ export default function OnboardingScreen() {
           width: 220,
           height: 220,
           borderRadius: radiusTokens.pill,
-          backgroundColor: colorSemanticTokens.state.infoSoft,
+          backgroundColor: colors.state.infoSoft,
           bottom: 120,
           left: -90,
         }}
@@ -77,8 +78,8 @@ export default function OnboardingScreen() {
             borderRadius: 30,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.border.subtle,
-            backgroundColor: colorSemanticTokens.surface.card,
+            borderColor: colors.border.subtle,
+            backgroundColor: colors.surface.card,
             paddingHorizontal: 20,
             paddingVertical: 18,
             gap: 18,
@@ -99,7 +100,7 @@ export default function OnboardingScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
                 fontSize: 34,
                 lineHeight: 42,
                 fontWeight: "800",
@@ -111,7 +112,7 @@ export default function OnboardingScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
                 fontSize: 34,
                 lineHeight: 42,
                 fontWeight: "800",
@@ -123,7 +124,7 @@ export default function OnboardingScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.secondary,
+                color: colors.text.secondary,
                 fontSize: 16,
                 lineHeight: 24,
                 fontWeight: "500",
@@ -143,8 +144,8 @@ export default function OnboardingScreen() {
                 borderRadius: 20,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.card,
+                borderColor: colors.border.subtle,
+                backgroundColor: colors.surface.card,
                 paddingHorizontal: 16,
                 paddingVertical: 13,
                 flexDirection: "row",
@@ -159,7 +160,7 @@ export default function OnboardingScreen() {
                   borderRadius: radiusTokens.pill,
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: colorSemanticTokens.background.subtle,
+                  backgroundColor: colors.background.subtle,
                 }}
               >
                 <Text selectable style={{ fontSize: 20 }}>
@@ -171,7 +172,7 @@ export default function OnboardingScreen() {
                 <Text
                   selectable
                   style={{
-                    color: colorSemanticTokens.text.primary,
+                    color: colors.text.primary,
                     fontSize: 15,
                     lineHeight: 20,
                     fontWeight: "700",
@@ -182,7 +183,7 @@ export default function OnboardingScreen() {
                 <Text
                   selectable
                   style={{
-                    color: colorSemanticTokens.text.secondary,
+                    color: colors.text.secondary,
                     fontSize: 14,
                     lineHeight: 20,
                     fontWeight: "500",
@@ -215,7 +216,7 @@ export default function OnboardingScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
                 fontSize: 18,
                 lineHeight: 26,
                 fontWeight: "500",
@@ -226,7 +227,7 @@ export default function OnboardingScreen() {
               <Text
                 selectable
                 style={{
-                  color: colorSemanticTokens.accent.primary,
+                  color: colors.accent.primary,
                   fontWeight: "700",
                 }}
               >

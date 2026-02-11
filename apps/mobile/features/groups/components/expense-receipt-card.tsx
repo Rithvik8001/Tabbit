@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 
 import { Button } from "@/design/primitives/button";
 import { Text, View } from "@/design/primitives/sora-native";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -39,25 +39,26 @@ export function ExpenseReceiptCard({
   onPreviewAttached,
   onClearAttached,
 }: ExpenseReceiptCardProps) {
+  const colors = useThemeColors();
   return (
     <View
       style={{
         borderRadius: radiusTokens.card,
         borderCurve: "continuous",
-        backgroundColor: colorSemanticTokens.surface.card,
+        backgroundColor: colors.surface.card,
         padding: spacingTokens.md,
         gap: spacingTokens.sm,
       }}
     >
       <Text
         selectable
-        style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+        style={[typographyScale.headingMd, { color: colors.text.primary }]}
       >
         Receipt (optional)
       </Text>
       <Text
         selectable
-        style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+        style={[typographyScale.bodySm, { color: colors.text.secondary }]}
       >
         Add one bill image. Supported formats: JPG, PNG, WebP, HEIC.
       </Text>
@@ -69,8 +70,8 @@ export function ExpenseReceiptCard({
               borderRadius: radiusTokens.control,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.background.subtle,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.background.subtle,
               padding: spacingTokens.sm,
               flexDirection: "row",
               alignItems: "center",
@@ -91,7 +92,7 @@ export function ExpenseReceiptCard({
                 selectable
                 style={[
                   typographyScale.headingSm,
-                  { color: colorSemanticTokens.text.primary },
+                  { color: colors.text.primary },
                 ]}
               >
                 Ready to upload
@@ -100,7 +101,7 @@ export function ExpenseReceiptCard({
                 selectable
                 style={[
                   typographyScale.bodySm,
-                  { color: colorSemanticTokens.text.secondary },
+                  { color: colors.text.secondary },
                 ]}
               >
                 {formatBytes(preparedReceipt.sizeBytes)} · {preparedReceipt.width}x
@@ -137,8 +138,8 @@ export function ExpenseReceiptCard({
               borderRadius: radiusTokens.control,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.background.subtle,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.background.subtle,
               padding: spacingTokens.sm,
               gap: 4,
             }}
@@ -147,7 +148,7 @@ export function ExpenseReceiptCard({
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               Receipt attached
@@ -156,7 +157,7 @@ export function ExpenseReceiptCard({
               selectable
               style={[
                 typographyScale.bodySm,
-                { color: colorSemanticTokens.text.secondary },
+                { color: colors.text.secondary },
               ]}
             >
               You can preview, replace, or remove it.
@@ -205,7 +206,7 @@ export function ExpenseReceiptCard({
       {error ? (
         <Text
           selectable
-          style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+          style={[typographyScale.bodySm, { color: colors.state.danger }]}
         >
           {error}
         </Text>

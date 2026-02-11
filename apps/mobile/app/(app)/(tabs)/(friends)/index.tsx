@@ -15,7 +15,7 @@ import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-
 import { OverallBalanceStrip } from "@/design/primitives/overall-balance-strip";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { TabTopActions } from "@/design/primitives/tab-top-actions";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -83,6 +83,7 @@ function mapFriendRow(friend: {
 }
 
 export default function FriendsTabScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { snapshot } = useHomeSnapshot();
   const {
@@ -152,8 +153,8 @@ export default function FriendsTabScreen() {
             value={query}
             onChangeText={setQuery}
             placeholder="Search friends"
-            placeholderTextColor={colorSemanticTokens.text.tertiary}
-            selectionColor={colorSemanticTokens.accent.primary}
+            placeholderTextColor={colors.text.tertiary}
+            selectionColor={colors.accent.primary}
             autoCapitalize="none"
             autoCorrect={false}
             style={[
@@ -162,11 +163,11 @@ export default function FriendsTabScreen() {
                 borderRadius: radiusTokens.control,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.card,
+                borderColor: colors.border.subtle,
+                backgroundColor: colors.surface.card,
                 paddingHorizontal: 14,
                 paddingVertical: 12,
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
               },
             ]}
           />
@@ -193,8 +194,8 @@ export default function FriendsTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.md,
               gap: spacingTokens.sm,
             }}
@@ -203,7 +204,7 @@ export default function FriendsTabScreen() {
               selectable
               style={[
                 typographyScale.headingMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               Requests
@@ -215,8 +216,8 @@ export default function FriendsTabScreen() {
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
                   borderWidth: 1,
-                  borderColor: colorSemanticTokens.state.danger,
-                  backgroundColor: colorSemanticTokens.state.dangerSoft,
+                  borderColor: colors.state.danger,
+                  backgroundColor: colors.state.dangerSoft,
                   padding: spacingTokens.sm,
                   gap: spacingTokens.xs,
                 }}
@@ -225,7 +226,7 @@ export default function FriendsTabScreen() {
                   selectable
                   style={[
                     typographyScale.bodySm,
-                    { color: colorSemanticTokens.state.danger },
+                    { color: colors.state.danger },
                   ]}
                 >
                   {actionError}
@@ -239,7 +240,7 @@ export default function FriendsTabScreen() {
                     selectable
                     style={[
                       typographyScale.headingSm,
-                      { color: colorSemanticTokens.state.danger },
+                      { color: colors.state.danger },
                     ]}
                   >
                     Dismiss
@@ -254,7 +255,7 @@ export default function FriendsTabScreen() {
                 style={{
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
-                  backgroundColor: colorSemanticTokens.background.subtle,
+                  backgroundColor: colors.background.subtle,
                   padding: spacingTokens.sm,
                   gap: spacingTokens.sm,
                 }}
@@ -263,7 +264,7 @@ export default function FriendsTabScreen() {
                   selectable
                   style={[
                     typographyScale.headingSm,
-                    { color: colorSemanticTokens.text.primary },
+                    { color: colors.text.primary },
                   ]}
                 >
                   {getPersonLabel({
@@ -314,7 +315,7 @@ export default function FriendsTabScreen() {
                 style={{
                   borderRadius: radiusTokens.control,
                   borderCurve: "continuous",
-                  backgroundColor: colorSemanticTokens.background.subtle,
+                  backgroundColor: colors.background.subtle,
                   padding: spacingTokens.sm,
                   gap: spacingTokens.sm,
                 }}
@@ -323,7 +324,7 @@ export default function FriendsTabScreen() {
                   selectable
                   style={[
                     typographyScale.headingSm,
-                    { color: colorSemanticTokens.text.primary },
+                    { color: colors.text.primary },
                   ]}
                 >
                   {getPersonLabel({
@@ -335,7 +336,7 @@ export default function FriendsTabScreen() {
                   selectable
                   style={[
                     typographyScale.bodySm,
-                    { color: colorSemanticTokens.text.secondary },
+                    { color: colors.text.secondary },
                   ]}
                 >
                   Request sent
@@ -364,8 +365,8 @@ export default function FriendsTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.state.danger,
-              backgroundColor: colorSemanticTokens.state.dangerSoft,
+              borderColor: colors.state.danger,
+              backgroundColor: colors.state.dangerSoft,
               padding: spacingTokens.md,
               gap: spacingTokens.sm,
             }}
@@ -374,7 +375,7 @@ export default function FriendsTabScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.state.danger },
+                { color: colors.state.danger },
               ]}
             >
               Could not load friends
@@ -384,7 +385,7 @@ export default function FriendsTabScreen() {
                 selectable
                 style={[
                   typographyScale.bodySm,
-                  { color: colorSemanticTokens.state.danger },
+                  { color: colors.state.danger },
                 ]}
               >
                 {friendsError}
@@ -395,7 +396,7 @@ export default function FriendsTabScreen() {
                 selectable
                 style={[
                   typographyScale.bodySm,
-                  { color: colorSemanticTokens.state.danger },
+                  { color: colors.state.danger },
                 ]}
               >
                 {requestsError}
@@ -415,7 +416,7 @@ export default function FriendsTabScreen() {
           >
             <ActivityIndicator
               size="small"
-              color={colorSemanticTokens.accent.primary}
+              color={colors.accent.primary}
             />
           </View>
         ) : null}
@@ -426,8 +427,8 @@ export default function FriendsTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.sm,
             }}
@@ -436,7 +437,7 @@ export default function FriendsTabScreen() {
               selectable
               style={[
                 typographyScale.headingMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               {friends.length > 0
@@ -447,7 +448,7 @@ export default function FriendsTabScreen() {
               selectable
               style={[
                 typographyScale.bodyMd,
-                { color: colorSemanticTokens.text.secondary },
+                { color: colors.text.secondary },
               ]}
             >
               {friends.length > 0
@@ -471,8 +472,8 @@ export default function FriendsTabScreen() {
                 borderRadius: radiusTokens.card,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.card,
+                borderColor: colors.border.subtle,
+                backgroundColor: colors.surface.card,
               }}
             >
               <BalanceListRow

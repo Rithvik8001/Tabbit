@@ -12,7 +12,7 @@ import {
   HeaderPillButton,
   PageHeading,
 } from "@/design/primitives/page-heading";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { useFriendRequests } from "@/features/friends/hooks/use-friend-requests";
 import { searchFriendCandidates } from "@/features/friends/lib/friend-requests-repository";
@@ -22,14 +22,13 @@ import type {
 } from "@/features/friends/types/friend-request.types";
 import { getPersonLabel } from "@/features/shared/lib/person-label";
 
-const ink = colorSemanticTokens.text.primary;
-const muted = colorSemanticTokens.text.secondary;
-const accent = colorSemanticTokens.accent.primary;
-
 const SUGGESTION_LIMIT = 8;
 const DEBOUNCE_MS = 350;
 
-function getRelationshipBadge(status: FriendRelationshipStatus): {
+function getRelationshipBadge(
+  status: FriendRelationshipStatus,
+  colors: ReturnType<typeof useThemeColors>,
+): {
   label: string;
   textColor: string;
   backgroundColor: string;
@@ -37,35 +36,39 @@ function getRelationshipBadge(status: FriendRelationshipStatus): {
   if (status === "already_friend") {
     return {
       label: "Friends",
-      textColor: colorSemanticTokens.financial.positive,
-      backgroundColor: colorSemanticTokens.state.successSoft,
+      textColor: colors.financial.positive,
+      backgroundColor: colors.state.successSoft,
     };
   }
 
   if (status === "outgoing_pending") {
     return {
       label: "Sent",
-      textColor: colorSemanticTokens.accent.primary,
-      backgroundColor: colorSemanticTokens.accent.soft,
+      textColor: colors.accent.primary,
+      backgroundColor: colors.accent.soft,
     };
   }
 
   if (status === "incoming_pending") {
     return {
       label: "Incoming",
-      textColor: colorSemanticTokens.state.info,
-      backgroundColor: colorSemanticTokens.state.infoSoft,
+      textColor: colors.state.info,
+      backgroundColor: colors.state.infoSoft,
     };
   }
 
   return {
     label: "Can request",
-    textColor: colorSemanticTokens.text.tertiary,
-    backgroundColor: colorSemanticTokens.background.subtle,
+    textColor: colors.text.tertiary,
+    backgroundColor: colors.background.subtle,
   };
 }
 
 export default function AddFriendScreen() {
+  const colors = useThemeColors();
+  const ink = colors.text.primary;
+  const muted = colors.text.secondary;
+  const accent = colors.accent.primary;
   const router = useRouter();
   const { sendRequest, isSendingToUser } = useFriendRequests();
 
@@ -210,7 +213,7 @@ export default function AddFriendScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -243,7 +246,7 @@ export default function AddFriendScreen() {
           value={query}
           onChangeText={setQuery}
           placeholder="Name or email"
-          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          placeholderTextColor={colors.text.tertiary}
           selectionColor={accent}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -254,7 +257,7 @@ export default function AddFriendScreen() {
             borderCurve: "continuous",
             borderWidth: 1.5,
             borderColor: "transparent",
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -284,7 +287,7 @@ export default function AddFriendScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             overflow: "hidden",
           }}
         >
@@ -303,7 +306,10 @@ export default function AddFriendScreen() {
             </Text>
           ) : (
             suggestions.map((candidate) => {
-              const badge = getRelationshipBadge(candidate.relationshipStatus);
+              const badge = getRelationshipBadge(
+                candidate.relationshipStatus,
+                colors,
+              );
               const canRequest = candidate.relationshipStatus === "can_request";
 
               return (
@@ -314,8 +320,8 @@ export default function AddFriendScreen() {
                     paddingVertical: 11,
                     borderTopWidth:
                       suggestions[0]?.userId === candidate.userId ? 0 : 1,
-                    borderTopColor: colorSemanticTokens.border.subtle,
-                    backgroundColor: colorSemanticTokens.surface.cardStrong,
+                    borderTopColor: colors.border.subtle,
+                    backgroundColor: colors.surface.cardStrong,
                     gap: 10,
                   }}
                 >
@@ -420,14 +426,14 @@ export default function AddFriendScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            backgroundColor: colors.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.state.danger,
+              color: colors.state.danger,
               fontSize: 14,
               lineHeight: 18,
               fontWeight: "600",
@@ -443,14 +449,14 @@ export default function AddFriendScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.accent.soft,
+            backgroundColor: colors.accent.soft,
             padding: 12,
           }}
         >
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.accent.primary,
+              color: colors.accent.primary,
               fontSize: 14,
               lineHeight: 18,
               fontWeight: "600",

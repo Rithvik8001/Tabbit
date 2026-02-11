@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Text, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 
@@ -16,6 +16,7 @@ export function SectionHeader({
   subtitle,
   trailing,
 }: SectionHeaderProps) {
+  const colors = useThemeColors();
   return (
     <View
       style={{
@@ -30,7 +31,7 @@ export function SectionHeader({
           selectable
           style={[
             typographyScale.headingLg,
-            { color: colorSemanticTokens.text.primary },
+            { color: colors.text.primary },
           ]}
         >
           {title}
@@ -40,7 +41,7 @@ export function SectionHeader({
             selectable
             style={[
               typographyScale.bodySm,
-              { color: colorSemanticTokens.text.tertiary },
+              { color: colors.text.tertiary },
             ]}
           >
             {subtitle}

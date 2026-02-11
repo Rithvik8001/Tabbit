@@ -15,7 +15,7 @@ import {
   HeaderPillButton,
   PageHeading,
 } from "@/design/primitives/page-heading";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { ExpenseReceiptCard } from "@/features/groups/components/expense-receipt-card";
@@ -47,12 +47,12 @@ import type {
 import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
 import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
-const stroke = colorSemanticTokens.border.subtle;
-const ink = colorSemanticTokens.text.primary;
-const muted = colorSemanticTokens.text.secondary;
-const accent = colorSemanticTokens.accent.primary;
-
 export default function EditExpenseScreen() {
+  const colors = useThemeColors();
+  const stroke = colors.border.subtle;
+  const ink = colors.text.primary;
+  const muted = colors.text.secondary;
+  const accent = colors.accent.primary;
   const { id, expenseId } = useLocalSearchParams<{
     id: string;
     expenseId: string;
@@ -329,7 +329,7 @@ export default function EditExpenseScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 20,
             alignItems: "center",
           }}
@@ -365,7 +365,7 @@ export default function EditExpenseScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 16,
             gap: 8,
           }}
@@ -422,7 +422,7 @@ export default function EditExpenseScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 16,
             gap: 8,
           }}
@@ -479,7 +479,7 @@ export default function EditExpenseScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 16,
             gap: 8,
           }}
@@ -531,7 +531,7 @@ export default function EditExpenseScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -573,14 +573,14 @@ export default function EditExpenseScreen() {
           onChangeText={setDescription}
           maxLength={MAX_DESCRIPTION_LENGTH}
           placeholder="e.g. Dinner at Nobu"
-          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          placeholderTextColor={colors.text.tertiary}
           selectionColor={accent}
           style={{
             borderRadius: radiusTokens.control,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -596,7 +596,7 @@ export default function EditExpenseScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -621,7 +621,7 @@ export default function EditExpenseScreen() {
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
           }}
         >
@@ -641,7 +641,7 @@ export default function EditExpenseScreen() {
             onChangeText={setAmountText}
             keyboardType="decimal-pad"
             placeholder="0.00"
-            placeholderTextColor={colorSemanticTokens.text.tertiary}
+            placeholderTextColor={colors.text.tertiary}
             selectionColor={accent}
             style={{
               flex: 1,
@@ -661,7 +661,7 @@ export default function EditExpenseScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -682,14 +682,14 @@ export default function EditExpenseScreen() {
           value={dateText}
           onChangeText={setDateText}
           placeholder="YYYY-MM-DD"
-          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          placeholderTextColor={colors.text.tertiary}
           selectionColor={accent}
           style={{
             borderRadius: radiusTokens.control,
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -705,7 +705,7 @@ export default function EditExpenseScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -740,11 +740,11 @@ export default function EditExpenseScreen() {
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected
-                    ? colorSemanticTokens.accent.primary
+                    ? colors.accent.primary
                     : stroke,
                   backgroundColor: isSelected
-                    ? colorSemanticTokens.accent.soft
-                    : colorSemanticTokens.surface.cardStrong,
+                    ? colors.accent.soft
+                    : colors.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                 }}
@@ -772,7 +772,7 @@ export default function EditExpenseScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -802,11 +802,11 @@ export default function EditExpenseScreen() {
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected
-                    ? colorSemanticTokens.accent.primary
+                    ? colors.accent.primary
                     : stroke,
                   backgroundColor: isSelected
-                    ? colorSemanticTokens.accent.soft
-                    : colorSemanticTokens.surface.cardStrong,
+                    ? colors.accent.soft
+                    : colors.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -845,7 +845,7 @@ export default function EditExpenseScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -882,11 +882,11 @@ export default function EditExpenseScreen() {
                     borderCurve: "continuous",
                     borderWidth: 1,
                     borderColor: isChecked
-                      ? colorSemanticTokens.accent.primary
+                      ? colors.accent.primary
                       : stroke,
                     backgroundColor: isChecked
-                      ? colorSemanticTokens.accent.soft
-                      : colorSemanticTokens.surface.cardStrong,
+                      ? colors.accent.soft
+                      : colors.surface.cardStrong,
                     paddingHorizontal: 12,
                     paddingVertical: 10,
                     gap: 10,
@@ -901,7 +901,7 @@ export default function EditExpenseScreen() {
                       borderWidth: 2,
                       borderColor: isChecked
                         ? accent
-                        : colorSemanticTokens.border.muted,
+                        : colors.border.muted,
                       backgroundColor: isChecked ? accent : "transparent",
                       alignItems: "center",
                       justifyContent: "center",
@@ -910,7 +910,7 @@ export default function EditExpenseScreen() {
                     {isChecked ? (
                       <Text
                         style={{
-                          color: colorSemanticTokens.text.inverse,
+                          color: colors.text.inverse,
                           fontSize: 13,
                           lineHeight: 15,
                           fontWeight: "600",
@@ -962,7 +962,7 @@ export default function EditExpenseScreen() {
                       borderCurve: "continuous",
                       borderWidth: 1,
                       borderColor: stroke,
-                      backgroundColor: colorSemanticTokens.surface.cardMuted,
+                      backgroundColor: colors.surface.cardMuted,
                       paddingHorizontal: 10,
                     }}
                   >
@@ -987,7 +987,7 @@ export default function EditExpenseScreen() {
                       }
                       keyboardType="decimal-pad"
                       placeholder="0.00"
-                      placeholderTextColor={colorSemanticTokens.text.tertiary}
+                      placeholderTextColor={colors.text.tertiary}
                       selectionColor={accent}
                       style={{
                         flex: 1,
@@ -1013,7 +1013,7 @@ export default function EditExpenseScreen() {
                       borderCurve: "continuous",
                       borderWidth: 1,
                       borderColor: stroke,
-                      backgroundColor: colorSemanticTokens.surface.cardMuted,
+                      backgroundColor: colors.surface.cardMuted,
                       paddingHorizontal: 10,
                     }}
                   >
@@ -1027,7 +1027,7 @@ export default function EditExpenseScreen() {
                       }
                       keyboardType="decimal-pad"
                       placeholder="0"
-                      placeholderTextColor={colorSemanticTokens.text.tertiary}
+                      placeholderTextColor={colors.text.tertiary}
                       selectionColor={accent}
                       style={{
                         flex: 1,
@@ -1109,15 +1109,15 @@ export default function EditExpenseScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.state.danger,
+              color: colors.state.danger,
               fontSize: 14,
               lineHeight: 18,
               fontWeight: "600",

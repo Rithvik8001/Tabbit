@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from "@/design/primitives/sora-native";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -20,6 +20,7 @@ import {
 } from "@/features/groups/lib/expenses-repository";
 
 export default function ReceiptPreviewScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { expenseId } = useLocalSearchParams<{ expenseId: string }>();
 
@@ -99,7 +100,7 @@ export default function ReceiptPreviewScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             Close
@@ -111,7 +112,7 @@ export default function ReceiptPreviewScreen() {
         selectable
         style={[
           typographyScale.headingLg,
-          { color: colorSemanticTokens.text.primary },
+          { color: colors.text.primary },
         ]}
       >
         Receipt
@@ -121,7 +122,7 @@ export default function ReceiptPreviewScreen() {
         <View style={{ alignItems: "center", paddingVertical: spacingTokens.xxl }}>
           <ActivityIndicator
             size="large"
-            color={colorSemanticTokens.accent.primary}
+            color={colors.accent.primary}
           />
         </View>
       ) : null}
@@ -132,8 +133,8 @@ export default function ReceiptPreviewScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: spacingTokens.md,
             gap: spacingTokens.sm,
           }}
@@ -142,7 +143,7 @@ export default function ReceiptPreviewScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.state.danger },
+              { color: colors.state.danger },
             ]}
           >
             {error}
@@ -157,8 +158,8 @@ export default function ReceiptPreviewScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.border.subtle,
-            backgroundColor: colorSemanticTokens.surface.card,
+            borderColor: colors.border.subtle,
+            backgroundColor: colors.surface.card,
             overflow: "hidden",
           }}
         >
@@ -168,7 +169,7 @@ export default function ReceiptPreviewScreen() {
             style={{
               width: "100%",
               height: 520,
-              backgroundColor: colorSemanticTokens.background.subtle,
+              backgroundColor: colors.background.subtle,
             }}
           />
         </View>

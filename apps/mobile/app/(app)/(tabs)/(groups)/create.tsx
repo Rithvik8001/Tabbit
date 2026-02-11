@@ -13,7 +13,7 @@ import {
   HeaderPillButton,
   PageHeading,
 } from "@/design/primitives/page-heading";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import {
   GROUP_DEFAULT_EMOJI_BY_TYPE,
@@ -23,13 +23,14 @@ import {
 import { useGroups } from "@/features/groups/hooks/use-groups";
 import type { GroupType } from "@/features/groups/types/group.types";
 
-const stroke = colorSemanticTokens.border.subtle;
-const ink = colorSemanticTokens.text.primary;
-const muted = colorSemanticTokens.text.secondary;
-const accent = colorSemanticTokens.accent.primary;
 const maxGroupNameLength = 40;
 
 export default function CreateGroupScreen() {
+  const colors = useThemeColors();
+  const stroke = colors.border.subtle;
+  const ink = colors.text.primary;
+  const muted = colors.text.secondary;
+  const accent = colors.accent.primary;
   const router = useRouter();
   const { createGroup, isCreating } = useGroups({ autoRefreshOnFocus: false });
   const [name, setName] = useState("");
@@ -113,7 +114,7 @@ export default function CreateGroupScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -155,7 +156,7 @@ export default function CreateGroupScreen() {
           onChangeText={setName}
           maxLength={maxGroupNameLength}
           placeholder="e.g. Summer in Tokyo"
-          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          placeholderTextColor={colors.text.tertiary}
           selectionColor={accent}
           autoFocus
           style={{
@@ -163,7 +164,7 @@ export default function CreateGroupScreen() {
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -178,7 +179,7 @@ export default function CreateGroupScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -208,11 +209,11 @@ export default function CreateGroupScreen() {
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected
-                    ? colorSemanticTokens.accent.primary
+                    ? colors.accent.primary
                     : stroke,
                   backgroundColor: isSelected
-                    ? colorSemanticTokens.accent.soft
-                    : colorSemanticTokens.surface.cardStrong,
+                    ? colors.accent.soft
+                    : colors.surface.cardStrong,
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 4,
@@ -250,7 +251,7 @@ export default function CreateGroupScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 12,
         }}
@@ -282,7 +283,7 @@ export default function CreateGroupScreen() {
               borderCurve: "continuous",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: colorSemanticTokens.background.subtle,
+              backgroundColor: colors.background.subtle,
             }}
           >
             <Text selectable style={{ fontSize: 18, lineHeight: 22 }}>
@@ -306,11 +307,11 @@ export default function CreateGroupScreen() {
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: isSelected
-                    ? colorSemanticTokens.accent.primary
+                    ? colors.accent.primary
                     : stroke,
                   backgroundColor: isSelected
-                    ? colorSemanticTokens.accent.soft
-                    : colorSemanticTokens.surface.cardStrong,
+                    ? colors.accent.soft
+                    : colors.surface.cardStrong,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -330,15 +331,15 @@ export default function CreateGroupScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.state.danger,
+              color: colors.state.danger,
               fontSize: 14,
               lineHeight: 18,
               fontWeight: "600",

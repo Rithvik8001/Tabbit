@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 
@@ -24,6 +24,7 @@ export function HeaderPillButton({
   onPress,
   tone = "neutral",
 }: HeaderPillButtonProps) {
+  const colors = useThemeColors();
   const isAccent = tone === "accent";
 
   return (
@@ -39,16 +40,16 @@ export function HeaderPillButton({
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: isAccent
-          ? colorSemanticTokens.accent.soft
-          : colorSemanticTokens.background.subtle,
+          ? colors.accent.soft
+          : colors.background.subtle,
       }}
     >
       <Text
         selectable
         style={{
           color: isAccent
-            ? colorSemanticTokens.accent.primary
-            : colorSemanticTokens.text.secondary,
+            ? colors.accent.primary
+            : colors.text.secondary,
           fontSize: 18,
           lineHeight: 22,
           fontWeight: "700",
@@ -68,6 +69,7 @@ export function PageHeading({
   trailing,
   size = "hero",
 }: PageHeadingProps) {
+  const colors = useThemeColors();
   const titleSize = size === "hero" ? 42 : 34;
   const titleLineHeight = size === "hero" ? 50 : 42;
 
@@ -91,7 +93,7 @@ export function PageHeading({
         <Text
           selectable
           style={{
-            color: colorSemanticTokens.text.primary,
+            color: colors.text.primary,
             fontSize: titleSize,
             lineHeight: titleLineHeight,
             fontWeight: "800",
@@ -104,7 +106,7 @@ export function PageHeading({
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.text.secondary,
+              color: colors.text.secondary,
               fontSize: 20,
               lineHeight: 28,
               fontWeight: "500",

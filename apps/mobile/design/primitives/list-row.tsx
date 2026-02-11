@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
 import { LiquidSurface } from "@/design/primitives/liquid-surface";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -20,7 +20,10 @@ function ListRowContent({
   subtitle,
   trailing,
   left,
-}: Omit<ListRowProps, "onPress">) {
+  colors,
+}: Omit<ListRowProps, "onPress"> & {
+  colors: ReturnType<typeof useThemeColors>;
+}) {
   return (
     <View
       style={{
@@ -35,7 +38,7 @@ function ListRowContent({
           selectable
           style={[
             typographyScale.headingSm,
-            { color: colorSemanticTokens.text.primary },
+            { color: colors.text.primary },
           ]}
         >
           {title}
@@ -45,7 +48,7 @@ function ListRowContent({
             selectable
             style={[
               typographyScale.bodySm,
-              { color: colorSemanticTokens.text.tertiary },
+              { color: colors.text.tertiary },
             ]}
           >
             {subtitle}
@@ -58,6 +61,7 @@ function ListRowContent({
 }
 
 export function ListRow({ onPress, ...props }: ListRowProps) {
+  const colors = useThemeColors();
   if (onPress) {
     return (
       <Pressable
@@ -69,7 +73,7 @@ export function ListRow({ onPress, ...props }: ListRowProps) {
         }}
       >
         <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding }}>
-          <ListRowContent {...props} />
+          <ListRowContent {...props} colors={colors} />
         </LiquidSurface>
       </Pressable>
     );
@@ -77,7 +81,7 @@ export function ListRow({ onPress, ...props }: ListRowProps) {
 
   return (
     <LiquidSurface contentStyle={{ padding: spacingTokens.cardPadding }}>
-      <ListRowContent {...props} />
+      <ListRowContent {...props} colors={colors} />
     </LiquidSurface>
   );
 }

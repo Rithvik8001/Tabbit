@@ -10,7 +10,7 @@ import {
 
 import { Button } from "@/design/primitives/button";
 import { ScreenContainer } from "@/design/primitives/screen-container";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -32,6 +32,7 @@ const DATE_FORMAT: Intl.DateTimeFormatOptions = {
 };
 
 export default function ExpenseDetailScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { user } = useAuth();
   const params = useLocalSearchParams<{
@@ -221,7 +222,7 @@ export default function ExpenseDetailScreen() {
           <Text
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.accent.primary },
+              { color: colors.accent.primary },
             ]}
           >
             Back
@@ -231,7 +232,7 @@ export default function ExpenseDetailScreen() {
         <Text
           style={[
             typographyScale.headingSm,
-            { color: colorSemanticTokens.text.primary },
+            { color: colors.text.primary },
           ]}
         >
           Details
@@ -248,7 +249,7 @@ export default function ExpenseDetailScreen() {
               <Text
                 style={[
                   typographyScale.headingSm,
-                  { color: colorSemanticTokens.state.danger },
+                  { color: colors.state.danger },
                 ]}
               >
                 Delete
@@ -264,7 +265,7 @@ export default function ExpenseDetailScreen() {
               <Text
                 style={[
                   typographyScale.headingSm,
-                  { color: colorSemanticTokens.accent.primary },
+                  { color: colors.accent.primary },
                 ]}
               >
                 Edit
@@ -281,7 +282,7 @@ export default function ExpenseDetailScreen() {
         >
           <ActivityIndicator
             size="small"
-            color={colorSemanticTokens.accent.primary}
+            color={colors.accent.primary}
           />
         </View>
       ) : null}
@@ -293,8 +294,8 @@ export default function ExpenseDetailScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: spacingTokens.md,
             gap: spacingTokens.sm,
           }}
@@ -303,7 +304,7 @@ export default function ExpenseDetailScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.state.danger },
+              { color: colors.state.danger },
             ]}
           >
             Could not load expense
@@ -312,7 +313,7 @@ export default function ExpenseDetailScreen() {
             selectable
             style={[
               typographyScale.bodySm,
-              { color: colorSemanticTokens.state.danger },
+              { color: colors.state.danger },
             ]}
           >
             {error}
@@ -334,8 +335,8 @@ export default function ExpenseDetailScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.lg,
             }}
@@ -346,7 +347,7 @@ export default function ExpenseDetailScreen() {
                 selectable
                 style={[
                   typographyScale.headingLg,
-                  { color: colorSemanticTokens.text.primary },
+                  { color: colors.text.primary },
                 ]}
               >
                 {isSettlement ? "Payment" : expense.description}
@@ -355,7 +356,7 @@ export default function ExpenseDetailScreen() {
                 selectable
                 style={[
                   typographyScale.displayMd,
-                  { color: colorSemanticTokens.text.primary },
+                  { color: colors.text.primary },
                 ]}
               >
                 {formatCents(expense.amountCents)}
@@ -367,7 +368,7 @@ export default function ExpenseDetailScreen() {
               <View
                 style={{
                   alignSelf: "flex-start",
-                  backgroundColor: colorSemanticTokens.accent.soft,
+                  backgroundColor: colors.accent.soft,
                   borderRadius: radiusTokens.pill,
                   paddingHorizontal: spacingTokens.md,
                   paddingVertical: spacingTokens.xs,
@@ -376,7 +377,7 @@ export default function ExpenseDetailScreen() {
                 <Text
                   style={[
                     typographyScale.labelMd,
-                    { color: colorSemanticTokens.accent.primary },
+                    { color: colors.accent.primary },
                   ]}
                 >
                   {groupChipLabel}
@@ -393,7 +394,7 @@ export default function ExpenseDetailScreen() {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: spacingTokens.xs,
-                    backgroundColor: colorSemanticTokens.state.infoSoft,
+                    backgroundColor: colors.state.infoSoft,
                     borderRadius: radiusTokens.pill,
                     paddingHorizontal: spacingTokens.md,
                     paddingVertical: spacingTokens.xs,
@@ -402,7 +403,7 @@ export default function ExpenseDetailScreen() {
                   <Text
                     style={[
                       typographyScale.labelMd,
-                      { color: colorSemanticTokens.state.info },
+                      { color: colors.state.info },
                     ]}
                   >
                     View receipt
@@ -417,7 +418,7 @@ export default function ExpenseDetailScreen() {
                 selectable
                 style={[
                   typographyScale.bodySm,
-                  { color: colorSemanticTokens.text.secondary },
+                  { color: colors.text.secondary },
                 ]}
               >
                 Added by {resolveName(expense.createdBy)} on{" "}
@@ -428,7 +429,7 @@ export default function ExpenseDetailScreen() {
                   selectable
                   style={[
                     typographyScale.bodySm,
-                    { color: colorSemanticTokens.text.tertiary },
+                    { color: colors.text.tertiary },
                   ]}
                 >
                   Last updated{" "}
@@ -450,8 +451,8 @@ export default function ExpenseDetailScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.lg,
             }}
@@ -469,7 +470,7 @@ export default function ExpenseDetailScreen() {
                   width: 36,
                   height: 36,
                   borderRadius: 18,
-                  backgroundColor: colorSemanticTokens.accent.soft,
+                  backgroundColor: colors.accent.soft,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -478,7 +479,7 @@ export default function ExpenseDetailScreen() {
                   style={{
                     fontSize: 14,
                     fontWeight: "700",
-                    color: colorSemanticTokens.accent.primary,
+                    color: colors.accent.primary,
                   }}
                 >
                   {resolveName(expense.paidBy).charAt(0).toUpperCase()}
@@ -488,7 +489,7 @@ export default function ExpenseDetailScreen() {
                 selectable
                 style={[
                   typographyScale.headingSm,
-                  { color: colorSemanticTokens.text.primary, flex: 1 },
+                  { color: colors.text.primary, flex: 1 },
                 ]}
               >
                 {isSettlement && expense.splits.length > 0
@@ -501,7 +502,7 @@ export default function ExpenseDetailScreen() {
             <View
               style={{
                 height: 1,
-                backgroundColor: colorSemanticTokens.border.subtle,
+                backgroundColor: colors.border.subtle,
               }}
             />
 
@@ -511,7 +512,7 @@ export default function ExpenseDetailScreen() {
                 <Text
                   style={[
                     typographyScale.labelMd,
-                    { color: colorSemanticTokens.text.secondary },
+                    { color: colors.text.secondary },
                   ]}
                 >
                   {expense.splitType === "equal"
@@ -536,8 +537,8 @@ export default function ExpenseDetailScreen() {
                         borderRadius: 14,
                         backgroundColor:
                           split.userId === currentUserId
-                            ? colorSemanticTokens.accent.soft
-                            : colorSemanticTokens.background.subtle,
+                            ? colors.accent.soft
+                            : colors.background.subtle,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -548,8 +549,8 @@ export default function ExpenseDetailScreen() {
                           fontWeight: "600",
                           color:
                             split.userId === currentUserId
-                              ? colorSemanticTokens.accent.primary
-                              : colorSemanticTokens.text.secondary,
+                              ? colors.accent.primary
+                              : colors.text.secondary,
                         }}
                       >
                         {resolveName(split.userId).charAt(0).toUpperCase()}
@@ -560,7 +561,7 @@ export default function ExpenseDetailScreen() {
                       style={[
                         typographyScale.bodyMd,
                         {
-                          color: colorSemanticTokens.text.primary,
+                          color: colors.text.primary,
                           flex: 1,
                           fontWeight:
                             split.userId === currentUserId ? "600" : "400",
@@ -573,7 +574,7 @@ export default function ExpenseDetailScreen() {
                       selectable
                       style={[
                         typographyScale.bodyMd,
-                        { color: colorSemanticTokens.text.secondary },
+                        { color: colors.text.secondary },
                       ]}
                     >
                       {formatCents(split.shareCents)}
@@ -590,10 +591,10 @@ export default function ExpenseDetailScreen() {
                   alignSelf: "flex-start",
                   backgroundColor:
                     impact.tone === "positive"
-                      ? colorSemanticTokens.state.successSoft
+                      ? colors.state.successSoft
                       : impact.tone === "negative"
-                        ? colorSemanticTokens.state.dangerSoft
-                        : colorSemanticTokens.background.subtle,
+                        ? colors.state.dangerSoft
+                        : colors.background.subtle,
                   borderRadius: radiusTokens.pill,
                   paddingHorizontal: spacingTokens.md,
                   paddingVertical: spacingTokens.xs,
@@ -605,10 +606,10 @@ export default function ExpenseDetailScreen() {
                     {
                       color:
                         impact.tone === "positive"
-                          ? colorSemanticTokens.state.success
+                          ? colors.state.success
                           : impact.tone === "negative"
-                            ? colorSemanticTokens.state.danger
-                            : colorSemanticTokens.text.secondary,
+                            ? colors.state.danger
+                            : colors.text.secondary,
                       fontWeight: "600",
                     },
                   ]}

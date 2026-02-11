@@ -8,7 +8,7 @@ import {
 } from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -17,6 +17,7 @@ import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
 
 export default function GroupSettingsScreen() {
+  const colors = useThemeColors();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -105,7 +106,7 @@ export default function GroupSettingsScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             Back
@@ -116,7 +117,7 @@ export default function GroupSettingsScreen() {
           selectable
           style={[
             typographyScale.headingLg,
-            { color: colorSemanticTokens.text.primary },
+            { color: colors.text.primary },
           ]}
         >
           Group settings
@@ -130,7 +131,7 @@ export default function GroupSettingsScreen() {
           selectable
           style={[
             typographyScale.bodyMd,
-            { color: colorSemanticTokens.text.secondary },
+            { color: colors.text.secondary },
           ]}
         >
           Loading settings...
@@ -143,8 +144,8 @@ export default function GroupSettingsScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: spacingTokens.md,
             gap: spacingTokens.sm,
           }}
@@ -153,7 +154,7 @@ export default function GroupSettingsScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.state.danger },
+              { color: colors.state.danger },
             ]}
           >
             
@@ -165,7 +166,7 @@ export default function GroupSettingsScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.accent.primary },
+                { color: colors.accent.primary },
               ]}
             >
               
@@ -182,8 +183,8 @@ export default function GroupSettingsScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.sm,
             }}
@@ -206,7 +207,7 @@ export default function GroupSettingsScreen() {
                   selectable
                   style={[
                     typographyScale.headingLg,
-                    { color: colorSemanticTokens.text.primary },
+                    { color: colors.text.primary },
                   ]}
                 >
                   {group.name}
@@ -215,7 +216,7 @@ export default function GroupSettingsScreen() {
                   selectable
                   style={[
                     typographyScale.bodySm,
-                    { color: colorSemanticTokens.text.secondary },
+                    { color: colors.text.secondary },
                   ]}
                 >
                   {members.length} {members.length === 1 ? "member" : "members"}
@@ -234,7 +235,7 @@ export default function GroupSettingsScreen() {
                     selectable
                     style={[
                       typographyScale.headingSm,
-                      { color: colorSemanticTokens.accent.primary },
+                      { color: colors.accent.primary },
                     ]}
                   >
                     Edit
@@ -250,7 +251,7 @@ export default function GroupSettingsScreen() {
               selectable
               style={[
                 typographyScale.headingMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               Group members
@@ -281,8 +282,8 @@ export default function GroupSettingsScreen() {
                     borderRadius: radiusTokens.card,
                     borderCurve: "continuous",
                     borderWidth: 1,
-                    borderColor: colorSemanticTokens.border.subtle,
-                    backgroundColor: colorSemanticTokens.surface.card,
+                    borderColor: colors.border.subtle,
+                    backgroundColor: colors.surface.card,
                     padding: spacingTokens.md,
                     flexDirection: "row",
                     justifyContent: "space-between",
@@ -296,7 +297,7 @@ export default function GroupSettingsScreen() {
                       selectable
                       style={[
                         typographyScale.headingMd,
-                        { color: colorSemanticTokens.text.primary },
+                        { color: colors.text.primary },
                       ]}
                     >
                       {label}
@@ -307,7 +308,7 @@ export default function GroupSettingsScreen() {
                         selectable
                         style={[
                           typographyScale.bodySm,
-                          { color: colorSemanticTokens.text.secondary },
+                          { color: colors.text.secondary },
                         ]}
                       >
                         {member.email}
@@ -323,7 +324,7 @@ export default function GroupSettingsScreen() {
                         selectable
                         style={[
                           typographyScale.headingSm,
-                          { color: colorSemanticTokens.state.danger },
+                          { color: colors.state.danger },
                         ]}
                       >
                         Remove

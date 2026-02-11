@@ -1,14 +1,15 @@
 import { Stack } from "expo-router";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 
 export default function AuthLayout() {
+  const colors = useThemeColors();
   return (
     <Stack
       screenOptions={{
         headerShown: false,
         animation: "slide_from_right",
-        contentStyle: { backgroundColor: colorSemanticTokens.background.canvas },
+        contentStyle: { backgroundColor: colors.background.canvas },
       }}
     >
       <Stack.Screen name="login" options={{ presentation: "card" }} />

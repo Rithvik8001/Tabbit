@@ -8,7 +8,7 @@ import {
   View,
 } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -35,6 +35,7 @@ function shortDate(value: string): string {
 }
 
 export default function GroupDetailScreen() {
+  const colors = useThemeColors();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -142,7 +143,7 @@ export default function GroupDetailScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             Back
@@ -162,7 +163,7 @@ export default function GroupDetailScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.accent.primary },
+                { color: colors.accent.primary },
               ]}
             >
               Settings
@@ -176,7 +177,7 @@ export default function GroupDetailScreen() {
           selectable
           style={[
             typographyScale.bodyMd,
-            { color: colorSemanticTokens.text.secondary },
+            { color: colors.text.secondary },
           ]}
         >
           Loading group...
@@ -189,8 +190,8 @@ export default function GroupDetailScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: spacingTokens.md,
             gap: spacingTokens.sm,
           }}
@@ -199,7 +200,7 @@ export default function GroupDetailScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.state.danger },
+              { color: colors.state.danger },
             ]}
           >
             
@@ -211,7 +212,7 @@ export default function GroupDetailScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.accent.primary },
+                { color: colors.accent.primary },
               ]}
             >
               
@@ -228,8 +229,8 @@ export default function GroupDetailScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.sm,
             }}
@@ -242,7 +243,7 @@ export default function GroupDetailScreen() {
               selectable
               style={[
                 typographyScale.displayMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               {group.name}
@@ -251,7 +252,7 @@ export default function GroupDetailScreen() {
               selectable
               style={[
                 typographyScale.bodyMd,
-                { color: colorSemanticTokens.text.secondary },
+                { color: colors.text.secondary },
               ]}
             >
               {members.length} {members.length === 1 ? "member" : "members"}
@@ -275,7 +276,7 @@ export default function GroupDetailScreen() {
                 style={{
                   borderRadius: radiusTokens.pill,
                   borderCurve: "continuous",
-                  backgroundColor: colorSemanticTokens.accent.primary,
+                  backgroundColor: colors.accent.primary,
                   paddingHorizontal: 14,
                   paddingVertical: 8,
                 }}
@@ -284,7 +285,7 @@ export default function GroupDetailScreen() {
                   selectable
                   style={[
                     typographyScale.headingSm,
-                    { color: colorSemanticTokens.text.inverse },
+                    { color: colors.text.inverse },
                   ]}
                 >
                   
@@ -301,7 +302,7 @@ export default function GroupDetailScreen() {
                 style={{
                   borderRadius: radiusTokens.pill,
                   borderCurve: "continuous",
-                  backgroundColor: colorSemanticTokens.background.subtle,
+                  backgroundColor: colors.background.subtle,
                   paddingHorizontal: 14,
                   paddingVertical: 8,
                 }}
@@ -310,7 +311,7 @@ export default function GroupDetailScreen() {
                   selectable
                   style={[
                     typographyScale.headingSm,
-                    { color: colorSemanticTokens.text.primary },
+                    { color: colors.text.primary },
                   ]}
                 >
                   
@@ -325,8 +326,8 @@ export default function GroupDetailScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.sm,
             }}
@@ -335,7 +336,7 @@ export default function GroupDetailScreen() {
               selectable
               style={[
                 typographyScale.headingMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               {isExpensesLoading
@@ -355,12 +356,12 @@ export default function GroupDetailScreen() {
                 {
                   color:
                     isExpensesLoading || expensesError
-                      ? colorSemanticTokens.text.secondary
+                      ? colors.text.secondary
                       : userBalance.direction === "you_are_owed"
-                      ? colorSemanticTokens.financial.positive
+                      ? colors.financial.positive
                       : userBalance.direction === "you_owe"
-                        ? colorSemanticTokens.financial.negative
-                        : colorSemanticTokens.text.secondary,
+                        ? colors.financial.negative
+                        : colors.text.secondary,
                 },
               ]}
             >
@@ -378,7 +379,7 @@ export default function GroupDetailScreen() {
                 selectable
                 style={[
                   typographyScale.bodySm,
-                  { color: colorSemanticTokens.text.secondary },
+                  { color: colors.text.secondary },
                 ]}
               >
                 Loading latest balances...
@@ -391,7 +392,7 @@ export default function GroupDetailScreen() {
                   selectable
                   style={[
                     typographyScale.bodySm,
-                    { color: colorSemanticTokens.state.danger },
+                    { color: colors.state.danger },
                   ]}
                 >
                   {expensesError}
@@ -401,7 +402,7 @@ export default function GroupDetailScreen() {
                     selectable
                     style={[
                       typographyScale.headingSm,
-                      { color: colorSemanticTokens.accent.primary },
+                      { color: colors.accent.primary },
                     ]}
                   >
                     Retry balances
@@ -433,7 +434,7 @@ export default function GroupDetailScreen() {
                     style={{
                       borderRadius: radiusTokens.control,
                       borderCurve: "continuous",
-                      backgroundColor: colorSemanticTokens.background.subtle,
+                      backgroundColor: colors.background.subtle,
                       paddingHorizontal: spacingTokens.sm,
                       paddingVertical: spacingTokens.xs,
                       flexDirection: "row",
@@ -446,7 +447,7 @@ export default function GroupDetailScreen() {
                       selectable
                       style={[
                         typographyScale.bodySm,
-                        { color: colorSemanticTokens.text.primary, flex: 1 },
+                        { color: colors.text.primary, flex: 1 },
                       ]}
                     >
                       {isPayer
@@ -471,7 +472,7 @@ export default function GroupDetailScreen() {
                           selectable
                           style={[
                             typographyScale.headingSm,
-                            { color: colorSemanticTokens.accent.primary },
+                            { color: colors.accent.primary },
                           ]}
                         >
                           Record payment
@@ -482,7 +483,7 @@ export default function GroupDetailScreen() {
                         selectable
                         style={[
                           typographyScale.bodySm,
-                          { color: colorSemanticTokens.text.tertiary },
+                          { color: colors.text.tertiary },
                         ]}
                       >
                         Unavailable
@@ -498,7 +499,7 @@ export default function GroupDetailScreen() {
               selectable
               style={[
                 typographyScale.bodyMd,
-                { color: colorSemanticTokens.text.secondary },
+                { color: colors.text.secondary },
               ]}
             >
               Loading expenses...
@@ -511,8 +512,8 @@ export default function GroupDetailScreen() {
                 borderRadius: radiusTokens.card,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.state.danger,
-                backgroundColor: colorSemanticTokens.state.dangerSoft,
+                borderColor: colors.state.danger,
+                backgroundColor: colors.state.dangerSoft,
                 padding: spacingTokens.md,
                 gap: spacingTokens.sm,
               }}
@@ -521,7 +522,7 @@ export default function GroupDetailScreen() {
                 selectable
                 style={[
                   typographyScale.headingSm,
-                  { color: colorSemanticTokens.state.danger },
+                  { color: colors.state.danger },
                 ]}
               >
                 Could not load expenses
@@ -530,7 +531,7 @@ export default function GroupDetailScreen() {
                 selectable
                 style={[
                   typographyScale.bodySm,
-                  { color: colorSemanticTokens.state.danger },
+                  { color: colors.state.danger },
                 ]}
               >
                 {expensesError}
@@ -540,7 +541,7 @@ export default function GroupDetailScreen() {
                   selectable
                   style={[
                     typographyScale.headingSm,
-                    { color: colorSemanticTokens.accent.primary },
+                    { color: colors.accent.primary },
                   ]}
                 >
                   Retry expenses
@@ -556,7 +557,7 @@ export default function GroupDetailScreen() {
                 selectable
                 style={[
                   typographyScale.headingMd,
-                  { color: colorSemanticTokens.text.primary },
+                  { color: colors.text.primary },
                 ]}
               >
                 {bucket.label}
@@ -576,8 +577,8 @@ export default function GroupDetailScreen() {
                       borderRadius: radiusTokens.card,
                       borderCurve: "continuous",
                       borderWidth: 1,
-                      borderColor: colorSemanticTokens.border.subtle,
-                      backgroundColor: colorSemanticTokens.surface.card,
+                      borderColor: colors.border.subtle,
+                      backgroundColor: colors.surface.card,
                       padding: spacingTokens.md,
                       gap: spacingTokens.sm,
                     }}
@@ -596,7 +597,7 @@ export default function GroupDetailScreen() {
                           selectable
                           style={[
                             typographyScale.headingMd,
-                            { color: colorSemanticTokens.text.primary },
+                            { color: colors.text.primary },
                           ]}
                         >
                           {expense.description}
@@ -605,7 +606,7 @@ export default function GroupDetailScreen() {
                           selectable
                           style={[
                             typographyScale.bodySm,
-                            { color: colorSemanticTokens.text.secondary },
+                            { color: colors.text.secondary },
                           ]}
                         >
                           {`Paid by ${resolvePayerLabel(expense)} · ${shortDate(expense.expenseDate)}`}
@@ -623,7 +624,7 @@ export default function GroupDetailScreen() {
                               selectable
                               style={[
                                 typographyScale.bodySm,
-                                { color: colorSemanticTokens.accent.primary },
+                                { color: colors.accent.primary },
                               ]}
                             >
                               Receipt attached · View
@@ -635,7 +636,7 @@ export default function GroupDetailScreen() {
                         selectable
                         style={[
                           typographyScale.headingMd,
-                          { color: colorSemanticTokens.text.primary },
+                          { color: colors.text.primary },
                         ]}
                       >
                         {formatCents(expense.amountCents)}
@@ -660,7 +661,7 @@ export default function GroupDetailScreen() {
                               selectable
                               style={[
                                 typographyScale.headingSm,
-                                { color: colorSemanticTokens.accent.primary },
+                                { color: colors.accent.primary },
                               ]}
                             >
                               Edit
@@ -680,7 +681,7 @@ export default function GroupDetailScreen() {
                               selectable
                               style={[
                                 typographyScale.headingSm,
-                                { color: colorSemanticTokens.state.danger },
+                                { color: colors.state.danger },
                               ]}
                             >
                               Delete

@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { hapticTokens } from "@/design/tokens/haptics";
 import { motionTokens } from "@/design/tokens/motion";
 import { radiusTokens } from "@/design/tokens/radius";
@@ -31,57 +31,66 @@ const isIOS = process.env.EXPO_OS === "ios";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-function getSolidPalette(tone: ButtonTone) {
+function getSolidPalette(
+  tone: ButtonTone,
+  colors: ReturnType<typeof useThemeColors>,
+) {
   switch (tone) {
     case "danger":
-      return { bg: colorSemanticTokens.state.danger, text: "#FFFFFF" };
+      return { bg: colors.state.danger, text: colors.text.inverse };
     case "neutral":
-      return { bg: colorSemanticTokens.background.subtle, text: colorSemanticTokens.text.primary };
+      return { bg: colors.background.subtle, text: colors.text.primary };
     case "blue":
-      return { bg: colorSemanticTokens.state.info, text: "#FFFFFF" };
+      return { bg: colors.state.info, text: colors.text.inverse };
     case "accent":
     default:
-      return { bg: colorSemanticTokens.accent.primary, text: "#FFFFFF" };
+      return { bg: colors.accent.primary, text: colors.text.inverse };
   }
 }
 
-function getSoftPalette(tone: ButtonTone) {
+function getSoftPalette(
+  tone: ButtonTone,
+  colors: ReturnType<typeof useThemeColors>,
+) {
   switch (tone) {
     case "danger":
       return {
-        bg: colorSemanticTokens.state.dangerSoft,
-        text: colorSemanticTokens.state.danger,
+        bg: colors.state.dangerSoft,
+        text: colors.state.danger,
       };
     case "neutral":
       return {
-        bg: colorSemanticTokens.background.subtle,
-        text: colorSemanticTokens.text.primary,
+        bg: colors.background.subtle,
+        text: colors.text.primary,
       };
     case "blue":
       return {
-        bg: colorSemanticTokens.state.infoSoft,
-        text: colorSemanticTokens.state.info,
+        bg: colors.state.infoSoft,
+        text: colors.state.info,
       };
     case "accent":
     default:
       return {
-        bg: colorSemanticTokens.accent.soft,
-        text: colorSemanticTokens.accent.primary,
+        bg: colors.accent.soft,
+        text: colors.accent.primary,
       };
   }
 }
 
-function getGhostColor(tone: ButtonTone) {
+function getGhostColor(
+  tone: ButtonTone,
+  colors: ReturnType<typeof useThemeColors>,
+) {
   switch (tone) {
     case "danger":
-      return colorSemanticTokens.state.danger;
+      return colors.state.danger;
     case "blue":
-      return colorSemanticTokens.state.info;
+      return colors.state.info;
     case "neutral":
-      return colorSemanticTokens.text.primary;
+      return colors.text.primary;
     case "accent":
     default:
-      return colorSemanticTokens.accent.primary;
+      return colors.accent.primary;
   }
 }
 
@@ -106,6 +115,7 @@ export function Button({
   tone = "accent",
   size = "md",
 }: ButtonProps) {
+  const colors = useThemeColors();
   const shouldReduceMotion = useReducedMotion();
   const scale = useSharedValue(1);
 
@@ -140,11 +150,11 @@ export function Button({
   const fontSize = size === "sm" ? 14 : size === "lg" ? 17 : 16;
 
   if (variant === "solid") {
-    const palette = getSolidPalette(tone);
+    const palette = getSolidPalette(tone, colors);
     const resolvedPalette = isDisabled
       ? {
-          bg: "#A7A3B0",
-          text: "#F3F2F6",
+          bg: colors.surface.cardMuted,
+          text: colors.text.tertiary,
         }
       : palette;
 
@@ -170,7 +180,7 @@ export function Button({
             opacity: 1,
             boxShadow: isDisabled
               ? "none"
-              : "0 8px 18px rgba(57, 19, 138, 0.22)",
+              : `0 8px 18px ${colors.accent.softStrong}`,
             ...padding,
           },
         ]}
@@ -193,7 +203,9 @@ export function Button({
   }
 
   if (variant === "ghost") {
-    const color = isDisabled ? colorSemanticTokens.text.tertiary : getGhostColor(tone);
+    const color = isDisabled
+      ? colors.text.tertiary
+      : getGhostColor(tone, colors);
     return (
       <AnimatedPressable
         accessibilityRole="button"
@@ -234,8 +246,8 @@ export function Button({
 
   // Soft variant
   const softPalette = isDisabled
-    ? { bg: colorSemanticTokens.background.subtle, text: colorSemanticTokens.text.tertiary }
-    : getSoftPalette(tone);
+    ? { bg: colors.background.subtle, text: colors.text.tertiary }
+    : getSoftPalette(tone, colors);
 
   return (
     <AnimatedPressable

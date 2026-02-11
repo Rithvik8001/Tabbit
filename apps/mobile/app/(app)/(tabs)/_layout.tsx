@@ -3,9 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useSegments } from "expo-router";
 import { useEffect, useRef } from "react";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
-
-const tabTint = colorSemanticTokens.accent.primary;
+import { useThemeColors } from "@/providers/theme-provider";
 
 function getActiveTabSegment(segments: string[]): string | null {
   const tabsIndex = segments.indexOf("(tabs)");
@@ -17,6 +15,8 @@ function getActiveTabSegment(segments: string[]): string | null {
 }
 
 export default function AppTabsLayout() {
+  const colors = useThemeColors();
+  const tabTint = colors.accent.primary;
   const segments = useSegments();
   const previousTabSegment = useRef<string | null>(null);
   const activeTabSegment = getActiveTabSegment(segments);
@@ -45,7 +45,7 @@ export default function AppTabsLayout() {
   return (
     <NativeTabs
       tintColor={tabTint}
-      backgroundColor={colorSemanticTokens.background.chrome}
+      backgroundColor={colors.background.chrome}
       labelStyle={{ fontSize: 11, fontWeight: "500" }}
     >
       <NativeTabs.Trigger name="(friends)">

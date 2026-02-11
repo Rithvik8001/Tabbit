@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, ScrollView, Text, TextInput, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -12,7 +12,13 @@ import { ensureDirectFriendGroup } from "@/features/friends/lib/friend-requests-
 import { useGroups } from "@/features/groups/hooks/use-groups";
 import { getPersonLabel } from "@/features/shared/lib/person-label";
 
-function SelectionDot({ isSelected }: { isSelected: boolean }) {
+function SelectionDot({
+  isSelected,
+  colors,
+}: {
+  isSelected: boolean;
+  colors: ReturnType<typeof useThemeColors>;
+}) {
   return (
     <View
       style={{
@@ -22,8 +28,8 @@ function SelectionDot({ isSelected }: { isSelected: boolean }) {
         borderCurve: "continuous",
         borderWidth: 2,
         borderColor: isSelected
-          ? colorSemanticTokens.accent.primary
-          : colorSemanticTokens.border.muted,
+          ? colors.accent.primary
+          : colors.border.muted,
         alignItems: "center",
         justifyContent: "center",
       }}
@@ -34,7 +40,7 @@ function SelectionDot({ isSelected }: { isSelected: boolean }) {
             width: 12,
             height: 12,
             borderRadius: radiusTokens.pill,
-            backgroundColor: colorSemanticTokens.accent.primary,
+            backgroundColor: colors.accent.primary,
           }}
         />
       ) : null}
@@ -68,6 +74,7 @@ function normalizeReturnTab(
 }
 
 export default function AddExpenseContextScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { scope: scopeParam, returnTab: returnTabParam } = useLocalSearchParams<{
     scope?: string | string[];
@@ -191,7 +198,7 @@ export default function AddExpenseContextScreen() {
         : "Enter names or emails";
 
   return (
-    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.canvas }}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
@@ -223,12 +230,12 @@ export default function AddExpenseContextScreen() {
               justifyContent: "center",
             }}
           >
-            <Ionicons name="close" size={24} color={colorSemanticTokens.text.primary} />
+            <Ionicons name="close" size={24} color={colors.text.primary} />
           </Pressable>
 
           <Text
             selectable
-            style={[typographyScale.headingLg, { color: colorSemanticTokens.text.primary }]}
+            style={[typographyScale.headingLg, { color: colors.text.primary }]}
           >
             Add an expense
           </Text>
@@ -248,7 +255,7 @@ export default function AddExpenseContextScreen() {
           >
             <Text
               selectable
-              style={[typographyScale.headingSm, { color: colorSemanticTokens.accent.primary }]}
+              style={[typographyScale.headingSm, { color: colors.accent.primary }]}
             >
               {isSubmitting ? "Adding..." : "Add"}
             </Text>
@@ -258,14 +265,14 @@ export default function AddExpenseContextScreen() {
         <View
           style={{
             borderBottomWidth: 1,
-            borderBottomColor: colorSemanticTokens.border.subtle,
+            borderBottomColor: colors.border.subtle,
             paddingBottom: spacingTokens.sm,
             gap: spacingTokens.sm,
           }}
         >
           <Text
             selectable
-            style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+            style={[typographyScale.headingMd, { color: colors.text.primary }]}
           >
             With you and:
           </Text>
@@ -273,8 +280,8 @@ export default function AddExpenseContextScreen() {
             value={query}
             onChangeText={setQuery}
             placeholder={searchPlaceholder}
-            placeholderTextColor={colorSemanticTokens.text.tertiary}
-            selectionColor={colorSemanticTokens.accent.primary}
+            placeholderTextColor={colors.text.tertiary}
+            selectionColor={colors.accent.primary}
             autoCapitalize="none"
             autoCorrect={false}
             style={[
@@ -283,11 +290,11 @@ export default function AddExpenseContextScreen() {
                 borderRadius: radiusTokens.control,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.card,
+                borderColor: colors.border.subtle,
+                backgroundColor: colors.surface.card,
                 paddingHorizontal: 14,
                 paddingVertical: 12,
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
               },
             ]}
           />
@@ -297,7 +304,7 @@ export default function AddExpenseContextScreen() {
           <View style={{ gap: spacingTokens.sm }}>
             <Text
               selectable
-              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+              style={[typographyScale.headingMd, { color: colors.text.primary }]}
             >
               Groups
             </Text>
@@ -305,7 +312,7 @@ export default function AddExpenseContextScreen() {
             {isGroupsLoading ? (
               <Text
                 selectable
-                style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                style={[typographyScale.bodySm, { color: colors.text.secondary }]}
               >
                 Loading groups...
               </Text>
@@ -327,9 +334,9 @@ export default function AddExpenseContextScreen() {
                     borderCurve: "continuous",
                     borderWidth: 1,
                     borderColor: isSelected
-                      ? colorSemanticTokens.accent.primary
-                      : colorSemanticTokens.border.subtle,
-                    backgroundColor: colorSemanticTokens.surface.card,
+                      ? colors.accent.primary
+                      : colors.border.subtle,
+                    backgroundColor: colors.surface.card,
                     padding: spacingTokens.sm,
                     flexDirection: "row",
                     alignItems: "center",
@@ -343,7 +350,7 @@ export default function AddExpenseContextScreen() {
                         width: 42,
                         height: 42,
                         borderRadius: radiusTokens.pill,
-                        backgroundColor: colorSemanticTokens.background.subtle,
+                        backgroundColor: colors.background.subtle,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -355,12 +362,12 @@ export default function AddExpenseContextScreen() {
                     <Text
                       selectable
                       numberOfLines={1}
-                      style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary, flex: 1 }]}
+                      style={[typographyScale.headingMd, { color: colors.text.primary, flex: 1 }]}
                     >
                       {group.name}
                     </Text>
                   </View>
-                  <SelectionDot isSelected={isSelected} />
+                  <SelectionDot isSelected={isSelected} colors={colors} />
                 </Pressable>
               );
             })}
@@ -371,7 +378,7 @@ export default function AddExpenseContextScreen() {
           <View style={{ gap: spacingTokens.sm }}>
             <Text
               selectable
-              style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+              style={[typographyScale.headingMd, { color: colors.text.primary }]}
             >
               Friends
             </Text>
@@ -379,7 +386,7 @@ export default function AddExpenseContextScreen() {
             {isFriendsLoading ? (
               <Text
                 selectable
-                style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                style={[typographyScale.bodySm, { color: colors.text.secondary }]}
               >
                 Loading friends...
               </Text>
@@ -405,9 +412,9 @@ export default function AddExpenseContextScreen() {
                     borderCurve: "continuous",
                     borderWidth: 1,
                     borderColor: isSelected
-                      ? colorSemanticTokens.accent.primary
-                      : colorSemanticTokens.border.subtle,
-                    backgroundColor: colorSemanticTokens.surface.card,
+                      ? colors.accent.primary
+                      : colors.border.subtle,
+                    backgroundColor: colors.surface.card,
                     padding: spacingTokens.sm,
                     flexDirection: "row",
                     alignItems: "center",
@@ -421,14 +428,14 @@ export default function AddExpenseContextScreen() {
                         width: 42,
                         height: 42,
                         borderRadius: radiusTokens.pill,
-                        backgroundColor: colorSemanticTokens.background.subtle,
+                        backgroundColor: colors.background.subtle,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
                       <Text
                         selectable
-                        style={[typographyScale.headingSm, { color: colorSemanticTokens.text.secondary }]}
+                        style={[typographyScale.headingSm, { color: colors.text.secondary }]}
                       >
                         {title.trim().slice(0, 1).toUpperCase()}
                       </Text>
@@ -437,7 +444,7 @@ export default function AddExpenseContextScreen() {
                       <Text
                         selectable
                         numberOfLines={1}
-                        style={[typographyScale.headingMd, { color: colorSemanticTokens.text.primary }]}
+                        style={[typographyScale.headingMd, { color: colors.text.primary }]}
                       >
                         {title}
                       </Text>
@@ -445,14 +452,14 @@ export default function AddExpenseContextScreen() {
                         <Text
                           selectable
                           numberOfLines={1}
-                          style={[typographyScale.bodySm, { color: colorSemanticTokens.text.secondary }]}
+                          style={[typographyScale.bodySm, { color: colors.text.secondary }]}
                         >
                           {friend.email}
                         </Text>
                       ) : null}
                     </View>
                   </View>
-                  <SelectionDot isSelected={isSelected} />
+                  <SelectionDot isSelected={isSelected} colors={colors} />
                 </Pressable>
               );
             })}
@@ -462,7 +469,7 @@ export default function AddExpenseContextScreen() {
         {error ? (
           <Text
             selectable
-            style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}
+            style={[typographyScale.bodySm, { color: colors.state.danger }]}
           >
             {error}
           </Text>

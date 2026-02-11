@@ -14,7 +14,7 @@ import {
   HeaderPillButton,
   PageHeading,
 } from "@/design/primitives/page-heading";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { ExpenseReceiptCard } from "@/features/groups/components/expense-receipt-card";
@@ -30,10 +30,6 @@ import { formatCents } from "@/features/groups/lib/format-currency";
 import type { PreparedExpenseReceiptUpload } from "@/features/groups/types/expense-receipt.types";
 import { isValidDateOnly } from "@/features/shared/lib/date-only";
 import { getGroupMemberLabel } from "@/features/shared/lib/person-label";
-
-const ink = colorSemanticTokens.text.primary;
-const muted = colorSemanticTokens.text.secondary;
-const accent = colorSemanticTokens.accent.primary;
 
 function getTodayString(): string {
   const d = new Date();
@@ -52,6 +48,10 @@ function getParamValue(value: string | string[] | undefined): string | null {
 }
 
 export default function GroupSettleUpScreen() {
+  const colors = useThemeColors();
+  const ink = colors.text.primary;
+  const muted = colors.text.secondary;
+  const accent = colors.accent.primary;
   const params = useLocalSearchParams<{
     id: string;
     fromUserId: string;
@@ -302,7 +302,7 @@ export default function GroupSettleUpScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 16,
           }}
         >
@@ -325,7 +325,7 @@ export default function GroupSettleUpScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 16,
             gap: 10,
           }}
@@ -362,7 +362,7 @@ export default function GroupSettleUpScreen() {
               borderCurve: "continuous",
               paddingHorizontal: 12,
               paddingVertical: 8,
-              backgroundColor: colorSemanticTokens.background.subtle,
+              backgroundColor: colors.background.subtle,
             }}
           >
             <Text
@@ -385,7 +385,7 @@ export default function GroupSettleUpScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 16,
             gap: 10,
           }}
@@ -422,7 +422,7 @@ export default function GroupSettleUpScreen() {
               borderCurve: "continuous",
               paddingHorizontal: 12,
               paddingVertical: 8,
-              backgroundColor: colorSemanticTokens.background.subtle,
+              backgroundColor: colors.background.subtle,
             }}
           >
             <Text
@@ -445,7 +445,7 @@ export default function GroupSettleUpScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             padding: 16,
             gap: 8,
           }}
@@ -479,7 +479,7 @@ export default function GroupSettleUpScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 8,
         }}
@@ -513,7 +513,7 @@ export default function GroupSettleUpScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 8,
         }}
@@ -557,7 +557,7 @@ export default function GroupSettleUpScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -580,7 +580,7 @@ export default function GroupSettleUpScreen() {
             alignItems: "center",
             borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
           }}
         >
@@ -600,7 +600,7 @@ export default function GroupSettleUpScreen() {
             onChangeText={setAmountText}
             keyboardType="decimal-pad"
             placeholder="0.00"
-            placeholderTextColor={colorSemanticTokens.text.tertiary}
+            placeholderTextColor={colors.text.tertiary}
             selectionColor={accent}
             style={{
               flex: 1,
@@ -649,12 +649,12 @@ export default function GroupSettleUpScreen() {
           value={dateText}
           onChangeText={setDateText}
           placeholder="YYYY-MM-DD"
-          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          placeholderTextColor={colors.text.tertiary}
           selectionColor={accent}
           style={{
             borderRadius: radiusTokens.control,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -683,14 +683,14 @@ export default function GroupSettleUpScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            backgroundColor: colors.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.state.danger,
+              color: colors.state.danger,
               fontSize: 14,
               lineHeight: 18,
               fontWeight: "500",

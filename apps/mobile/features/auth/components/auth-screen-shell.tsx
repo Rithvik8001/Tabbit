@@ -8,7 +8,7 @@ import {
 } from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 
 type AuthScreenShellProps = {
   title: string;
@@ -21,10 +21,11 @@ export function AuthScreenShell({
   children,
   footer,
 }: AuthScreenShellProps) {
+  const colors = useThemeColors();
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.canvas }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -44,7 +45,7 @@ export function AuthScreenShell({
             style={{
               fontSize: 26,
               fontWeight: "600",
-              color: colorSemanticTokens.text.primary,
+              color: colors.text.primary,
               textAlign: "center",
               marginBottom: 40,
             }}

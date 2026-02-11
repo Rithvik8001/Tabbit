@@ -3,7 +3,7 @@ import type { StyleProp, ViewStyle } from "@/design/primitives/sora-native";
 import { ScrollView, View } from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { spacingTokens } from "@/design/tokens/spacing";
 
 type ScreenContainerProps = {
@@ -21,6 +21,7 @@ export function ScreenContainer({
   scrollViewStyle,
   withBackground: _withBackground = true,
 }: ScreenContainerProps) {
+  const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const [viewportHeight, setViewportHeight] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);
@@ -47,7 +48,7 @@ export function ScreenContainer({
     <View
       style={{
         flex: 1,
-        backgroundColor: colorSemanticTokens.background.canvas,
+        backgroundColor: colors.background.canvas,
       }}
     >
       <View
@@ -92,11 +93,11 @@ export function ScreenContainer({
             }}
             style={{
               borderTopWidth: 1,
-              borderTopColor: colorSemanticTokens.border.subtle,
+              borderTopColor: colors.border.subtle,
               paddingHorizontal: spacingTokens.screenHorizontal,
               paddingTop: spacingTokens.sm,
               paddingBottom: Math.max(insets.bottom, spacingTokens.sm),
-              backgroundColor: colorSemanticTokens.background.chrome,
+              backgroundColor: colors.background.chrome,
             }}
           >
             {footer}

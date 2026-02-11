@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "@/design/primitives/sora-native";
 import { Button } from "@/design/primitives/button";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { TextField } from "@/design/primitives/text-field";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 import { useAuth } from "@/features/auth/state/auth-provider";
@@ -13,6 +13,7 @@ import { getDisplayNameValidationMessage } from "@/features/auth/utils/auth-vali
 import { useProfile } from "@/features/profile/hooks/use-profile";
 
 export default function ProfileSettingsScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { user } = useAuth();
   const { profile, isLoading, isSaving, error, saveDisplayName } = useProfile();
@@ -69,7 +70,7 @@ export default function ProfileSettingsScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             Back
@@ -80,7 +81,7 @@ export default function ProfileSettingsScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.accent.primary },
+              { color: colors.accent.primary },
             ]}
           >
             Done
@@ -90,7 +91,7 @@ export default function ProfileSettingsScreen() {
 
       <Text
         selectable
-        style={[typographyScale.displayMd, { color: colorSemanticTokens.text.primary }]}
+        style={[typographyScale.displayMd, { color: colors.text.primary }]}
       >
         Profile
       </Text>
@@ -108,16 +109,16 @@ export default function ProfileSettingsScreen() {
       />
 
       <View style={{ gap: 4 }}>
-        <Text selectable style={[typographyScale.bodyMd, { color: colorSemanticTokens.text.secondary }]}>
+        <Text selectable style={[typographyScale.bodyMd, { color: colors.text.secondary }]}>
           {profileEmail}
         </Text>
-        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.text.tertiary }]}>
+        <Text selectable style={[typographyScale.bodySm, { color: colors.text.tertiary }]}>
           Sign-in method: {providerLabel}
         </Text>
       </View>
 
       {error ? (
-        <Text selectable style={[typographyScale.bodySm, { color: colorSemanticTokens.state.danger }]}>
+        <Text selectable style={[typographyScale.bodySm, { color: colors.state.danger }]}>
           {error}
         </Text>
       ) : null}

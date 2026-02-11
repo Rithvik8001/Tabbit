@@ -13,16 +13,11 @@ import {
   HeaderPillButton,
   PageHeading,
 } from "@/design/primitives/page-heading";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { isValidEmail } from "@/features/auth/utils/auth-validation";
 import { useGroupDetail } from "@/features/groups/hooks/use-group-detail";
 import type { GroupMemberCandidate } from "@/features/groups/types/group-member.types";
-
-const stroke = colorSemanticTokens.border.subtle;
-const ink = colorSemanticTokens.text.primary;
-const muted = colorSemanticTokens.text.secondary;
-const accent = colorSemanticTokens.accent.primary;
 
 const SUGGESTION_LIMIT = 8;
 const DEBOUNCE_MS = 350;
@@ -32,6 +27,11 @@ function getCandidateInputValue(candidate: GroupMemberCandidate) {
 }
 
 export default function AddMemberScreen() {
+  const colors = useThemeColors();
+  const stroke = colors.border.subtle;
+  const ink = colors.text.primary;
+  const muted = colors.text.secondary;
+  const accent = colors.accent.primary;
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const {
@@ -174,7 +174,7 @@ export default function AddMemberScreen() {
         style={{
           borderRadius: radiusTokens.card,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.surface.card,
+          backgroundColor: colors.surface.card,
           padding: 16,
           gap: 10,
         }}
@@ -207,7 +207,7 @@ export default function AddMemberScreen() {
           value={query}
           onChangeText={setQuery}
           placeholder="Name or email"
-          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          placeholderTextColor={colors.text.tertiary}
           selectionColor={accent}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -218,7 +218,7 @@ export default function AddMemberScreen() {
             borderCurve: "continuous",
             borderWidth: 1,
             borderColor: stroke,
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
             paddingHorizontal: 14,
             paddingVertical: 12,
             color: ink,
@@ -246,7 +246,7 @@ export default function AddMemberScreen() {
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.state.danger,
+              color: colors.state.danger,
               fontSize: 13,
               lineHeight: 16,
               fontWeight: "600",
@@ -262,7 +262,7 @@ export default function AddMemberScreen() {
           style={{
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
-            backgroundColor: colorSemanticTokens.surface.card,
+            backgroundColor: colors.surface.card,
             overflow: "hidden",
           }}
         >
@@ -297,8 +297,8 @@ export default function AddMemberScreen() {
                     borderTopWidth: suggestions[0]?.id === candidate.id ? 0 : 1,
                     borderTopColor: stroke,
                     backgroundColor: isSelected
-                      ? colorSemanticTokens.accent.soft
-                      : colorSemanticTokens.surface.cardStrong,
+                      ? colors.accent.soft
+                      : colors.surface.cardStrong,
                     gap: 2,
                   }}
                 >
@@ -339,15 +339,15 @@ export default function AddMemberScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: 12,
           }}
         >
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.state.danger,
+              color: colors.state.danger,
               fontSize: 14,
               lineHeight: 18,
               fontWeight: "600",

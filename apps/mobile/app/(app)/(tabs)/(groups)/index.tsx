@@ -15,7 +15,7 @@ import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-
 import { OverallBalanceStrip } from "@/design/primitives/overall-balance-strip";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { TabTopActions } from "@/design/primitives/tab-top-actions";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -43,6 +43,7 @@ type GroupStatus = {
 };
 
 export default function GroupsTabScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { snapshot } = useHomeSnapshot();
   const { groups, isLoading, error, refresh } = useGroups();
@@ -255,8 +256,8 @@ export default function GroupsTabScreen() {
             value={query}
             onChangeText={setQuery}
             placeholder="Search groups"
-            placeholderTextColor={colorSemanticTokens.text.tertiary}
-            selectionColor={colorSemanticTokens.accent.primary}
+            placeholderTextColor={colors.text.tertiary}
+            selectionColor={colors.accent.primary}
             autoCapitalize="none"
             autoCorrect={false}
             style={[
@@ -265,11 +266,11 @@ export default function GroupsTabScreen() {
                 borderRadius: radiusTokens.control,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.card,
+                borderColor: colors.border.subtle,
+                backgroundColor: colors.surface.card,
                 paddingHorizontal: 14,
                 paddingVertical: 12,
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
               },
             ]}
           />
@@ -296,8 +297,8 @@ export default function GroupsTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.state.danger,
-              backgroundColor: colorSemanticTokens.state.dangerSoft,
+              borderColor: colors.state.danger,
+              backgroundColor: colors.state.dangerSoft,
               padding: spacingTokens.md,
               gap: spacingTokens.sm,
             }}
@@ -306,7 +307,7 @@ export default function GroupsTabScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.state.danger },
+                { color: colors.state.danger },
               ]}
             >
               Could not load groups
@@ -315,7 +316,7 @@ export default function GroupsTabScreen() {
               selectable
               style={[
                 typographyScale.bodySm,
-                { color: colorSemanticTokens.state.danger },
+                { color: colors.state.danger },
               ]}
             >
               {error}
@@ -334,8 +335,8 @@ export default function GroupsTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.state.warning,
-              backgroundColor: colorSemanticTokens.state.warningSoft,
+              borderColor: colors.state.warning,
+              backgroundColor: colors.state.warningSoft,
               padding: spacingTokens.md,
               gap: spacingTokens.sm,
             }}
@@ -344,7 +345,7 @@ export default function GroupsTabScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.state.warning },
+                { color: colors.state.warning },
               ]}
             >
               Balances may be outdated
@@ -353,7 +354,7 @@ export default function GroupsTabScreen() {
               selectable
               style={[
                 typographyScale.bodySm,
-                { color: colorSemanticTokens.state.warning },
+                { color: colors.state.warning },
               ]}
             >
               {balanceError}
@@ -367,7 +368,7 @@ export default function GroupsTabScreen() {
           >
             <ActivityIndicator
               size="small"
-              color={colorSemanticTokens.accent.primary}
+              color={colors.accent.primary}
             />
           </View>
         ) : null}
@@ -378,8 +379,8 @@ export default function GroupsTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.sm,
             }}
@@ -388,7 +389,7 @@ export default function GroupsTabScreen() {
               selectable
               style={[
                 typographyScale.headingMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               {groups.length > 0
@@ -399,7 +400,7 @@ export default function GroupsTabScreen() {
               selectable
               style={[
                 typographyScale.bodyMd,
-                { color: colorSemanticTokens.text.secondary },
+                { color: colors.text.secondary },
               ]}
             >
               {groups.length > 0
@@ -423,8 +424,8 @@ export default function GroupsTabScreen() {
                 borderRadius: radiusTokens.card,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.card,
+                borderColor: colors.border.subtle,
+                backgroundColor: colors.surface.card,
               }}
             >
               <BalanceListRow

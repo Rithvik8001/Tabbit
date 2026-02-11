@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { TextInputProps } from "@/design/primitives/sora-native";
 import { Text, TextInput, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -23,6 +23,7 @@ export function TextField({
   onFocus,
   ...props
 }: TextFieldProps) {
+  const colors = useThemeColors();
   const [isFocused, setIsFocused] = useState(false);
   const resolvedLabel = required && !label.includes("*") ? `${label} *` : label;
 
@@ -42,14 +43,14 @@ export function TextField({
         selectable
         style={[
           typographyScale.labelSm,
-          { color: colorSemanticTokens.text.primary, fontWeight: "500" },
+          { color: colors.text.primary, fontWeight: "500" },
         ]}
       >
         {resolvedLabel}
       </Text>
       <TextInput
-        selectionColor={colorSemanticTokens.accent.primary}
-        placeholderTextColor={colorSemanticTokens.text.tertiary}
+        selectionColor={colors.accent.primary}
+        placeholderTextColor={colors.text.tertiary}
         onFocus={handleFocus}
         onBlur={handleBlur}
         style={[
@@ -60,12 +61,12 @@ export function TextField({
             borderCurve: "continuous",
             borderWidth: 1.5,
             borderColor: error
-              ? colorSemanticTokens.state.danger
+              ? colors.state.danger
               : isFocused
-                ? colorSemanticTokens.accent.primary
+                ? colors.accent.primary
                 : "transparent",
-            backgroundColor: colorSemanticTokens.background.subtle,
-            color: colorSemanticTokens.text.primary,
+            backgroundColor: colors.background.subtle,
+            color: colors.text.primary,
             paddingHorizontal: spacingTokens.md,
             paddingVertical: 12,
           },
@@ -77,7 +78,7 @@ export function TextField({
           selectable
           style={[
             typographyScale.bodySm,
-            { color: colorSemanticTokens.state.danger },
+            { color: colors.state.danger },
           ]}
         >
           {error}
@@ -87,7 +88,7 @@ export function TextField({
           selectable
           style={[
             typographyScale.bodySm,
-            { color: colorSemanticTokens.text.tertiary },
+            { color: colors.text.tertiary },
           ]}
         >
           {helperText}

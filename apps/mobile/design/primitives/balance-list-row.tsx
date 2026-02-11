@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -18,16 +18,19 @@ type BalanceListRowProps = {
   onPress?: () => void;
 };
 
-function statusColor(tone: BalanceRowTone): string {
+function statusColor(
+  tone: BalanceRowTone,
+  colors: ReturnType<typeof useThemeColors>,
+): string {
   if (tone === "positive") {
-    return colorSemanticTokens.financial.positive;
+    return colors.financial.positive;
   }
 
   if (tone === "negative") {
-    return colorSemanticTokens.financial.negative;
+    return colors.financial.negative;
   }
 
-  return colorSemanticTokens.text.secondary;
+  return colors.text.secondary;
 }
 
 export function BalanceListRow({
@@ -40,7 +43,8 @@ export function BalanceListRow({
   tone = "neutral",
   onPress,
 }: BalanceListRowProps) {
-  const resolvedStatusColor = statusColor(tone);
+  const colors = useThemeColors();
+  const resolvedStatusColor = statusColor(tone, colors);
 
   const content = (
     <View
@@ -58,7 +62,7 @@ export function BalanceListRow({
           height: 48,
           borderRadius: radiusTokens.pill,
           borderCurve: "continuous",
-          backgroundColor: colorSemanticTokens.background.subtle,
+          backgroundColor: colors.background.subtle,
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -71,7 +75,7 @@ export function BalanceListRow({
           <Text
             selectable
             style={{
-              color: colorSemanticTokens.text.secondary,
+              color: colors.text.secondary,
               fontSize: 16,
               lineHeight: 20,
               fontWeight: "700",
@@ -88,7 +92,7 @@ export function BalanceListRow({
           numberOfLines={1}
           style={[
             typographyScale.headingMd,
-            { color: colorSemanticTokens.text.primary },
+            { color: colors.text.primary },
           ]}
         >
           {title}
@@ -99,7 +103,7 @@ export function BalanceListRow({
             numberOfLines={1}
             style={[
               typographyScale.bodySm,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             {subtitle}

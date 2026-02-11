@@ -14,7 +14,7 @@ import { FilterChipRow } from "@/design/primitives/filter-chip-row";
 import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-cta";
 import { ScreenContainer } from "@/design/primitives/screen-container";
 import { TabTopActions } from "@/design/primitives/tab-top-actions";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -149,6 +149,7 @@ function matchesImpactFilter(
 }
 
 export default function ActivityTabScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { items, isLoading, isLoadingMore, error, refresh, hasMore, loadMore } =
     useActivityFeed();
@@ -200,8 +201,8 @@ export default function ActivityTabScreen() {
             value={query}
             onChangeText={setQuery}
             placeholder="Search activity"
-            placeholderTextColor={colorSemanticTokens.text.tertiary}
-            selectionColor={colorSemanticTokens.accent.primary}
+            placeholderTextColor={colors.text.tertiary}
+            selectionColor={colors.accent.primary}
             autoCapitalize="none"
             autoCorrect={false}
             style={[
@@ -210,11 +211,11 @@ export default function ActivityTabScreen() {
                 borderRadius: radiusTokens.control,
                 borderCurve: "continuous",
                 borderWidth: 1,
-                borderColor: colorSemanticTokens.border.subtle,
-                backgroundColor: colorSemanticTokens.surface.card,
+                borderColor: colors.border.subtle,
+                backgroundColor: colors.surface.card,
                 paddingHorizontal: 14,
                 paddingVertical: 12,
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
               },
             ]}
           />
@@ -239,8 +240,8 @@ export default function ActivityTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.state.danger,
-              backgroundColor: colorSemanticTokens.state.dangerSoft,
+              borderColor: colors.state.danger,
+              backgroundColor: colors.state.dangerSoft,
               padding: spacingTokens.md,
               gap: spacingTokens.sm,
             }}
@@ -249,7 +250,7 @@ export default function ActivityTabScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.state.danger },
+                { color: colors.state.danger },
               ]}
             >
               Could not load activity
@@ -258,7 +259,7 @@ export default function ActivityTabScreen() {
               selectable
               style={[
                 typographyScale.bodySm,
-                { color: colorSemanticTokens.state.danger },
+                { color: colors.state.danger },
               ]}
             >
               {error}
@@ -273,7 +274,7 @@ export default function ActivityTabScreen() {
           >
             <ActivityIndicator
               size="small"
-              color={colorSemanticTokens.accent.primary}
+              color={colors.accent.primary}
             />
           </View>
         ) : null}
@@ -284,8 +285,8 @@ export default function ActivityTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.sm,
             }}
@@ -294,7 +295,7 @@ export default function ActivityTabScreen() {
               selectable
               style={[
                 typographyScale.headingMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               {hasActiveFilters ? "No activity matches this view" : "No activity yet"}
@@ -303,7 +304,7 @@ export default function ActivityTabScreen() {
               selectable
               style={[
                 typographyScale.bodyMd,
-                { color: colorSemanticTokens.text.secondary },
+                { color: colors.text.secondary },
               ]}
             >
               {hasActiveFilters
@@ -320,8 +321,8 @@ export default function ActivityTabScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
             }}
           >
             <BalanceListRow

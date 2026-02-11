@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Pressable, Text } from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { AuthInputGroup } from "@/features/auth/components/auth-input-group";
 import { AuthScreenShell } from "@/features/auth/components/auth-screen-shell";
 import { useAuth } from "@/features/auth/state/auth-provider";
@@ -32,6 +32,7 @@ function maskEmail(email: string): string {
 }
 
 export default function VerifySignupOtpScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const params = useLocalSearchParams<{ email?: string }>();
   const emailFromParams = getParamValue(params.email);
@@ -151,7 +152,7 @@ export default function VerifySignupOtpScreen() {
         style={{
           fontSize: 14,
           fontWeight: "400",
-          color: colorSemanticTokens.text.secondary,
+          color: colors.text.secondary,
           textAlign: "center",
           lineHeight: 21,
         }}
@@ -185,7 +186,7 @@ export default function VerifySignupOtpScreen() {
           style={{
             fontSize: 13,
             fontWeight: "400",
-            color: colorSemanticTokens.state.success,
+            color: colors.state.success,
             textAlign: "center",
           }}
         >
@@ -213,7 +214,7 @@ export default function VerifySignupOtpScreen() {
           style={{
             fontSize: 13,
             fontWeight: "600",
-            color: colorSemanticTokens.accent.primary,
+            color: colors.accent.primary,
           }}
         >
           {resendLabel}
@@ -226,7 +227,7 @@ export default function VerifySignupOtpScreen() {
             style={{
               fontSize: 13,
               fontWeight: "600",
-              color: colorSemanticTokens.accent.primary,
+              color: colors.accent.primary,
             }}
           >
             Back to sign up

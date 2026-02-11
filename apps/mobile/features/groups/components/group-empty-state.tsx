@@ -1,23 +1,23 @@
 import { Text, View } from "@/design/primitives/sora-native";
 
 import { Button } from "@/design/primitives/button";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
-
-const ink = colorSemanticTokens.text.primary;
-const muted = colorSemanticTokens.text.secondary;
 
 type GroupEmptyStateProps = {
   onCreate: () => void;
 };
 
 export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
+  const colors = useThemeColors();
+  const ink = colors.text.primary;
+  const muted = colors.text.secondary;
   return (
     <View
       style={{
         borderRadius: radiusTokens.card,
         borderCurve: "continuous",
-        backgroundColor: colorSemanticTokens.surface.card,
+        backgroundColor: colors.surface.card,
         padding: 24,
         gap: 12,
         alignItems: "center",
@@ -31,7 +31,7 @@ export function GroupEmptyState({ onCreate }: GroupEmptyStateProps) {
           borderCurve: "continuous",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: colorSemanticTokens.accent.soft,
+          backgroundColor: colors.accent.soft,
         }}
       >
         <Text selectable style={{ fontSize: 30, lineHeight: 34 }}>

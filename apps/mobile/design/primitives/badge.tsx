@@ -1,6 +1,6 @@
 import { Text, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -10,36 +10,40 @@ type BadgeProps = {
   tone?: "accent" | "success" | "danger" | "neutral";
 };
 
-function getBadgeColors(tone: NonNullable<BadgeProps["tone"]>) {
+function getBadgeColors(
+  tone: NonNullable<BadgeProps["tone"]>,
+  colors: ReturnType<typeof useThemeColors>,
+) {
   if (tone === "success") {
     return {
-      backgroundColor: colorSemanticTokens.state.successSoft,
-      color: colorSemanticTokens.state.success,
+      backgroundColor: colors.state.successSoft,
+      color: colors.state.success,
     };
   }
 
   if (tone === "danger") {
     return {
-      backgroundColor: colorSemanticTokens.state.dangerSoft,
-      color: colorSemanticTokens.state.danger,
+      backgroundColor: colors.state.dangerSoft,
+      color: colors.state.danger,
     };
   }
 
   if (tone === "accent") {
     return {
-      backgroundColor: colorSemanticTokens.accent.soft,
-      color: colorSemanticTokens.accent.primary,
+      backgroundColor: colors.accent.soft,
+      color: colors.accent.primary,
     };
   }
 
   return {
-    backgroundColor: colorSemanticTokens.background.subtle,
-    color: colorSemanticTokens.text.secondary,
+    backgroundColor: colors.background.subtle,
+    color: colors.text.secondary,
   };
 }
 
 export function Badge({ label, tone = "neutral" }: BadgeProps) {
-  const palette = getBadgeColors(tone);
+  const colors = useThemeColors();
+  const palette = getBadgeColors(tone, colors);
 
   return (
     <View

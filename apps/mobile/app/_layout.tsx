@@ -5,24 +5,25 @@ import { useEffect } from "react";
 import { ActivityIndicator, View } from "@/design/primitives/sora-native";
 
 import { AppProvider } from "@/providers/app-provider";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/features/auth/state/auth-provider";
 
 void SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { session, isAuthLoading } = useAuth();
+  const { colors, isHydrated } = useTheme();
 
   useEffect(() => {
-    if (!isAuthLoading) {
+    if (!isAuthLoading && isHydrated) {
       void SplashScreen.hideAsync();
     }
-  }, [isAuthLoading]);
+  }, [isAuthLoading, isHydrated]);
 
-  if (isAuthLoading) {
+  if (isAuthLoading || !isHydrated) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator color={colorSemanticTokens.accent.primary} />
+        <ActivityIndicator color={colors.accent.primary} />
       </View>
     );
   }
@@ -31,14 +32,14 @@ function RootNavigator() {
     <Stack
       screenOptions={{
         contentStyle: {
-          backgroundColor: colorSemanticTokens.background.canvas,
+          backgroundColor: colors.background.canvas,
         },
         headerShadowVisible: false,
         headerBackButtonDisplayMode: "minimal",
-        headerTintColor: colorSemanticTokens.text.primary,
+        headerTintColor: colors.text.primary,
         headerTitleStyle: {
           fontSize: 17,
-          color: colorSemanticTokens.text.primary,
+          color: colors.text.primary,
         },
       }}
     >
@@ -57,8 +58,17 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <AppProvider>
-      <StatusBar style="dark" />
-      <RootNavigator />
+      <AppChrome />
     </AppProvider>
+  );
+}
+
+function AppChrome() {
+  const { resolvedTheme } = useTheme();
+  return (
+    <>
+      <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
+      <RootNavigator />
+    </>
   );
 }

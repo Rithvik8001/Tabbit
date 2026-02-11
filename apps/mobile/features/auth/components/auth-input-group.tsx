@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "@/design/primitives/sora-native";
 import type { TextInputProps } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 
 export type FieldConfig = TextInputProps & {
@@ -16,7 +16,13 @@ type AuthInputGroupProps = {
   fields: FieldConfig[];
 };
 
-function AuthInputField({ field }: { field: FieldConfig }) {
+function AuthInputField({
+  field,
+  colors,
+}: {
+  field: FieldConfig;
+  colors: ReturnType<typeof useThemeColors>;
+}) {
   const [isSecure, setIsSecure] = useState(field.secureTextEntry ?? false);
   const [isFocused, setIsFocused] = useState(false);
   const hasEyeToggle = field.secureTextEntry;
@@ -28,7 +34,7 @@ function AuthInputField({ field }: { field: FieldConfig }) {
         style={{
           fontSize: 13,
           fontWeight: "500",
-          color: colorSemanticTokens.text.primary,
+          color: colors.text.primary,
         }}
       >
         {field.placeholder}
@@ -38,22 +44,22 @@ function AuthInputField({ field }: { field: FieldConfig }) {
           flexDirection: "row",
           alignItems: "center",
           backgroundColor: hasError
-            ? "rgba(239, 68, 68, 0.06)"
-            : colorSemanticTokens.background.subtle,
+            ? colors.state.dangerSoft
+            : colors.background.subtle,
           borderRadius: radiusTokens.control,
           borderCurve: "continuous",
           borderWidth: 1.5,
           borderColor: hasError
-            ? colorSemanticTokens.state.danger
+            ? colors.state.danger
             : isFocused
-              ? colorSemanticTokens.accent.primary
+              ? colors.accent.primary
               : "transparent",
         }}
       >
         <TextInput
           {...field}
           secureTextEntry={isSecure}
-          placeholderTextColor={colorSemanticTokens.text.tertiary}
+          placeholderTextColor={colors.text.tertiary}
           onFocus={(e) => {
             setIsFocused(true);
             field.onFocus?.(e);
@@ -68,7 +74,7 @@ function AuthInputField({ field }: { field: FieldConfig }) {
             paddingVertical: 14,
             fontSize: 16,
             fontWeight: "400",
-            color: colorSemanticTokens.text.primary,
+            color: colors.text.primary,
           }}
         />
         {hasEyeToggle ? (
@@ -80,7 +86,7 @@ function AuthInputField({ field }: { field: FieldConfig }) {
             <Ionicons
               name={isSecure ? "eye-off-outline" : "eye-outline"}
               size={22}
-              color={colorSemanticTokens.text.tertiary}
+              color={colors.text.tertiary}
             />
           </Pressable>
         ) : null}
@@ -90,7 +96,7 @@ function AuthInputField({ field }: { field: FieldConfig }) {
           style={{
             fontSize: 12,
             fontWeight: "400",
-            color: colorSemanticTokens.state.danger,
+            color: colors.state.danger,
           }}
         >
           {field.error}
@@ -101,10 +107,11 @@ function AuthInputField({ field }: { field: FieldConfig }) {
 }
 
 export function AuthInputGroup({ fields }: AuthInputGroupProps) {
+  const colors = useThemeColors();
   return (
     <View style={{ gap: 16 }}>
       {fields.map((field, index) => (
-        <AuthInputField key={index} field={field} />
+        <AuthInputField key={index} field={field} colors={colors} />
       ))}
     </View>
   );

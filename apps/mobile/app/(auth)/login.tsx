@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/primitives/button";
 import { HeaderPillButton } from "@/design/primitives/page-heading";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { useAuth } from "@/features/auth/state/auth-provider";
 import { loginSchema, parseFormErrors } from "@/features/auth/utils/auth-schemas";
@@ -29,6 +29,7 @@ function getParamValue(value: string | string[] | undefined): string | null {
 }
 
 export default function LoginScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ verified?: string }>();
@@ -83,7 +84,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colorSemanticTokens.background.canvas }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.canvas }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -115,8 +116,8 @@ export default function LoginScreen() {
               borderRadius: 28,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               paddingHorizontal: 18,
               paddingVertical: 18,
               gap: 12,
@@ -135,7 +136,7 @@ export default function LoginScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
                 fontSize: 32,
                 lineHeight: 40,
                 fontWeight: "800",
@@ -147,7 +148,7 @@ export default function LoginScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.secondary,
+                color: colors.text.secondary,
                 fontSize: 16,
                 lineHeight: 24,
                 fontWeight: "500",
@@ -163,8 +164,8 @@ export default function LoginScreen() {
               borderRadius: 28,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               paddingHorizontal: 16,
               paddingVertical: 16,
               gap: 12,
@@ -173,7 +174,7 @@ export default function LoginScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.primary,
+                color: colors.text.primary,
                 fontSize: 20,
                 lineHeight: 26,
                 fontWeight: "700",
@@ -186,7 +187,7 @@ export default function LoginScreen() {
               <Text
                 selectable
                 style={{
-                  color: colorSemanticTokens.text.secondary,
+                  color: colors.text.secondary,
                   fontSize: 15,
                   lineHeight: 20,
                   fontWeight: "600",
@@ -201,24 +202,24 @@ export default function LoginScreen() {
                   clearFieldError("email");
                 }}
                 placeholder="Your email"
-                placeholderTextColor={colorSemanticTokens.text.tertiary}
+                placeholderTextColor={colors.text.tertiary}
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="email-address"
                 textContentType="emailAddress"
                 autoComplete="email"
-                selectionColor={colorSemanticTokens.accent.primary}
+                selectionColor={colors.accent.primary}
                 style={{
                   borderRadius: radiusTokens.xl,
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: fieldErrors.email
-                    ? colorSemanticTokens.state.danger
-                    : colorSemanticTokens.border.subtle,
-                  backgroundColor: colorSemanticTokens.background.subtle,
+                    ? colors.state.danger
+                    : colors.border.subtle,
+                  backgroundColor: colors.background.subtle,
                   paddingHorizontal: 20,
                   paddingVertical: 16,
-                  color: colorSemanticTokens.text.primary,
+                  color: colors.text.primary,
                   fontSize: 16,
                   lineHeight: 22,
                   fontWeight: "500",
@@ -228,7 +229,7 @@ export default function LoginScreen() {
                 <Text
                   selectable
                   style={{
-                    color: colorSemanticTokens.state.danger,
+                    color: colors.state.danger,
                     fontSize: 12,
                     lineHeight: 17,
                     fontWeight: "500",
@@ -250,7 +251,7 @@ export default function LoginScreen() {
                 <Text
                   selectable
                   style={{
-                    color: colorSemanticTokens.text.secondary,
+                    color: colors.text.secondary,
                     fontSize: 15,
                     lineHeight: 20,
                     fontWeight: "600",
@@ -264,7 +265,7 @@ export default function LoginScreen() {
                     <Text
                       selectable
                       style={{
-                        color: colorSemanticTokens.accent.primary,
+                        color: colors.accent.primary,
                         fontSize: 15,
                         lineHeight: 20,
                         fontWeight: "700",
@@ -284,9 +285,9 @@ export default function LoginScreen() {
                   borderCurve: "continuous",
                   borderWidth: 1,
                   borderColor: fieldErrors.password
-                    ? colorSemanticTokens.state.danger
-                    : colorSemanticTokens.border.subtle,
-                  backgroundColor: colorSemanticTokens.background.subtle,
+                    ? colors.state.danger
+                    : colors.border.subtle,
+                  backgroundColor: colors.background.subtle,
                   paddingHorizontal: 20,
                 }}
               >
@@ -297,17 +298,17 @@ export default function LoginScreen() {
                     clearFieldError("password");
                   }}
                   placeholder="Enter your password"
-                  placeholderTextColor={colorSemanticTokens.text.tertiary}
+                  placeholderTextColor={colors.text.tertiary}
                   secureTextEntry={isPasswordHidden}
                   autoCapitalize="none"
                   autoCorrect={false}
                   textContentType="password"
                   autoComplete="password"
-                  selectionColor={colorSemanticTokens.accent.primary}
+                  selectionColor={colors.accent.primary}
                   style={{
                     flex: 1,
                     paddingVertical: 16,
-                    color: colorSemanticTokens.text.primary,
+                    color: colors.text.primary,
                     fontSize: 16,
                     lineHeight: 22,
                     fontWeight: "500",
@@ -317,7 +318,7 @@ export default function LoginScreen() {
                   <Ionicons
                     name={isPasswordHidden ? "eye-off-outline" : "eye-outline"}
                     size={24}
-                    color={colorSemanticTokens.text.tertiary}
+                    color={colors.text.tertiary}
                   />
                 </Pressable>
               </View>
@@ -325,7 +326,7 @@ export default function LoginScreen() {
                 <Text
                   selectable
                   style={{
-                    color: colorSemanticTokens.state.danger,
+                    color: colors.state.danger,
                     fontSize: 12,
                     lineHeight: 17,
                     fontWeight: "500",
@@ -340,7 +341,7 @@ export default function LoginScreen() {
               <Text
                 selectable
                 style={{
-                  color: colorSemanticTokens.state.danger,
+                  color: colors.state.danger,
                   fontSize: 12,
                   lineHeight: 17,
                   fontWeight: "500",
@@ -355,7 +356,7 @@ export default function LoginScreen() {
               <Text
                 selectable
                 style={{
-                  color: colorSemanticTokens.state.success,
+                  color: colors.state.success,
                   fontSize: 12,
                   lineHeight: 17,
                   fontWeight: "500",
@@ -387,7 +388,7 @@ export default function LoginScreen() {
             <Text
               selectable
               style={{
-                color: colorSemanticTokens.text.tertiary,
+                color: colors.text.tertiary,
                 fontSize: 14,
                 lineHeight: 20,
                 fontWeight: "500",
@@ -400,7 +401,7 @@ export default function LoginScreen() {
                 <Text
                   selectable
                   style={{
-                    color: colorSemanticTokens.accent.primary,
+                    color: colors.accent.primary,
                     fontSize: 14,
                     lineHeight: 20,
                     fontWeight: "700",

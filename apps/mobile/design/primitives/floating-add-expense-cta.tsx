@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "@/design/primitives/sora-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { typographyScale } from "@/design/tokens/typography";
 
@@ -15,6 +15,7 @@ export function FloatingAddExpenseCta({
   onPress,
   label = "Add expense",
 }: FloatingAddExpenseCtaProps) {
+  const colors = useThemeColors();
   const insets = useSafeAreaInsets();
 
   return (
@@ -37,20 +38,20 @@ export function FloatingAddExpenseCta({
           flexDirection: "row",
           alignItems: "center",
           gap: 10,
-          backgroundColor: colorSemanticTokens.accent.primary,
-          boxShadow: "0 10px 22px rgba(16, 16, 28, 0.25)",
+          backgroundColor: colors.accent.primary,
+          boxShadow: `0 10px 22px ${colors.accent.softStrong}`,
         }}
       >
         <Ionicons
           name="receipt-outline"
           size={20}
-          color={colorSemanticTokens.text.inverse}
+          color={colors.text.inverse}
         />
         <Text
           selectable
           style={[
             typographyScale.headingMd,
-            { color: colorSemanticTokens.text.inverse },
+            { color: colors.text.inverse },
           ]}
         >
           {label}

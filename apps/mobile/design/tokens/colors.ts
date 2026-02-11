@@ -51,7 +51,9 @@ export type ColorSemanticTokens = {
   };
 };
 
-export const colorSemanticTokens: ColorSemanticTokens = {
+export type ResolvedTheme = "light" | "dark";
+
+export const lightColorSemanticTokens: ColorSemanticTokens = {
   background: {
     canvas: "#F3F1F6",
     chrome: "#FFFFFF",
@@ -103,5 +105,83 @@ export const colorSemanticTokens: ColorSemanticTokens = {
     neutral: "#1A1A1A",
   },
 };
+
+export const darkColorSemanticTokens: ColorSemanticTokens = {
+  background: {
+    canvas: "#000000",
+    chrome: "#000000",
+    subtle: "#0A0A0D",
+    overlay: "rgba(0, 0, 0, 0.62)",
+    gradientStart: "#000000",
+    gradientEnd: "#0A0A0D",
+  },
+  surface: {
+    card: "#0B0B0F",
+    cardStrong: "#121218",
+    cardMuted: "#17171C",
+    glass: "#0B0B0F",
+    glassStrong: "#14141A",
+  },
+  border: {
+    subtle: "#1E1E26",
+    muted: "#2A2A34",
+    strong: "#3A3A48",
+    accent: "#7C4DFF",
+    glass: "#232330",
+  },
+  text: {
+    primary: "#F5F5F7",
+    secondary: "#B7BAC4",
+    tertiary: "#8F93A1",
+    inverse: "#FFFFFF",
+    accent: "#B89FFF",
+  },
+  accent: {
+    primary: "#7C4DFF",
+    soft: "rgba(124, 77, 255, 0.20)",
+    softStrong: "rgba(124, 77, 255, 0.32)",
+    contrast: "#E8E0FF",
+  },
+  state: {
+    success: "#34D399",
+    successSoft: "rgba(52, 211, 153, 0.20)",
+    warning: "#FBBF24",
+    warningSoft: "rgba(251, 191, 36, 0.20)",
+    danger: "#F87171",
+    dangerSoft: "rgba(248, 113, 113, 0.20)",
+    info: "#60A5FA",
+    infoSoft: "rgba(96, 165, 250, 0.20)",
+  },
+  financial: {
+    positive: "#34D399",
+    negative: "#F87171",
+    neutral: "#F5F5F7",
+  },
+};
+
+export function getColorSemanticTokens(theme: ResolvedTheme): ColorSemanticTokens {
+  return theme === "dark" ? darkColorSemanticTokens : lightColorSemanticTokens;
+}
+
+const activeTokensState: { current: ColorSemanticTokens } = {
+  current: lightColorSemanticTokens,
+};
+
+export function setActiveColorSemanticTokens(theme: ResolvedTheme) {
+  activeTokensState.current = getColorSemanticTokens(theme);
+}
+
+export function getActiveColorSemanticTokens(): ColorSemanticTokens {
+  return activeTokensState.current;
+}
+
+export const colorSemanticTokens: ColorSemanticTokens = new Proxy(
+  {} as ColorSemanticTokens,
+  {
+    get(_target, key: keyof ColorSemanticTokens) {
+      return activeTokensState.current[key];
+    },
+  },
+) as ColorSemanticTokens;
 
 export type FinancialPolarity = "positive" | "negative" | "neutral";

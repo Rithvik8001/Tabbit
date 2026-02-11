@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -16,6 +16,7 @@ export function OverallBalanceStrip({
   netBalanceCents,
   onFilterPress,
 }: OverallBalanceStripProps) {
+  const colors = useThemeColors();
   const isNegative = netBalanceCents < 0;
   const isPositive = netBalanceCents > 0;
 
@@ -26,10 +27,10 @@ export function OverallBalanceStrip({
       : "Overall, you are settled up";
 
   const amountColor = isPositive
-    ? colorSemanticTokens.financial.positive
+    ? colors.financial.positive
     : isNegative
-      ? colorSemanticTokens.financial.negative
-      : colorSemanticTokens.text.secondary;
+      ? colors.financial.negative
+      : colors.text.secondary;
 
   const amount = formatCents(Math.abs(netBalanceCents));
 
@@ -38,9 +39,9 @@ export function OverallBalanceStrip({
       style={{
         borderRadius: radiusTokens.card,
         borderCurve: "continuous",
-        backgroundColor: colorSemanticTokens.surface.card,
+        backgroundColor: colors.surface.card,
         borderWidth: 1,
-        borderColor: colorSemanticTokens.border.subtle,
+        borderColor: colors.border.subtle,
         paddingHorizontal: spacingTokens.lg,
         paddingVertical: spacingTokens.md,
         flexDirection: "row",
@@ -53,7 +54,7 @@ export function OverallBalanceStrip({
         selectable
         style={[
           typographyScale.headingMd,
-          { color: colorSemanticTokens.text.primary, flex: 1 },
+          { color: colors.text.primary, flex: 1 },
         ]}
       >
         {textPrefix} <Text style={{ color: amountColor }}>{amount}</Text>
@@ -70,13 +71,13 @@ export function OverallBalanceStrip({
             borderCurve: "continuous",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: colorSemanticTokens.background.subtle,
+            backgroundColor: colors.background.subtle,
           }}
         >
           <Ionicons
             name="options-outline"
             size={18}
-            color={colorSemanticTokens.text.secondary}
+            color={colors.text.secondary}
           />
         </Pressable>
       ) : null}

@@ -1,7 +1,7 @@
 import { Text, View } from "@/design/primitives/sora-native";
 
 import { LiquidSurface } from "@/design/primitives/liquid-surface";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
 
@@ -12,12 +12,13 @@ type StatTileProps = {
 };
 
 export function StatTile({ label, value, tone = "neutral" }: StatTileProps) {
+  const colors = useThemeColors();
   const valueColor =
     tone === "positive"
-      ? colorSemanticTokens.financial.positive
+      ? colors.financial.positive
       : tone === "negative"
-        ? colorSemanticTokens.financial.negative
-        : colorSemanticTokens.text.primary;
+        ? colors.financial.negative
+        : colors.text.primary;
 
   return (
     <LiquidSurface
@@ -31,7 +32,7 @@ export function StatTile({ label, value, tone = "neutral" }: StatTileProps) {
         style={[
           typographyScale.labelSm,
           {
-            color: colorSemanticTokens.text.secondary,
+            color: colors.text.secondary,
             fontWeight: "500",
           },
         ]}

@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView, Text } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { fontFamilyTokens, typographyScale } from "@/design/tokens/typography";
@@ -19,6 +19,7 @@ export function FilterChipRow<T extends string>({
   activeKey,
   onSelect,
 }: FilterChipRowProps<T>) {
+  const colors = useThemeColors();
   return (
     <ScrollView
       horizontal
@@ -41,12 +42,12 @@ export function FilterChipRow<T extends string>({
               paddingHorizontal: spacingTokens.md,
               paddingVertical: spacingTokens.sm,
               backgroundColor: isActive
-                ? colorSemanticTokens.accent.primary
-                : colorSemanticTokens.surface.card,
+                ? colors.accent.primary
+                : colors.surface.card,
               borderWidth: isActive ? 0 : 1,
               borderColor: isActive
                 ? undefined
-                : colorSemanticTokens.border.subtle,
+                : colors.border.subtle,
             }}
           >
             <Text
@@ -54,8 +55,8 @@ export function FilterChipRow<T extends string>({
                 typographyScale.labelMd,
                 {
                   color: isActive
-                    ? colorSemanticTokens.text.inverse
-                    : colorSemanticTokens.text.secondary,
+                    ? colors.text.inverse
+                    : colors.text.secondary,
                   fontFamily: isActive
                     ? fontFamilyTokens.bodySemiBold
                     : fontFamilyTokens.bodyMedium,

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -16,9 +16,11 @@ type TabTopActionsProps = {
 function IconCircleButton({
   icon,
   onPress,
+  colors,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   onPress?: () => void;
+  colors: ReturnType<typeof useThemeColors>;
 }) {
   return (
     <Pressable
@@ -32,16 +34,16 @@ function IconCircleButton({
         borderCurve: "continuous",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: colorSemanticTokens.surface.card,
+        backgroundColor: colors.surface.card,
         borderWidth: 1,
-        borderColor: colorSemanticTokens.border.subtle,
+        borderColor: colors.border.subtle,
         opacity: onPress ? 1 : 0.6,
       }}
     >
       <Ionicons
         name={icon}
         size={20}
-        color={colorSemanticTokens.text.secondary}
+        color={colors.text.secondary}
       />
     </Pressable>
   );
@@ -53,6 +55,7 @@ export function TabTopActions({
   onSearchPress,
   onFilterPress,
 }: TabTopActionsProps) {
+  const colors = useThemeColors();
   return (
     <View
       style={{
@@ -63,10 +66,16 @@ export function TabTopActions({
         gap: spacingTokens.sm,
       }}
     >
-      <IconCircleButton icon="search" onPress={onSearchPress} />
+      <IconCircleButton icon="search" onPress={onSearchPress} colors={colors} />
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacingTokens.sm }}>
-        {onFilterPress ? <IconCircleButton icon="options-outline" onPress={onFilterPress} /> : null}
+        {onFilterPress ? (
+          <IconCircleButton
+            icon="options-outline"
+            onPress={onFilterPress}
+            colors={colors}
+          />
+        ) : null}
 
         {rightActionLabel && onRightActionPress ? (
           <Pressable
@@ -84,7 +93,7 @@ export function TabTopActions({
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.accent.primary },
+                { color: colors.accent.primary },
               ]}
             >
               {rightActionLabel}

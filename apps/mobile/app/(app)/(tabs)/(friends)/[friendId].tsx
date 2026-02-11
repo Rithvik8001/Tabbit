@@ -8,7 +8,7 @@ import {
   View,
 } from "@/design/primitives/sora-native";
 
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -46,6 +46,7 @@ function shortDate(value: string): string {
 }
 
 export default function FriendDetailScreen() {
+  const colors = useThemeColors();
   const { friendId } = useLocalSearchParams<{ friendId: string }>();
   const router = useRouter();
 
@@ -129,7 +130,7 @@ export default function FriendDetailScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             Back
@@ -141,7 +142,7 @@ export default function FriendDetailScreen() {
         <View style={{ paddingTop: spacingTokens.xl, alignItems: "center" }}>
           <ActivityIndicator
             size="large"
-            color={colorSemanticTokens.accent.primary}
+            color={colors.accent.primary}
           />
         </View>
       ) : null}
@@ -152,8 +153,8 @@ export default function FriendDetailScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.state.danger,
-            backgroundColor: colorSemanticTokens.state.dangerSoft,
+            borderColor: colors.state.danger,
+            backgroundColor: colors.state.dangerSoft,
             padding: spacingTokens.md,
             gap: spacingTokens.sm,
           }}
@@ -162,7 +163,7 @@ export default function FriendDetailScreen() {
             selectable
             style={[
               typographyScale.headingSm,
-              { color: colorSemanticTokens.state.danger },
+              { color: colors.state.danger },
             ]}
           >
             {error}
@@ -172,7 +173,7 @@ export default function FriendDetailScreen() {
               selectable
               style={[
                 typographyScale.headingSm,
-                { color: colorSemanticTokens.accent.primary },
+                { color: colors.accent.primary },
               ]}
             >
               Retry
@@ -188,8 +189,8 @@ export default function FriendDetailScreen() {
               borderRadius: radiusTokens.card,
               borderCurve: "continuous",
               borderWidth: 1,
-              borderColor: colorSemanticTokens.border.subtle,
-              backgroundColor: colorSemanticTokens.surface.card,
+              borderColor: colors.border.subtle,
+              backgroundColor: colors.surface.card,
               padding: spacingTokens.cardPadding,
               gap: spacingTokens.sm,
             }}
@@ -198,7 +199,7 @@ export default function FriendDetailScreen() {
               selectable
               style={[
                 typographyScale.displayMd,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               {friendName}
@@ -210,10 +211,10 @@ export default function FriendDetailScreen() {
                 typographyScale.headingMd,
                 {
                   color: isSettled
-                    ? colorSemanticTokens.text.secondary
+                    ? colors.text.secondary
                     : isPositive
-                      ? colorSemanticTokens.financial.positive
-                      : colorSemanticTokens.financial.negative,
+                      ? colors.financial.positive
+                      : colors.financial.negative,
                 },
               ]}
             >
@@ -241,7 +242,7 @@ export default function FriendDetailScreen() {
                   style={{
                     borderRadius: radiusTokens.pill,
                     borderCurve: "continuous",
-                    backgroundColor: colorSemanticTokens.accent.primary,
+                    backgroundColor: colors.accent.primary,
                     paddingHorizontal: 14,
                     paddingVertical: 8,
                   }}
@@ -250,7 +251,7 @@ export default function FriendDetailScreen() {
                     selectable
                     style={[
                       typographyScale.headingSm,
-                      { color: colorSemanticTokens.text.inverse },
+                      { color: colors.text.inverse },
                     ]}
                   >
                     Settle up
@@ -263,7 +264,7 @@ export default function FriendDetailScreen() {
                 style={{
                   borderRadius: radiusTokens.pill,
                   borderCurve: "continuous",
-                  backgroundColor: colorSemanticTokens.background.subtle,
+                  backgroundColor: colors.background.subtle,
                   paddingHorizontal: 14,
                   paddingVertical: 8,
                   opacity: isEnsuring ? 0.6 : 1,
@@ -273,7 +274,7 @@ export default function FriendDetailScreen() {
                   selectable
                   style={[
                     typographyScale.headingSm,
-                    { color: colorSemanticTokens.text.primary },
+                    { color: colors.text.primary },
                   ]}
                 >
                   {isEnsuring ? "Starting..." : "Add expense"}
@@ -286,7 +287,7 @@ export default function FriendDetailScreen() {
                 selectable
                 style={[
                   typographyScale.bodySm,
-                  { color: colorSemanticTokens.state.danger },
+                  { color: colors.state.danger },
                 ]}
               >
                 {addExpenseError}
@@ -300,7 +301,7 @@ export default function FriendDetailScreen() {
                 selectable
                 style={[
                   typographyScale.headingMd,
-                  { color: colorSemanticTokens.text.primary },
+                  { color: colors.text.primary },
                 ]}
               >
                 {bucket.monthLabel}
@@ -312,8 +313,8 @@ export default function FriendDetailScreen() {
                     borderRadius: radiusTokens.card,
                     borderCurve: "continuous",
                     borderWidth: 1,
-                    borderColor: colorSemanticTokens.border.subtle,
-                    backgroundColor: colorSemanticTokens.surface.card,
+                    borderColor: colors.border.subtle,
+                    backgroundColor: colors.surface.card,
                     padding: spacingTokens.md,
                     gap: 6,
                   }}
@@ -331,7 +332,7 @@ export default function FriendDetailScreen() {
                         selectable
                         style={[
                           typographyScale.headingMd,
-                          { color: colorSemanticTokens.text.primary },
+                          { color: colors.text.primary },
                         ]}
                       >
                         {item.description}
@@ -340,7 +341,7 @@ export default function FriendDetailScreen() {
                         selectable
                         style={[
                           typographyScale.bodySm,
-                          { color: colorSemanticTokens.text.secondary },
+                          { color: colors.text.secondary },
                         ]}
                       >
                         {item.groupEmoji ? `${item.groupEmoji} ` : ""}
@@ -359,7 +360,7 @@ export default function FriendDetailScreen() {
                             selectable
                             style={[
                               typographyScale.bodySm,
-                              { color: colorSemanticTokens.accent.primary },
+                              { color: colors.accent.primary },
                             ]}
                           >
                             Receipt attached · View
@@ -374,10 +375,10 @@ export default function FriendDetailScreen() {
                         {
                           color:
                             item.netCents > 0
-                              ? colorSemanticTokens.financial.positive
+                              ? colors.financial.positive
                               : item.netCents < 0
-                                ? colorSemanticTokens.financial.negative
-                                : colorSemanticTokens.text.secondary,
+                                ? colors.financial.negative
+                                : colors.text.secondary,
                         },
                       ]}
                     >
@@ -398,8 +399,8 @@ export default function FriendDetailScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.border.subtle,
-            backgroundColor: colorSemanticTokens.surface.card,
+            borderColor: colors.border.subtle,
+            backgroundColor: colors.surface.card,
             padding: spacingTokens.cardPadding,
             gap: spacingTokens.sm,
           }}
@@ -408,7 +409,7 @@ export default function FriendDetailScreen() {
             selectable
             style={[
               typographyScale.headingMd,
-              { color: colorSemanticTokens.text.primary },
+              { color: colors.text.primary },
             ]}
           >
             Friend unavailable
@@ -417,7 +418,7 @@ export default function FriendDetailScreen() {
             selectable
             style={[
               typographyScale.bodyMd,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             This friend is no longer available. Go back and pick another friend.

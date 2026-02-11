@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/design/primitives/button";
 import { FloatingAddExpenseCta } from "@/design/primitives/floating-add-expense-cta";
 import { ScreenContainer } from "@/design/primitives/screen-container";
-import { colorSemanticTokens } from "@/design/tokens/colors";
+import { useThemeColors } from "@/providers/theme-provider";
 import { radiusTokens } from "@/design/tokens/radius";
 import { spacingTokens } from "@/design/tokens/spacing";
 import { typographyScale } from "@/design/tokens/typography";
@@ -16,10 +16,12 @@ function AccountRow({
   label,
   subtitle,
   disabled = false,
+  colors,
 }: {
   label: string;
   subtitle?: string;
   disabled?: boolean;
+  colors: ReturnType<typeof useThemeColors>;
 }) {
   return (
     <View
@@ -27,8 +29,8 @@ function AccountRow({
         borderRadius: radiusTokens.card,
         borderCurve: "continuous",
         borderWidth: 1,
-        borderColor: colorSemanticTokens.border.subtle,
-        backgroundColor: colorSemanticTokens.surface.card,
+        borderColor: colors.border.subtle,
+        backgroundColor: colors.surface.card,
         paddingHorizontal: spacingTokens.md,
         paddingVertical: spacingTokens.sm,
         flexDirection: "row",
@@ -42,7 +44,7 @@ function AccountRow({
           selectable
           style={[
             typographyScale.headingMd,
-            { color: colorSemanticTokens.text.primary },
+            { color: colors.text.primary },
           ]}
         >
           {label}
@@ -52,7 +54,7 @@ function AccountRow({
             selectable
             style={[
               typographyScale.bodySm,
-              { color: colorSemanticTokens.text.secondary },
+              { color: colors.text.secondary },
             ]}
           >
             {subtitle}
@@ -63,7 +65,7 @@ function AccountRow({
         selectable
         style={[
           typographyScale.headingSm,
-          { color: colorSemanticTokens.text.tertiary },
+          { color: colors.text.tertiary },
         ]}
       >
         ›
@@ -73,6 +75,7 @@ function AccountRow({
 }
 
 export default function SettingsTabScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const { signOut, user } = useAuth();
   const { profile } = useProfile();
@@ -113,8 +116,8 @@ export default function SettingsTabScreen() {
             borderRadius: radiusTokens.card,
             borderCurve: "continuous",
             borderWidth: 1,
-            borderColor: colorSemanticTokens.border.subtle,
-            backgroundColor: colorSemanticTokens.surface.card,
+            borderColor: colors.border.subtle,
+            backgroundColor: colors.surface.card,
             padding: spacingTokens.cardPadding,
             flexDirection: "row",
             alignItems: "center",
@@ -127,7 +130,7 @@ export default function SettingsTabScreen() {
               height: 64,
               borderRadius: radiusTokens.pill,
               borderCurve: "continuous",
-              backgroundColor: colorSemanticTokens.accent.soft,
+              backgroundColor: colors.accent.soft,
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -136,7 +139,7 @@ export default function SettingsTabScreen() {
               selectable
               style={[
                 typographyScale.headingLg,
-                { color: colorSemanticTokens.accent.primary },
+                { color: colors.accent.primary },
               ]}
             >
               {displayName.trim().slice(0, 1).toUpperCase()}
@@ -147,7 +150,7 @@ export default function SettingsTabScreen() {
               selectable
               style={[
                 typographyScale.headingLg,
-                { color: colorSemanticTokens.text.primary },
+                { color: colors.text.primary },
               ]}
             >
               {displayName}
@@ -156,7 +159,7 @@ export default function SettingsTabScreen() {
               selectable
               style={[
                 typographyScale.bodyMd,
-                { color: colorSemanticTokens.text.secondary },
+                { color: colors.text.secondary },
               ]}
             >
               {email}
@@ -168,7 +171,7 @@ export default function SettingsTabScreen() {
                 selectable
                 style={[
                   typographyScale.headingSm,
-                  { color: colorSemanticTokens.accent.primary },
+                  { color: colors.accent.primary },
                 ]}
               >
                 Edit
@@ -183,6 +186,7 @@ export default function SettingsTabScreen() {
               <AccountRow
                 label="Profile"
                 subtitle="Username and account details"
+                colors={colors}
               />
             </Pressable>
           </Link>
@@ -192,6 +196,17 @@ export default function SettingsTabScreen() {
               <AccountRow
                 label="Notifications"
                 subtitle="Email updates and alerts"
+                colors={colors}
+              />
+            </Pressable>
+          </Link>
+
+          <Link href="/(app)/(tabs)/(settings)/appearance" asChild>
+            <Pressable>
+              <AccountRow
+                label="Appearance"
+                subtitle="System, light, or dark mode"
+                colors={colors}
               />
             </Pressable>
           </Link>
@@ -202,7 +217,7 @@ export default function SettingsTabScreen() {
             selectable
             style={[
               typographyScale.bodySm,
-              { color: colorSemanticTokens.state.danger },
+              { color: colors.state.danger },
             ]}
           >
             {signOutError}
